@@ -1,0 +1,485 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+\documentclass[12pt]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Input Commands and Packages
+\input{mevansTex}
+\input{abbrev}
+
+\newcommand{\tit}[1]{\begin{center}\textbf{\Huge{#1}}\end{center}\vspace{1ex}}
+\newcommand{\fig}[1]{\textbf{\large{Figure #1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document
+
+\begin{document}
+
+%%%%%%%%%%%%%%%% PDH
+\tit{Pound-Drever-Hall Error Signal}
+\fig{3.2}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{pdh.eps}
+\end{center}
+
+The Pound-Drever-Hall error signal for a \FPC.
+ The cavity parameters are similar to those of the LIGO 1 arm
+  cavities ($r_{IT} = 0.986$, $r_{ET} = 1$, and $\lambda_0 = 1064\nm$.)
+ The ``linear region'' in $S_{PDH}$  is centered at $\Delta = 0$ and
+  approximately $1\nm$ wide.
+ In this region a standard linear controller can be used to
+  hold the cavity on resonance.
+ The carrier power in the cavity,
+  $\abs{\Afo{IT_0}}^2$, is also shown for reference.
+
+\begin{equation}
+S_{PDH} \propto \abs{\Afo{IT_0}}^2 \fsin{2 \wn_0 \Delta}
+\end{equation}
+
+
+\newpage
+%%%%%%%%%%%%%%%% TVa
+\tit{Threshold Velocity: Naive Model}
+
+\fig{3.3}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{threshA.eps}
+\end{center}
+
+ Threshold velocity in a simple \la{} model.
+ A linear controller attempts to lock the cavity as
+  $\Delta = 0$ is approached with various initial velocities
+  $v_{init}$.
+ From left to right, the first is well below the threshold velocity,
+  the second just below, and the third well above.
+
+\newpage
+%%%%%%%%%%%%%%%% TVb
+\tit{Threshold Velocity: Slightly Less Naive Model}
+
+\fig{3.4}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{threshB.eps}
+\end{center}
+
+ Threshold velocity in a more realistic \la{} model.
+ Including realistic actuation limits significantly
+  reduces the threshold velocity of a linear controller.
+ The model parameters are taken from the LIGO 1 arm cavity:
+  the force limit is $10 \mN$
+  and the mass of the optic is $10.3 \kg$.
+
+\newpage
+%%%%%%%%%%%%%%%% ESL
+\tit{Error Signal Linearization}
+
+\fig{3.5}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{Slin.eps}
+\end{center}
+
+ $S_{Lin}$ is scaled by $P_{TRN}$ at $\Delta = 0$ such that
+  the slopes of $S_{Lin}$ and $S_{PDH}$ are equal near the
+  resonance point and
+  $\abs{\Afo{IT_0}}^2 = P_{TRN} / t_{ET}^2$ is shown for reference.
+ The broad linear region in $S_{Lin}$ makes it a superior
+  error signal for use with a linear controller,
+  especially during \la{}.
+
+\begin{equation}
+S_{PDH} \propto \abs{\Afo{IT_0}}^2 \fsin{2 \wn_0 \Delta}
+\end{equation}
+
+\begin{equation}
+S_{Lin} = \frac{S_{PDH}}{P_{TRN}}
+\end{equation}
+
+\begin{equation}
+S_{Lin} \propto \fsin{2 \wn_0 \Delta}
+\end{equation}
+
+\begin{equation}
+S_{Lin} \sim \Delta
+\end{equation}
+
+
+\newpage
+%%%%%%%%%%%%%%%% LA with ESL
+\tit{\LA{} with Error Signal Linearization: Simulated}
+
+\fig{3.6}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{threshC.eps}
+\end{center}
+
+ Threshold velocity with error signal linearization, simulated.
+ Figure (a) shows $\Delta$ and the force applied to the corresponding
+  \dof{} during a simulated \la{} event.
+ The power in the cavity ($\abs{\Afo{IT_0}}^2$, dash-dot),
+  demod signal ($S_{demod}$, solid),
+  and linearized error signal ($S_{Lin}$, dashed)
+  are shown in (b) for the same event.
+ Note that the threshold velocity of this controller is more than
+  10 times greater than that shown in figure 3.4 for
+  a controller without error signal linearization,
+  despite having identical actuation limitations.
+
+\newpage
+%%%%%%%%%%%%%%%% LA with ESL
+\tit{\LA{} with Error Signal Linearization: Experimental}
+
+\fig{3.7}
+
+\begin{center}
+$v_{init} \sim 1 \um/s$
+\end{center}
+\begin{center}
+\includegraphics[width=0.9\textwidth]{threshD.eps}
+\end{center}
+
+ This data was collected at the LIGO Hanford Observatory using one of the
+  $2 \km$ arm cavities.
+ This event, which has $v_{init} \sim 1 \um/\second$, is very near the
+  threshold velocity of the controller.
+ Note how $S_{Lin}$ continues to grow even after the
+  linear region in $S_{demod}$ has been crossed,
+  thereby allowing the controller to acquire lock when it would have
+  otherwise been lost.
+
+\newpage
+%%%%%%%%%%%%%%%% 1
+\tit{States 1 and 2}
+
+\input{state1.pstex_t}
+
+None of the \dsf{} are controlled.
+The cavities occasionally resonate as the mirrors move freely.
+This is the starting point for lock acquisition.
+
+\begin{equation*}
+\matrixBegin{c}
+ \slp \\
+ \sLp \\
+ \sLm \\
+ \slm \\
+\matrixEnd
+ =
+\matrixBegin{c}
+ 0 \\
+ 0 \\
+ 0 \\
+ 0 \\
+\matrixEnd
+\end{equation*}
+
+\vspace{0.5in}
+
+\input{state2.pstex_t}
+
+$\dlm$ and $\dlp$
+ are controlled such that the carrier is anti-resonant in the
+ power recycling cavity and zero at the ASY port.
+The recycling cavity length and the modulation frequency are
+ chosen such that the carrier anti-resonance is
+ coincident with a resonance for the first-order sidebands.
+
+The sideband power in the recycling cavity in this state,
+ and throughout the rest of the state progression,
+ is about 10 times the input sideband power.
+There is essentially no carrier power in the \ifo{} in this state.
+
+\begin{equation*}
+\matrixBegin{c}
+ \slp \\
+ \slm \\
+\matrixEnd
+ =
+\matrixBegin{cc}
+ G_{\lp, I_{ref}} & 0 \\
+ 0                & G_{\lm, Q_{ref}} \\
+\matrixEnd^{-1}
+\matrixBegin{c}
+ I_{ref} \\
+ Q_{ref} \\
+\matrixEnd
+\end{equation*}
+
+\begin{equation*}
+\matrixBegin{c}
+ \sLp \\
+ \sLm \\
+\matrixEnd
+ =
+\matrixBegin{c}
+ 0 \\
+ 0 \\
+\matrixEnd
+\end{equation*}
+
+\newpage
+%%%%%%%%%%%%%%%% 3
+\tit{State 3}
+
+\input{state3.pstex_t}
+
+State 3 is reached when state 2 holds and one of the two arm cavities
+ is controlled such that the carrier is resonant.
+Resonance in the arm cavity causes the carrier field
+ reflected from that arm to reverse its sign,
+ thereby making the ASY port bright for the carrier.
+
+\begin{equation*}
+\matrixBegin{c}
+ \slp \\
+ \sLp \\
+ \slm \\
+\matrixEnd
+ =
+\matrixBegin{ccc}
+ G_{\lp, I_{ref}} & G_{\Lp, I_{ref}} & 0 \\
+ 0                & G_{\Lp, Q_{asy}} & 0 \\
+ 0                & 0 & G_{\lm, Q_{ref}} \\
+\matrixEnd^{-1}
+\matrixBegin{c}
+ I_{ref} \\
+ Q_{asy} \\
+ Q_{ref} \\
+\matrixEnd
+\end{equation*}
+
+In this state $\sLm = \pm \sLp$ depending on which arm is locked.
+
+\newpage
+%%%%%%%%%%%%%%%% 4
+\tit{State 4}
+
+\input{state4.pstex_t}
+
+This is a transitory state that occurs when state 3 holds and
+ the as yet uncontrolled arm cavity is locked at carrier resonance.
+In this state the carrier is resonant in both arm cavities and the
+ recycling cavity.
+The resulting coupled
+ cavity allows the carrier power in the \ifo{} to increase
+ by roughly three orders of magnitude.
+
+At the onset of this state all of the \dsf{} are controlled and all of the
+ ``No Signal'' singularities have been removed from $\SM$.
+\begin{equation*}
+\matrixBegin{c}
+ \slp \\
+ \sLp \\
+ \sLm \\
+ \slm \\
+\matrixEnd
+ =
+\matrixBegin{cccc}
+ G_{\lp, I_{ref}} & G_{\Lp, I_{ref}} & G_{\Lm, I_{ref}} & 0 \\
+ G_{\lp, I_{pob}} & G_{\Lp, I_{pob}} & G_{\Lm, I_{pob}} & 0 \\
+ 0                & G_{\Lp, Q_{asy}} & G_{\Lm, Q_{asy}} & 0 \\
+ 0                & 0 & 0 & G_{\lm, Q_{ref}} \\
+\matrixEnd^{-1}
+\matrixBegin{c}
+ I_{ref} \\
+ I_{pob} \\
+ Q_{asy} \\
+ Q_{ref} \\
+\matrixEnd
+\end{equation*}
+
+As the carrier power in the recycling cavity builds,
+ and the reflected carrier power decreases,
+ control of $\dlm$ is switched to $Q_{pob}$ to avoid a
+ zero in the $Q_{ref}$ signal.
+\begin{equation*}
+\matrixBegin{c}
+ \slp \\
+ \sLp \\
+ \sLm \\
+ \slm \\
+\matrixEnd
+ =
+\matrixBegin{cccc}
+ G_{\lp, I_{ref}} & G_{\Lp, I_{ref}} & G_{\Lm, I_{ref}} & 0 \\
+ G_{\lp, I_{pob}} & G_{\Lp, I_{pob}} & G_{\Lm, I_{pob}} & 0 \\
+ 0                & G_{\Lp, Q_{asy}} & G_{\Lm, Q_{asy}} & 0 \\
+ 0                & 0 & 0 & G_{\lm, Q_{pob}} \\
+\matrixEnd^{-1}
+\matrixBegin{c}
+ I_{ref} \\
+ I_{pob} \\
+ Q_{asy} \\
+ Q_{pob} \\
+\matrixEnd
+\end{equation*}
+
+A ``Degenerate Signal'' singularity is encountered in the course of
+ the power buildup.
+As the singularity is approached,
+ control of $\dlp$ is relinquished,
+ but is regained once the singularity has
+ passed enroute to state 5.
+\begin{equation*}
+\matrixBegin{c}
+ \sLp \\
+ \sLm \\
+ \slm \\
+\matrixEnd
+ =
+\matrixBegin{ccc}
+ G_{\Lp, I_{ref}} & G_{\Lm, I_{ref}} & 0 \\
+ G_{\Lp, Q_{asy}} & G_{\Lm, Q_{asy}} & 0 \\
+ 0 & 0 & G_{\lm, Q_{ref}} \\
+\matrixEnd^{-1}
+\matrixBegin{c}
+ I_{ref} \\
+ Q_{asy} \\
+ Q_{ref} \\
+\matrixEnd
+\end{equation*}
+
+\begin{equation*}
+ \slp = 0
+\end{equation*}
+
+\newpage
+%%%%%%%%%%%%%%%% 5
+\tit{State 5}
+
+\input{state5.pstex_t}
+
+The final state of the \ifo, at least from the \la{} point of view,
+ is reached when state 4 has endured long enough for the power in
+ the \ifo{} to stabilize.
+This is the ending point for lock acquisition, though
+ the controllers used to achieve this state must be capable of
+ holding it long enough for the transition to a low-noise controller
+ to occur.
+
+\begin{equation*}
+\matrixBegin{c}
+ \slp \\
+ \sLp \\
+ \sLm \\
+ \slm \\
+\matrixEnd
+ =
+\matrixBegin{cccc}
+ G_{\lp, I_{ref}} & G_{\Lp, I_{ref}} & G_{\Lm, I_{ref}} & 0 \\
+ G_{\lp, I_{pob}} & G_{\Lp, I_{pob}} & G_{\Lm, I_{pob}} & 0 \\
+ 0                & G_{\Lp, Q_{asy}} & G_{\Lm, Q_{asy}} & 0 \\
+ 0                & 0 & 0 & G_{\lm, Q_{pob}} \\
+\matrixEnd^{-1}
+\matrixBegin{c}
+ I_{ref} \\
+ I_{pob} \\
+ Q_{asy} \\
+ Q_{pob} \\
+\matrixEnd
+\end{equation*}
+
+\newpage
+%%%%%%%%%%%%%%%% LA
+\tit{\LA}
+
+\fig{4.2}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{lockA.eps}
+\end{center}
+
+\vspace{0.5in}
+
+\fig{5.5}
+
+\begin{center}
+\includegraphics[width=0.9\textwidth]{lockB.eps}
+\end{center}
+
+\newpage
+%%%%%%%%%%%%%%%% LA
+\tit{Gain Coefficients}
+
+\begin{eqnarray}
+ G_{\Lp, I_{ref}} & = & g_{Aref}~ \Any{REF_1}~ A_{+}  \\
+ G_{\Lm, I_{ref}} & = & g_{Aref}~ \Any{REF_1}~ A_{-} \\
+ G_{\lp, I_{ref}}  & = & g_{Pref}~ \group{\Any{REF_0} - \Any{REF_2}}~
+  A_{PRM} \\
+ G_{\Lp, I_{pob}} & = & g_{Apob}~ \Any{POB_1}~ A_{+} \\
+ G_{\Lm, I_{pob}} & = & g_{Apob}~ \Any{POB_1}~ A_{-} \\
+ G_{\lp, I_{pob}}  & = & g_{Ppob}~ \Any{POB_0}~ A_{PRM} \\
+ G_{\Lp, Q_{asy}} & = & g_{Aasy}~ \Any{ASY_1}~ A_{-} \\
+ G_{\Lm, Q_{asy}} & = & g_{Aasy}~ \Any{ASY_1}~ A_{+} \\
+ G_{\lm, Q_{ref}} & = & g_{Mref}~ \group{\Any{REF_0} + \Any{REF_2}}~
+  A_{PRM} \\
+ G_{\lm, Q_{pob}} & = & g_{Mpob}~ \Any{POB_0}~ A_{PRM}
+\end{eqnarray}
+ where
+\begin{equation}
+\elabel{A_pm}
+A_{\pm} = \frac{\abs{\Afo{IT_0}}^2 \pm \abs{\Afo{IR_0}}^2}{\Afo{PR_0}},
+\end{equation}
+%
+\begin{equation}
+\elabel{A_PRM}
+A_{PRM} = \frac{\abs{\Afo{PR_1}}^2}{\Abi{PR_1}},
+\end{equation}
+%
+ and the various $g$s are constant gain coefficients.
+The contribution from the second-order sidebands has been
+ included only in the reflected signals since,
+ while carrier contribution dominates at other ports,
+ $\Any{REF_0}$ may go to zero,
+ making $\Any{REF_2}$ the dominant contributor to the reflected signal.
+Filling in zeros for the (relatively small)
+ elements of the sensing matrix not given above
+ yields the full sensing matrix,
+\begin{equation}
+\elabel{SM_PRIFO}
+\SM_{PR} =
+\matrixBegin{cccc}
+ G_{\Lp, I_{ref}} & G_{\Lm, I_{ref}} & G_{\lp, I_{ref}} & 0 \\
+ G_{\Lp, I_{pob}} & G_{\Lm, I_{pob}} & G_{\lp, I_{pob}} & 0 \\
+ G_{\Lp, Q_{asy}} & G_{\Lm, Q_{asy}} & 0 & 0 \\
+ 0 & 0 & 0 & G_{\lm, Q_{ref}} \\
+ 0 & 0 & 0 & G_{\lm, Q_{pob}}
+\matrixEnd.
+\end{equation}
+
+\newpage
+%%%%%%%%%%%%%%%% ND
+\tit{Normalized Determinant}
+
+In order to use the determinant of a matrix not just as an indicator
+ of arrival at a matrix singularity,
+ but as a measure of the proximity of a singularity,
+ it must be normailzed.
+The normailzed determinant given here is constructed such that
+ scaling of any given row or column does not change its value.
+
+For some set of indices $p_{m,n}$,
+ the determinant of a matrix $\mathbf{M}$ can be expressed
+\begin{equation}
+\abs{\mathbf{M}} = \sum_{n = 1}^N (-1)^n
+ \prod_{m = 1}^N \mathbf{M}_{m,p_{m, n}}.
+\end{equation}
+For the same $p_{m,n}$, the normalized determinant is
+\begin{equation}
+\widehat{\abs{\mathbf{M}}} = \frac
+{\sum_{n = 1}^N (-1)^n \prod_{m = 1}^N \mathbf{M}_{m,p_{m, n}}}
+{\sum_{n = 1}^N \abs{\prod_{m = 1}^N \mathbf{M}_{m,p_{m, n}}}}
+\end{equation}
+ such that
+\begin{equation}
+-1 \le {\widehat{\abs{\mathbf{M}}}} \le 1.
+\end{equation}
+
+\end{document}

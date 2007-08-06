@@ -1,0 +1,32 @@
+add RFmodulator
+  a sideband generator which matches frequency componenets
+  with frequency and amplitude noise inputs
+
+modify getXxxName function to support multiple numbers
+  with no number argument, return all names
+  with vector of numbers, return cell array of names
+
+write lock function
+  given a sensing matrix, an offset vector, an initial position, and a set of adjustable drives
+  return a position which has all zero error signals
+  allow error function instead of sensing matrix
+
+write sigAC reducer
+  given sensing matrix and drive matrix, return mSens * sigAC * mDrive
+
+support alignment signals
+  allow for basis specification at each optic (e.g., cavity basis)
+  make input basis specification user-friendly
+  improve addSource example (include basis contruction)
+
+clean up the BeamSplitter - reduce code duplication with Mirror
+  make BS contain a Mirror?
+
+write display functions for each to display type specific information
+
+make sources squeezable
+
+================================= Investigate
+check quantum noises
+
+=================================

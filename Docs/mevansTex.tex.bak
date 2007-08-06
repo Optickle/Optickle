@@ -1,0 +1,102 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages
+
+\usepackage{epsfig}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{color}
+\usepackage{array}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Labels and References
+
+\newcommand{\alabel}[1]{\label{app:#1}}
+\newcommand{\clabel}[1]{\label{cpt:#1}}
+\newcommand{\slabel}[1]{\label{sec:#1}}
+\newcommand{\elabel}[1]{\label{eqn:#1}}
+\newcommand{\flabel}[1]{\label{fig:#1}}
+\newcommand{\tlabel}[1]{\label{tab:#1}}
+
+\newcommand{\aref}[1]{\ref{app:#1}}
+\newcommand{\cref}[1]{\ref{cpt:#1}}
+\newcommand{\sref}[1]{\ref{sec:#1}}
+\newcommand{\eref}[1]{(ref{eqn:#1}}
+\newcommand{\fref}[1]{\ref{fig:#1}}
+\newcommand{\tref}[1]{\ref{tab:#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Structures
+
+% List
+\newcommand{\listBegin}{\begin{tabular}{cp{4.5in}}}
+\newcommand{\listEnd}{\end{tabular}}
+\newcommand{\listItem}{\ensuremath{\bullet}&}
+
+% Matrix
+\newcommand{\matrixBegin}[1]{\left[\!\!\left[ \begin{array}{#1}}
+\newcommand{\matrixEnd}{\end{array} \right]\!\!\right]}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Misc
+\newcommand{\vecv}[1]{\vec{v}_{#1}}
+\newcommand{\matm}[1]{\mathbf{M}_{#1}}
+\newcommand{\matI}{\mathbb{I}}
+
+\newcommand{\abs}[1]{\left| #1 \right|}
+\newcommand{\group}[1]{\left[ #1 \right]}
+\newcommand{\set}[1]{\left\{ #1 \right\}}
+
+\newcommand{\fun}[2]{\,{#1}\!\left( {#2} \right)}
+\newcommand{\funt}[1]{\fun{#1}{t}}
+\newcommand{\tfun}[2]{\fun{\textrm{#1}}{#2}}
+\newcommand{\tfunt}[1]{\funt{\textrm{#1}}}
+
+\newcommand{\fsin}[1]{\tfun{sin}{#1}}
+\newcommand{\fcos}[1]{\tfun{cos}{#1}}
+\newcommand{\imag}[1]{\fun{\mathcal{I}m}{#1}}
+\newcommand{\real}[1]{\fun{\mathcal{R}e}{#1}}
+
+\newcommand{\deriv}[2]{\frac{d{#1}}{d{#2}}}
+\newcommand{\partderiv}[2]{\frac{\partial{#1}}{\partial{#2}}}
+
+\newcommand{\E}[2]{#1 \times 10^{#2}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Units
+\newcommand{\unit}[1]{\,\mbox{#1}}
+
+\newcommand{\second}{\unit{s}}
+\newcommand{\ms}{\unit{ms}}
+\newcommand{\us}{\unit{$\mu$s}}
+
+\newcommand{\Hz}{\unit{Hz}}
+\newcommand{\kHz}{\unit{kHz}}
+\newcommand{\MHz}{\unit{MHz}}
+
+\newcommand{\meter}{\unit{m}}
+\newcommand{\mm}{\unit{mm}}
+\newcommand{\um}{\unit{$\mu$m}}
+\newcommand{\nm}{\unit{nm}}
+\newcommand{\km}{\unit{km}}
+
+\newcommand{\gram}{\unit{g}}
+\newcommand{\kg}{\unit{kg}}
+
+\newcommand{\Newton}{\unit{N}}
+\newcommand{\mN}{\unit{mN}}
+
+\newcommand{\degree}{^\circ}
+\newcommand{\radian}{\unit{rad}}
+
+\newcommand{\Volt}{\unit{V}}
+\newcommand{\kV}{\unit{kV}}
+
+\newcommand{\Watt}{\unit{W}}
+\newcommand{\mW}{\unit{mW}}
+
+\newcommand{\Amp}{\unit{A}}
+\newcommand{\mA}{\unit{mA}}
+
+\newcommand{\dB}{\unit{dB}}
+
+\newcommand{\lps}{\unit{$\lambda/\mbox{s}$}}
