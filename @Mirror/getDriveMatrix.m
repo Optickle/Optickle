@@ -6,7 +6,7 @@
 function mDrv = getDriveMatrix(obj, pos, par, mOpt, d)
   
   % check for optional arguments
-  if nargin < 4
+  if nargin < 5
     [mOpt, d] = getFieldMatrix(obj, pos, par);
   end
   

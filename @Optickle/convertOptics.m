@@ -91,8 +91,7 @@ function [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
       
       % accumulate noises (removing ones that are zero)
       mQ1 = mOut * sparse(mQuant_n);
-      isNonZero = sum(mQ1, 1) ~= 0;
+      isNonZero = full(any(mQ1, 1));
       mQuant = [mQuant, mQ1(:, isNonZero)];  %#ok<AGROW>
-      %mQuant = [mQuant, mQ1];  %#ok<AGROW>
     end
   end

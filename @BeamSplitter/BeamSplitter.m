@@ -38,7 +38,7 @@
 function obj = BeamSplitter(varargin)
 
   obj = struct('aoi', [], 'Chr', [], 'Thr', [], 'Lhr', [], ...
-    'Rar', [], 'Lmd', [], 'Nmd', [], 'pos', 0, 'mechTF', []);
+    'Rar', [], 'Lmd', [], 'Nmd', []);
 
   obj = class(obj, 'BeamSplitter', Optic);
 

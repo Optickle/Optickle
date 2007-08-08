@@ -6,17 +6,17 @@
 function [mOpt, d] = getFieldMatrix(obj, pos, par)
   
   % constants
-  Nin = 2;							% obj.Optic.Nin
-  Nout = 4;							% obj.Optic.Nout
+  Nin = 2;				% obj.Optic.Nin
+  Nout = 4;				% obj.Optic.Nout
   pos = pos + obj.Optic.pos;		% mirror position, with offset
   
   % ==== Compute Coupling Matrix
   % amplitude reflectivities, transmissivities and phases
-  hr = -sqrt(1 - obj.Thr - obj.Lhr);		% HR refl
-  ht =  sqrt(obj.Thr);						% HR trans
-  ar = -sqrt(obj.Rar);						% AR refl
-  at =  sqrt(1 - obj.Rar);					% AR trans
-  bt =  sqrt(1 - obj.Lmd);					% bulk trans
+  hr = -sqrt(1 - obj.Thr - obj.Lhr);	% HR refl
+  ht =  sqrt(obj.Thr);			% HR trans
+  ar = -sqrt(obj.Rar);			% AR refl
+  at =  sqrt(1 - obj.Rar);		% AR trans
+  bt =  sqrt(1 - obj.Lmd);		% bulk trans
 
   % transmission combinations
   hrbt = -hr * bt;

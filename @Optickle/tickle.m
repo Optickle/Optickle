@@ -22,7 +22,8 @@
 % opt = optFP;
 % [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
 
-function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = tickle(opt, pos, f)
+function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
+  tickle(opt, pos, f)
 
   % === Argument Handling
   if nargin < 2
@@ -37,14 +38,14 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = tickle(opt, p
   LIGHT_SPEED = opt.c;
   
   % ==== Sizes of Things
-  Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;				% number of links
-  Nprb = opt.Nprobe;			% number of probes
-  Nrf  = length(vFrf);			% number of RF components
-  Naf  = length(f);				% number of audio frequencies
-  Nfld = Nlnk * Nrf;            % number of RF fields
-  Narf = 2 * Nfld;				% number of audio fields
-  Ndof = Narf + Ndrv;			% number of degrees-of-freedom
+  Ndrv = opt.Ndrive;		% number of drives (internal DOFs)
+  Nlnk = opt.Nlink;		% number of links
+  Nprb = opt.Nprobe;		% number of probes
+  Nrf  = length(vFrf);		% number of RF components
+  Naf  = length(f);		% number of audio frequencies
+  Nfld = Nlnk * Nrf;		% number of RF fields
+  Narf = 2 * Nfld;		% number of audio fields
+  Ndof = Narf + Ndrv;		% number of degrees-of-freedom
   
   % decide which calculation is necessary
   isAC = ~isempty(f) && nargout > 2;
@@ -54,7 +55,8 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = tickle(opt, p
   memReq = (20 * Nprb *  Ndrv *  Naf) / 1e6;
   if memReq > 200
     qstr = sprintf('This will require about %.0f Mb of memory.', memReq);
-    rstr = questdlg([qstr ' Continue?'], 'ComputeFields', 'Yes', 'No', 'No');
+    rstr = questdlg([qstr ' Continue?'], 'ComputeFields', ...
+      'Yes', 'No', 'No');
     if strcmp(rstr, 'No')
       error('Too much memory required.  Exiting.');
     end
@@ -90,8 +92,8 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = tickle(opt, p
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % compute DC fields
-  eyeNfld = speye(Nfld);						% a sparse identity matrix
-  mPhi = getPhaseMatrix(vLen, vFrf);			% propagation phase matrix
+  eyeNfld = speye(Nfld);			% a sparse identity matrix
+  mPhi = getPhaseMatrix(vLen, vFrf);		% propagation phase matrix
   vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
 
   % compile system wide probe matrix and probe shot noise vector
@@ -204,6 +206,9 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = tickle(opt, p
       % incoherent sum of amplitude and phase noise
       noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
       noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+      
+      % HACK: noise probe
+      %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
     end
     
     % ==== Timing and User Interaction
@@ -232,8 +237,8 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = tickle(opt, p
       else
         try
           strWB = [str ' (close this window to stop)'];
-          findobj(hWaitBar);				% error if wait bar is closed
-          waitbar(frac, hWaitBar, strWB);		% update wait string
+          findobj(hWaitBar);			% error if wait bar closed
+          waitbar(frac, hWaitBar, strWB);	% update wait string
           tLast = tNow;
         catch
           error('Wait bar closed by user.  Exiting.')
