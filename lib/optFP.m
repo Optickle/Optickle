@@ -3,7 +3,7 @@
 function opt = optFP
 
   % RF component vector
-  vMod = (-4:4)';
+  vMod = (-1:1)';
   fMod = 20e6;
   vFrf = fMod * vMod;
   gamma = 0.2;
@@ -28,8 +28,8 @@ function opt = optFP
   opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
 
   % add mirrors
-  opt = addMirror(opt, 'IX', 0, 0, 0.0000001);
-  opt = addMirror(opt, 'EX', 0, 0, 0.9999999);
+  opt = addMirror(opt, 'IX', 0, 0, 0.01);
+  opt = addMirror(opt, 'EX', 0, 0, 0.01);
 
   opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 2);
   opt = addLink(opt, 'IX', 'fr', 'EX', 'fr', lCav);
@@ -41,8 +41,6 @@ function opt = optFP
   opt = setMechTF(opt, 'IX', zpk([], -w * [0.1 + 1i, 0.1 - 1i], 1 / m));
   opt = setMechTF(opt, 'EX', zpk([], -w * [0.1 + 1i, 0.1 - 1i], 1 / m));
 
-  opt = setPosOffset(opt, 'EX', 1e-9);
-  
   % add detectors
   opt = addSink(opt, 'REFL');
   opt = addSink(opt, 'TRANS');
@@ -50,9 +48,9 @@ function opt = optFP
   opt = addLink(opt, 'IX', 'bk', 'REFL', 'in', 2);
   opt = addLink(opt, 'EX', 'bk', 'TRANS', 'in', 5);
 
-  % add probes (At used instead of In for backward compatability)
-  phi = 30.728;
-  opt = addProbeAt(opt, 'REFL_DC', 'REFL', 'in', 0, 0);		% DC
-  opt = addProbeAt(opt, 'REFL_I', 'REFL', 'in', fMod, 0 + phi);	% 1f demod
-  opt = addProbeAt(opt, 'REFL_Q', 'REFL', 'in', fMod, 90 + phi);% 1f demod
-  opt = addProbeAt(opt, 'TRANS_DC', 'TRANS', 'in', 0, 0);	% DC
+  % add probes
+  phi = -83.721 * 0;
+  opt = addProbeIn(opt, 'REFL_DC', 'REFL', 'in', 0, 0);		% DC
+  opt = addProbeIn(opt, 'REFL_I', 'REFL', 'in', fMod, 0 + phi);	% 1f demod
+  opt = addProbeIn(opt, 'REFL_Q', 'REFL', 'in', fMod, 90 + phi);% 1f demod
+  opt = addProbeIn(opt, 'TRANS_DC', 'TRANS', 'in', 0, 0);	% DC

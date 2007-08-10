@@ -6,6 +6,8 @@
 %
 % fDC - DC fields at each position (Nlink x Nrf x Npos)
 % sigDC - DC signals for each probe (Nprobe x Npos)
+%
+% see also sweepLinear
 
 function [fDC, sigDC] = sweep(opt, pos)
 

@@ -13,10 +13,10 @@ function [mOpt, d] = getFieldMatrix(obj, pos, par)
   % ==== Compute Coupling Matrix
   % amplitude reflectivities, transmissivities and phases
   hr = -sqrt(1 - obj.Thr - obj.Lhr);		% HR refl
-  ht =  sqrt(obj.Thr);						% HR trans
-  ar = -sqrt(obj.Rar);						% AR refl
-  at =  sqrt(1 - obj.Rar);					% AR trans
-  bt =  sqrt(1 - obj.Lmd);					% bulk trans
+  ht =  sqrt(obj.Thr);				% HR trans
+  ar = -sqrt(obj.Rar);				% AR refl
+  at =  sqrt(1 - obj.Rar);			% AR trans
+  bt =  sqrt(1 - obj.Lmd);			% bulk trans
 
   % transmission combinations
   hrbt = -hr * bt;
@@ -53,7 +53,7 @@ function [mOpt, d] = getFieldMatrix(obj, pos, par)
   mOpt = sparse(par.Nrf * Nout, par.Nrf * Nin);
   for n = 1:par.Nrf
     % reflection phase due to mirror position
-    rp = exp(-i * par.k(n) * pos * d);
+    rp = exp(i * par.k(n) * pos * d);
 
     % enter this submatrix into mOpt
     nn = (1:Nout) + Nout * (n - 1);

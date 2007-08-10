@@ -37,13 +37,15 @@ function [vLen, prbList, mapList] = convertLinks(opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % probe list
-  prbElem = struct('mPrb', sparse(Nrf, Nrf), 'mIn', sparse(Nrf, Nfld));
+  prbElem = struct('mIn', sparse(Nrf, Nfld), ...
+    'mPrb', sparse(Nrf, Nrf), 'mPrbQ', sparse(Nrf, Nrf));
   prbList = repmat(prbElem, Nprb, 1);
   
   % loop over probes
   for k = 1:Nprb
     prb = opt.probe(k);
     phi = exp(i * pi * prb.phase / 180);
+    phi_quad = exp(i * pi * (prb.phase + 90) / 180);
 
     % loop over RF components
     for n = 1:Nrf
@@ -61,8 +63,10 @@ function [vLen, prbList, mapList] = convertLinks(opt)
           prbList(k).mPrb(m, n) = 2;
         elseif df_p < 1e-3
           prbList(k).mPrb(m, n) = phi;
+          prbList(k).mPrbQ(m, n) = phi_quad;
         elseif df_m < 1e-3
           prbList(k).mPrb(m, n) = conj(phi);
+          prbList(k).mPrbQ(m, n) = conj(phi_quad);
         elseif df_p < 1 || df_m < 1
           warning(['Demodulation frequency near-miss for probe %d ' ... 
             'with RF components %d and %d.'], k, n, m)
@@ -78,7 +82,10 @@ function [vLen, prbList, mapList] = convertLinks(opt)
   % mDOF: optic interal DOFs to all DOFs          Ndrv x obj.Ndrv
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+  if nargout < 3
+    return
+  end
+  
   % system matrices
   mapElem = struct('mIn', [], 'mOut', [], 'mDOF', []);
   mapList = repmat(mapElem, Nopt, 1);
