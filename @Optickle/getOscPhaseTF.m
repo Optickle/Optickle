@@ -6,6 +6,7 @@
 %
 % %% Example:
 % opt = optFP;
+% f = logspace(-1, 4, 100);
 % [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
 % [mOscPhase, nMod] = getOscPhaseTF(opt, fDC, sigAC);
 % m = [getTF(sigAC, 2:3, nMod), getTF(mOscPhase, 2:3, 1)];

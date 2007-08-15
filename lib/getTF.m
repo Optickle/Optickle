@@ -9,6 +9,9 @@
 %
 %  mTF is Naf x N collection of audio-frequency response vectors
 %
+% NOTE: To perform more complicated operations on transfer
+%       matrices, see LTI object FRD ("help frd").
+%
 % %% Example, from input 5 to outputs 1, 2 and 3:
 % mTF = getTF(sigAC, 1:3, 5);
 %
@@ -30,12 +33,18 @@ function mTF = getTF(sigAC, nm, m)
     if length(nm) ~= numel(nm)
       error('Third argument with non-vector first argument... what to do?');
     end
+    
+    % vectorize
+    m = m(:);
+    nm = nm(:);
+    
+    % deal with scalars
     if length(m) == length(nm)
-      nm = [nm(:), m(:)];
+      nm = [nm, m];
     elseif length(m) == 1
-      nm = [nm(:), m * ones(size(nm(:)))];
+      nm = [nm, m * ones(size(nm))];
     else
-      nm = [nm * ones(size(nm(:))), m(:)];
+      nm = [nm * ones(size(m)), m];
     end
   end
 

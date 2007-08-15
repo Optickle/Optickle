@@ -1,6 +1,7 @@
-% Get the name of a probe
-%
 % name = getProbeName(opt, sn)
+%
+% Get the name of a probe
+%   sn may be a single serial number, a vector, or a cell array
 
 function name = getProbeName(opt, varargin)
 
@@ -15,7 +16,7 @@ function name = getProbeName(opt, varargin)
     sn = getProbeNum(opt, sn);
     name = opt.probe(sn).name;
   elseif iscell(sn)
-    % an cell array of numbers (or names, but why would anyone do that?)
+    % a cell array of numbers (or names, but why would anyone do that?)
     N = length(sn);
     name = cell(N, 1);
     for n = 1:N

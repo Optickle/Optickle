@@ -7,4 +7,4 @@ function obj = setPosOffset(obj, pos)
     error('%s: drive positions not equal to number of drives (%d ~= %d)', ...
       obj.name, length(pos), obj.Ndrive);
   end
-  obj.pos = pos;
+  obj.pos = pos(:);

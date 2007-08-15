@@ -5,9 +5,6 @@
 
 function opt = setDriveOffset(opt, nDrv, dx)
   
-  dm = getDriveMap(opt);
-  nOpt = dm(nDrv, 1);
-  pos = getPosOffset(opt, nOpt);
-  pos(dm(nDrv, 2)) = dx;
-  opt = setPosOffset(opt, nOpt, pos);
-  
+  pos = getPosOffset(opt);        % get all pos offsets
+  pos(nDrv) = dx;                 % change some of them
+  opt = setPosOffset(opt, pos);   % set all pos offsets

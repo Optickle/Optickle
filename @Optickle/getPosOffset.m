@@ -3,7 +3,32 @@
 % pos = getPosOffset(opt, name)
 % name - name or serial number of an optic
 
-function pos = getPosOffset(opt, name)
+function pos = getPosOffset(opt, varargin)
 
-  sn = getSerialNum(opt, name);
-  pos = getPosOffset(opt.optic{sn});
+  if isempty(varargin)
+    sn = 1:opt.Noptic;
+  else
+    sn = varargin{1};
+  end
+
+  if ischar(sn) || length(sn) == 1
+    % a single number or name
+    sn = getSerialNum(opt, sn);
+    pos = getPosOffset(opt.optic{sn});
+  elseif iscell(sn)
+    % a cell array of numbers
+    N = length(sn);
+    pos = [];
+    for n = 1:N
+      snn = getSerialNum(opt, sn{n});
+      pos = [pos; getPosOffset(opt.optic{snn})];
+    end
+  else
+    % a vector of numbers
+    N = length(sn);
+    pos = [];
+    for n = 1:N
+      snn = getSerialNum(opt, sn(n));
+      pos = [pos; getPosOffset(opt.optic{snn})];
+    end
+  end

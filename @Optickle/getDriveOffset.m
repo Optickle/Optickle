@@ -5,7 +5,5 @@
 
 function dx = getDriveOffset(opt, nDrv)
   
-  dm = getDriveMap(opt);
-  nOpt = dm(nDrv, 1);
-  pos = getPosOffset(opt, nOpt);
-  dx = pos(dm(nDrv, 2));
+  pos = getPosOffset(opt);        % get all pos offsets
+  dx = pos(nDrv);                 % select some of them

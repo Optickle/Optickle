@@ -21,9 +21,38 @@
 % f = logspace(0, 3, 300);
 % opt = optFP;
 % [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
+%
+% %%%%%%%%%%%%%%%%%%%% With control struct
+% [fDC, sigDC, sOpt, noiseOut] = tickle(opt, pos, sCon)
+%
+% An alternate means of using tickle is to pass a control struct
+% as the third argument.  This control struct describes a controller
+% which takes the outputs of the Optickle model (probe signals) and 
+% precesses them to produce inputs to the model (drive signals).  See
+% convertSimulink for more details.
+%
+% The control struct must contain the following fields:
+%  f - frequency vector (suplied by user)
+%  Nin - control system inputs
+%  Nout - control system outputs
+%  mCon - control matrix for each frequency Nin x Nout x Naf
+%  mPrbIn - probe output to control system input map (Nin x Nprobe)
+%  mDrvIn - drive output to control system input map (Nin x Ndrive)
+%  mPrbOut - control system output to probe input map (Nprobe x  Nout)
+%  mDrvOut - control system output to drive input map (Ndrive x  Nout)
+%
+% The results are the usual fDC and sigDC, along with an Optickle
+% system struct which contains the following fields:
+%  mPlant - transfer from control outputs to control inputs
+%           this is taken from sigAC and mMech
+%  mOpenLoop - open loop tranfer at control outputs
+%              mOpenLoop = sCon.mCon * mPlant
+%  mCloseLoop - close loop transfer at control outputs
+%               mCloseLoop = inv(eye(mCon.Nout) - mOpenLoop)
+%  mInOut - transfer from control inputs to control outputs with loops
+%           mInOut = mCloseLoop * sCon.mCon;
 
-function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
-  tickle(opt, pos, f)
+function [fDC, sigDC, varargout] = tickle(opt, pos, f)
 
   % === Argument Handling
   if nargin < 2
@@ -33,6 +62,13 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
     f = [];
   end
 
+  % third argument is actually control struct (see convertSimulink)
+  isCon = isstruct(f);
+  if isCon
+    sCon = f;
+    f = sCon.f;
+  end
+  
   % === Field Info
   [vFrf, vSrc] = getSourceInfo(opt);
   LIGHT_SPEED = opt.c;
@@ -49,7 +85,7 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
   
   % decide which calculation is necessary
   isAC = ~isempty(f) && nargout > 2;
-  isNoise = isAC && nargout > 4;
+  isNoise = isAC && (nargout > 4 || (isCon && nargout > 3));
   
   % check the memory requirements
   memReq = (20 * Nprb *  Ndrv *  Naf) / 1e6;
@@ -98,6 +134,7 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
 
   % compile system wide probe matrix and probe shot noise vector
   mPrb = sparse(Nprb, Narf);
+  mPrbQ = sparse(Nprb, Nfld);
   shotPrb = zeros(Nprb, 1);
   for k = 1:Nprb
     mIn_k = prbList(k).mIn;
@@ -107,15 +144,20 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
     mPrb(k, 1:Nfld) = (mPrb_k * conj(vDCin)).' * mIn_k;
     mPrb(k, (1:Nfld) + Nfld) = (mPrb_k.' * vDCin).' * mIn_k;
     
+    % quad phase signals, for oscillator phase noise
+    mPrbQ_k = prbList(k).mPrbQ;
+    mPrbQ(k, :) = (mPrbQ_k * conj(vDCin)).' * mIn_k;
+
     % shot noise
     if isNoise
       shotPrb(k) = pQuant * (2 - sum(abs(mPrb_k), 1)) * abs(vDCin).^2;
     end
   end
-
+  
   %%%%% compute DC outputs
   % sigDC is already real, but use "real" to remove numerical junk
   sigDC = real(mPrb(:, 1:Nfld) * vDC) / 2;
+  sigQ = real(mPrbQ * vDC) / 2;
   fDC = reshape(vDC, Nlnk, Nrf);		% DC fields for output
 
   % if AC is not needed, just end here
@@ -154,14 +196,32 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
   mOOz = sparse(Ndrv, Ndrv);
   mQOz = sparse(Ndrv, Nnoise);
   eyeNdof = speye(Ndof);
-  mExc = eyeNdof(:, jDrv);
 
   % intialize result space
-  sigAC = zeros(Nprb, Ndrv, Naf);
-  mMech = zeros(Ndrv, Ndrv, Naf);
+  if ~isCon
+    % full results: all probes, all drives
+    mExc = eyeNdof(:, jDrv);
+    sigAC = zeros(Nprb, Ndrv, Naf);
+    mMech = zeros(Ndrv, Ndrv, Naf);
+    noiseAC = zeros(Nprb, Naf);
+    noiseMech = zeros(Ndrv, Naf);
+  else
+    % reduced results for control struct
+    mExc = eyeNdof(:, jDrv) * sCon.mDrvOut;
 
-  noiseAC = zeros(Nprb, Naf);
-  noiseMech = zeros(Ndrv, Naf);
+    sOpt.mInOut = zeros(sCon.Nout, sCon.Nin, Naf);
+    sOpt.mPlant = zeros(sCon.Nin, sCon.Nout, Naf);
+    sOpt.mOpenLoop = zeros(sCon.Nout, sCon.Nout, Naf);
+    sOpt.mCloseLoop = zeros(sCon.Nout, sCon.Nout, Naf);
+    
+    eyeNout = eye(sCon.Nout);
+    mPrbPrb = sCon.mPrbIn * sparse(diag(sigQ)) * sCon.mPrbOut;
+
+    if isNoise
+      noiseOut = zeros(sCon.Nout, Naf);
+      shotPrbAmp = sqrt(shotPrb);
+    end
+  end
   
   % since this can take a while, let's time it
   tic;
@@ -193,9 +253,28 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
     tfAC = (eyeNdof - mDof) \ mExc;
 
     % extract optic to probe transfer functions
-    sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
-    mMech(:, :, nAF) = tfAC(jDrv, :);
-
+    if ~isCon
+      % no control struct, return TFs to all probes and drives
+      sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
+      mMech(:, :, nAF) = tfAC(jDrv, :);
+    else
+      % reduce probes and drives to those required by control struct
+      mPlant = sCon.mPrbIn * mPrb * tfAC(jAsb, :) + ...
+	sCon.mDrvIn * tfAC(jDrv, :) + mPrbPrb;
+      
+      % compute closed loop response of outputs
+      mCon = sCon.mCon(:, :, nAF);
+      mOL = mCon * mPlant;
+      mCL = inv(eyeNout - mOL);
+      mInOut = mCL * mCon;
+      
+      % store into the sOpt struct
+      sOpt.mInOut(:, :, nAF) = mInOut;
+      sOpt.mPlant(:, :, nAF) = mPlant;
+      sOpt.mOpenLoop(:, :, nAF) = mOL;
+      sOpt.mCloseLoop(:, :, nAF) = mCL;
+    end
+    
     if isNoise
       %%%% With Quantum Noise
       mQinj = [mPhim * mQuant; conj(mPhip * mQuant); mQOz];
@@ -204,8 +283,17 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
       noiseDrv = mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise
-      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
-      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+      if ~isCon
+	noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+	noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+      else
+	% transfer noise to outputs
+	noiseAmp = mInOut * (sCon.mPrbIn * noisePrb + ...
+	  sCon.mDrvIn * noiseDrv);
+	noisePrbAmp = mInOut * sCon.mPrbIn * shotPrbAmp;
+	noiseOut(:, nAF) = sqrt(sum(abs(noiseAmp).^2, 2) + ...
+	  abs(noisePrbAmp).^2);
+      end
       
       % HACK: noise probe
       %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
@@ -259,3 +347,18 @@ function [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech, shotPrb] = ...
 
   % make sure that the wait bar is closed
   drawnow
+
+  % build outputs
+  if ~isCon
+    varargout{1} = sigAC;
+    varargout{2} = mMech;
+    if isNoise
+      varargout{3} = noiseAC;
+      varargout{4} = noiseMech;
+    end
+  else
+    varargout{1} = sOpt;
+    if isNoise
+      varargout{2} = noiseOut;
+    end
+  end    
