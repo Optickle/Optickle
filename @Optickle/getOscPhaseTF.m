@@ -1,4 +1,4 @@
-% [mOscPhase, nMod] = getOscPhaseTF(opt, fDC, sigAC)
+% [mOscPhase, nDrive] = getOscPhaseTF(opt, fDC, sigAC)
 %
 % Returns an oscillator phase noise matrix from all RFmodulators
 % to all probes with matching demodulation frequencies.  The
@@ -13,7 +13,7 @@
 % loglog(f, abs(m))
 % legend('I - optical', 'Q - optical', 'I - total', 'Q - total')
 
-function [mOscPhase, nMod] = getOscPhaseTF(opt, fDC, sigAC)
+function [mOscPhase, nDrive] = getOscPhaseTF(opt, fDC, sigAC)
 
   % tickle like environment
   vDC = fDC(:);
@@ -56,7 +56,7 @@ function [mOscPhase, nMod] = getOscPhaseTF(opt, fDC, sigAC)
     obj = opt.optic{nMod(n)};
     if isa(obj, 'RFmodulator')
       fMod = obj.fMod;
-      nMod = getDriveIndex(opt, nMod(n), 'phase');
+      nDrive(n) = getDriveIndex(opt, nMod(n), 'phase');
       
       % loop through probes, looking for frequency matches
       for m = 1:Nprb
@@ -64,7 +64,7 @@ function [mOscPhase, nMod] = getOscPhaseTF(opt, fDC, sigAC)
 	df = abs(prb.freq - fMod) / fMod;
 	if df < 1e-3
 	  % found match
-	  mOscPhase(m, n, :) = sigAC(m, nMod(n), :) + sigQ(m);
+	  mOscPhase(m, n, :) = sigAC(m, nDrive(n), :) + sigQ(m);
 	end
       end
     end
