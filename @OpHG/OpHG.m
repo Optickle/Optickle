@@ -28,6 +28,9 @@ function op = OpHG(varargin)
     arg = varargin{1};
     if( isa(arg, 'OpHG') )			% copy constructor
       op = arg;
+    elseif isnan(arg)
+      op.x = NaN;
+      op.y = NaN;
     elseif all(size(arg) == [2, 2])  & isa(arg, 'double')
       op.x = arg;				% basis specified
       op.y = arg;				%   with op.x == op.y

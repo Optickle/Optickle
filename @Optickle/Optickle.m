@@ -35,20 +35,21 @@
 % Types of optics are listed below:
 %   Source - a field source (0 inputs, 1 output)
 %   Sink - a field sink, used for detectors (1 inputs, 0 output)
+%
 %   Modulator - audio frequency phase and amplitude modulation (1 in, 1 out)
+%   RFModulator - RF frequency phase and amplitude modulation (1 in, 1 out)
 %
 %   Mirror - a general curved mirror (2 inputs, 4 outputs)
 %   BeamSplitter - a beam-splitter (4 inputs, 8 outputs)
 %
-%   Lens - a thin lens, used for basis transforms (1 input, 1 output)
-%   Telescope - a hypothetical pair of lenses (1 input, 1 output)
+%   Telescope - a lense or set of lenses (1 input, 1 output)
 %
 % ======== Links
 % Links are connections between optics.
 % 
 % sn = serial number of this link
-% snParent, nParent = serial number and input number of parent
-% snSource, nSource = serial number and port number of source link
+% snSource, portSource = serial number and port number of source optic
+% snSink, portSink = serial number and port number of sink (destination)
 % len - the length of the link
 %
 % ======== Probes

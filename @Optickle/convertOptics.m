@@ -1,7 +1,7 @@
 % [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
+%
 % Convert Optics to Matrices
 %   mapList is from convertLinks
-%
 
 function [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
 
@@ -42,6 +42,9 @@ function [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
   %   mOpt: optical transfer matrix      Nfld x Nfld
   %   rctList(n).m: reaction matrix      Ndrv x Nfld (list of Naf)
   %   drvList(n).m: drive matrix         Nfld x Nfld (list of Ndrv)
+  %
+  % NOTE: changes here must be made also in sweep, which contains
+  % an optimized version of the following code.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % parameters for construction

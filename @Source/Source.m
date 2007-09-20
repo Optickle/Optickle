@@ -7,7 +7,7 @@
 % specified by the Rayleigh Range (z0) of the beam, and the distance
 % past the beam waist (z, positive for a waist behind the source).
 %
-% obj = Source(name, vArf, z0, z)
+% obj = Source(name, vArf, z, z0)
 %
 % A source has no inputs, 1 output, and 2 drives
 % Output: 1, out, fr
@@ -40,25 +40,22 @@ function obj = Source(varargin)
     case 2
       % ==== name, vArf
       [name, obj.vArf] = deal(varargin{:});
-      zx = 0;
-      z0x = 1e3;
-      obj.qxy = [zx - i * z0x, zx - i * z0x];
       
       % build optic (a source has no inputs)
       outNames = {{'out', 'fr'}};
       obj.Optic = Optic(name, {}, outNames, {});
     case 4
-      % ==== name, vArf, z0, z
-      [name, obj.vArf, z0x, zx] = deal(varargin{:});
-      obj.qxy = [zx - i * z0x, zx - i * z0x];
+      % ==== name, vArf, z, z0
+      [name, obj.vArf, zx, z0x] = deal(varargin{:});
+      obj.qxy = [zx + i * z0x, zx + i * z0x];
       
       % build optic (a source has no inputs)
       outNames = {{'out', 'fr'}};
       obj.Optic = Optic(name, {}, outNames, []);
     case 6
-      % ==== name, vArf, z0x, zx, z0y, zy
-      [name, obj.vArf, z0x, zx, z0y, zy] = deal(varargin{:});
-      obj.qxy = [zx - i * z0x, zy - i * z0y];
+      % ==== name, vArf, zx, z0x, zy, z0y
+      [name, obj.vArf, zx, z0x, zy, z0y] = deal(varargin{:});
+      obj.qxy = [zx + i * z0x, zy + i * z0y];
       
       % build optic (a source has no inputs)
       outNames = {{'out', 'fr'}};

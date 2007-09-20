@@ -1,22 +1,18 @@
-write lock function
-  given a sensing matrix, an offset vector, an initial position, and a set of adjustable drives
-  return a position which has all zero error signals
-  allow error function instead of sensing matrix
+documentation
+  function list by type (and check for old stuff)
+  quantum noise
+  angular TFs
 
-write sigAC reducer
-  given sensing matrix and drive matrix, return mSens * sigAC * mDrive
+build full IFO model (aLIGO?)
+  pos and pit controls, with Simulink interface
 
-support alignment signals
-  allow for basis specification at each optic (e.g., cavity basis)
-  make input basis specification user-friendly
-  improve addSource example (include basis contruction)
+allow multiple sources
+  make sources squeezable
 
 clean up the BeamSplitter - reduce code duplication with Mirror
   make BS contain a Mirror?
 
-write display functions for each to display type specific information
-
-make sources squeezable
+write display functions for each Optic class to display type specific information
 
 ================================= Investigate
 

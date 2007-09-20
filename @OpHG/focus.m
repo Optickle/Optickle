@@ -1,5 +1,5 @@
 % Make an OpHG for a focusing element
-%   returns op = shift_operator(dz) * op
+%   returns op = focus_operator * op
 %
 % The focus parameter is the curvature induced by this element.
 % For a curved optic in vacuum, the curvature induced
@@ -12,10 +12,10 @@
 %   crv = 1 / f
 %
 % A radially symmetric optic can be specified with only one curvature
-% op = focusOpHG(curv)
+% op = focus(curv)
 %
 % Curvatures can also be specified independently
-% op = focusOpHG(curvX, curvY)
+% op = focus(curvX, curvY)
 
 function op = focus(op, curvX, curvY)
 

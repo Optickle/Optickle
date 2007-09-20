@@ -21,10 +21,10 @@
 % mechTF - reaction transfer functions
 %   This matrix of transfer-funtions should take radiation pressure
 %   as its first input, and give position as its first
-%   output (m/N).  If specified, the second and third inputs
-%   should be radiation torques around the X and Y axes, and
-%   the outputs are rotations around the same axes (pitch and
-%   yaw) with units of rad/(N m). (see setMechTF)
+%   output (m/N).  (see setMechTF, getMechTF, getMechResp)
+% mechTFpit - takes radiation torque around the X axis, and
+%   outputs rotations around the same axis (pitch) with units
+%   of rad/(N m).
 %
 % ==== Functions
 % getFieldIn - the index of an input field at some port
@@ -55,7 +55,7 @@ function obj = Optic(varargin)
     'Nin', 0, 'Nout', 0, 'inNames', [], 'outNames', [], ...
     'in', [], 'out', [], 'qxy', [], ...
     'Ndrive', 0, 'driveNames', [], 'drive', [], ...
-    'pos', [], 'mechTF', []);
+    'pos', [], 'mechTF', [], 'mechTFpit', []);
 
   obj.inNames = {};  % do this here because {} in struct is bad
   obj.outNames = {};

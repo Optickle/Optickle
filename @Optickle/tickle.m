@@ -12,7 +12,7 @@
 %  where Nprobe is the number of probes.
 % sigAC - transfer matrix (Nprobe x Ndrive x Naf),
 %   where Ndrive is the total number of optic drive
-%   inputs (e.g., 1 for a mirror, 2 for a modulator).
+%   inputs (e.g., 1 for a mirror, 2 for a RFmodulator).
 %   Thus, sigAC is arranged such that sigAC(n, m, :)
 %   is the TF from the drive m to probe n.
 % mMech - modified drive transfer functions (Ndrv x Ndrv x Naf)
@@ -32,10 +32,10 @@
 % convertSimulink for more details.
 %
 % The control struct must contain the following fields:
-%  f - frequency vector (suplied by user)
+%  f - frequency vector (Naf x 1)
 %  Nin - control system inputs
 %  Nout - control system outputs
-%  mCon - control matrix for each frequency Nin x Nout x Naf
+%  mCon - control matrix for each f value (Nin x Nout x Naf)
 %  mPrbIn - probe output to control system input map (Nin x Nprobe)
 %  mDrvIn - drive output to control system input map (Nin x Ndrive)
 %  mPrbOut - control system output to probe input map (Nprobe x  Nout)
@@ -86,7 +86,7 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   % decide which calculation is necessary
   isAC = ~isempty(f) && nargout > 2;
   isNoise = isAC && (nargout > 4 || (isCon && nargout > 3));
-  
+
   % check the memory requirements
   memReq = (20 * Nprb *  Ndrv *  Naf) / 1e6;
   if memReq > 200
@@ -162,8 +162,6 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
 
   % if AC is not needed, just end here
   if ~isAC
-    sigAC = zeros(Nprb, Ndrv, 0);
-    mMech = zeros(Ndrv, Ndrv, 0);
     return
   end
   

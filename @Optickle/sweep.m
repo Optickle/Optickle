@@ -17,10 +17,10 @@ function [fDC, sigDC] = sweep(opt, pos)
   % ==== Sizes of Things
   Nopt = opt.Noptic;			% number of optics
   Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;				% number of links
+  Nlnk = opt.Nlink;			% number of links
   Nprb = opt.Nprobe;			% number of probes
   Nrf  = length(vFrf);			% number of RF components
-  Nfld = Nlnk * Nrf;            % number of RF fields
+  Nfld = Nlnk * Nrf;			% number of RF fields
   Npos = size(pos, 2);			% number of position vectors
   
   % check positions
@@ -29,37 +29,53 @@ function [fDC, sigDC] = sweep(opt, pos)
       size(pos, 1), Ndrv);
   end
 
-  % get start positions
-  pos0 = zeros(Ndrv, 1);
-  for n = 1:Nopt
-    obj = opt.optic{n};
-    pos0(obj.drive) = getPosOffset(opt, n);
-  end
-
   % link converstion
   [vLen, prbList, mapList] = convertLinks(opt);
-  mPhi = getPhaseMatrix(vLen, vFrf);			% propagation phase matrix
+  mPhi = getPhaseMatrix(vLen, vFrf);	% propagation phase matrix
 
+  % parameters for construction
+  par = getOptParam(opt);
+  par.Naf = 0;
+  
+  % get initial optical matrices
+  mOptAll = cell(Nopt, 1);
+  vDrvAll = cell(Nopt, 1);
+  for m = 1:Nopt
+    obj = opt.optic{m};
+    vDrvAll{m} = obj.drive;   % extracting these makes things much faster
+    mOptAll{m} = mapList(m).mOut * ...
+      getMatrices(obj, pos(vDrvAll{m}, 1), par) * mapList(m).mIn;
+  end
+    
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % main position loop
   sigDC = zeros(Nprb, Npos);
   fDC = zeros(Nlnk, Nrf, Npos);
   
-  eyeNfld = speye(Nfld);						% a sparse identity matrix
+  eyeNfld = speye(Nfld);		% a sparse identity matrix
 
   for n = 1:Npos
-    % add position offsets
+    %%%%% optic converstion (short version of convertOptics)
+    mOpt = sparse(Nfld, Nfld);
+    
+    % look for position change
+    if n == 1
+      dpos = false(Ndrv, 1);
+    else
+      dpos = pos(:, n) ~= pos(:, n - 1);
+    end
+    
+    % build optical matrix
     for m = 1:Nopt
       obj = opt.optic{m};
-      opt = setPosOffset(opt, m, pos0(obj.drive) + pos(obj.drive, n));
+      if any(dpos(vDrvAll{m}))
+        mOptAll{m} = mapList(m).mOut * ...
+	  getFieldMatrix(obj, pos(vDrvAll{m}, n), par) * mapList(m).mIn;
+      end
+      mOpt = mOpt + mOptAll{m};
     end
 
-    % optic converstion
-    %   TODO: make this more inteligent
-    %   pass pos to convertOptics, and do it only when pos changes
-    mOpt = convertOptics(opt, mapList, []);
-
-    % compute DC fields
+    %%%%% compute DC fields (short version of tickle)
     vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
 
     % compile system wide probe matrix

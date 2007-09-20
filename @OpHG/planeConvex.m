@@ -22,7 +22,7 @@
 function mop = planeConvex(op, aoi, crv, ior)
 
   % operator matrix  
-  mop = repmat(op, 4, 2);
+  mop = repmat(OpHG(NaN), 4, 2);
   
   % inverse focal lengths
   sinFront = sin(pi * aoi / 180);
@@ -41,7 +41,7 @@ function mop = planeConvex(op, aoi, crv, ior)
   top = focus(nop, -ctx, -cty);			% transmission
 
   % from front input node (in1)
-  %   no route to back pick-off: mop(3, 1) undefined
+  %   no route to back pick-off: mop(3, 1) left invalid
   mop(1, 1) = fop * op;
   mop(2, 1) = top * op;
   mop(4, 1) = bop * top * op;
@@ -50,4 +50,5 @@ function mop = planeConvex(op, aoi, crv, ior)
   %   planar reflection to back pick-off: mop(3, 1) == op
   mop(1, 2) = top * op;
   mop(2, 2) = bop * op;
+  mop(3, 2) = op;
   mop(4, 2) = bop * bop * op;

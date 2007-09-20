@@ -2,8 +2,13 @@
 %
 % mPhi = getPhaseMatrix(vLen, vFreq)
 
-function mPhi = getPhaseMatrix(vLen, vFreq)
+function mPhi = getPhaseMatrix(vLen, vFreq, vPhiGouy)
   
-  v = exp(i * vLen(:) * vFreq(:)');
-  N = length(v(:));
+  if nargin == 2
+    v = exp(i * vLen(:) * vFreq(:)');
+  else
+    Nrf = numel(vFreq);
+    v = exp(i * (vLen(:) * vFreq(:)' + repmat(vPhiGouy, 1, Nrf)));
+  end
+  N = numel(v(:));
   mPhi = sparse(1:N, 1:N, v(:), N, N);

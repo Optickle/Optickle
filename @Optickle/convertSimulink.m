@@ -3,39 +3,40 @@
 % Converts a simulink model to a Optickle control struct.
 % If f is given in Hz, the simulink model is assumed to be in Hz.
 % 
-% Simulink inputs and outputs are identified with Optickle
-% probes and drives by their names.  A name which starts with
-% "probe:" is matched with a probe.  A name which starts with
-% "drive:" is matched with a drive.  If an optic has multiple
-% drive types, the drive type can be appended after a "."
-% (e.g., "drive:Mod1.phase").
-%
 % The matching of Optickle's probe outputs to Simulink inputs,
 % and Optickle drive inputs to Simulink outputs forms the core
-% of this operation.  To help with the simulation of oscillator
-% phase noise, probes can be used as Optickle input (Simulink
-% outputs) which transfer oscillator phase to probe output.
-% In this case the prefix "phase:" is used.
+% of this operation.  Simulink inputs and outputs are identified
+% with Optickle probes and drives by their names.  An input name
+% which starts with "probe:" is matched with a probe.  An output
+% name which starts with "drive:" is matched with a drive.  If an
+% optic has multiple drive types, the drive type can be appended
+% after a "." (e.g., "drive:Mod1.phase").  The results of this
+% matching are the mPrbIn and mDrvOut matrices.
+%
+% To help with the simulation of oscillator phase noise, probes
+% can be used as Optickle input (Simulink outputs) which transfer
+% oscillator phase to probe output. In this case the prefix "phase:"
+% is used, and the result is the mPrbOut matrix.
 %
 % Though a bit more obscure, the drives are also matched to
 % Simulink inputs, such that they may be used to form loops in
 % Simulink (e.g., optic positions can be used to construct
 % local sensors, with the mechanical transfer functions modified
-% by radiation pressure, as in mMech from tickle).  In this case
-% the prefix "sense:" is used.
+% by radiation pressure, as in mMech from tickle).  Here the
+% prefix "sense:" is used, and the result is the mDrvIn matrix.
 %
 % The control struct contains the following fields:
 %
-%  f - frequency vector (suplied by user)
+%  f - frequency vector (Naf x 1, supplied by user)
 %  Nin - control system inputs
 %  Nout - control system outputs
-%  mCon - control matrix for each frequency Nin x Nout x Naf
+%  mCon - control matrix for each f value (Nin x Nout x Naf, from freqresp)
 %  mPrbIn - probe output to control system input map (Nin x Nprobe)
 %  mDrvIn - drive output to control system input map (Nin x Ndrive)
 %  mPrbOut - control system output to probe input map (Nprobe x  Nout)
 %  mDrvOut - control system output to drive input map (Ndrive x  Nout)
 %
-%  SystemName - system name (suplied by user)
+%  SystemName - system name (supplied by user)
 %  InputName - input names, from linmod
 %  OutputName - output names, from linmod
 

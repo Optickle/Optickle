@@ -1,13 +1,27 @@
-% Get the mechanical response vectors for a given frequency vector
-%   currently this only supports one DOF
+% rsp = getMechResp(obj, f, nDOF)
+%   get a mechanical response vector for a given frequency vector
 %
-% rsp = getMechResp(obj, f)
+% nDOF = 1 is for position
+% nDOF = 2 is for pitch
 
-function rsp = getMechResp(obj, f)
+function rsp = getMechResp(obj, f, nDOF)
 
   Naf = length(f);
-  mechTF = obj.mechTF;
   
+  if nargin < 3
+    nDOF = 1;
+  end
+  
+  % switch on DOF
+  switch nDOF
+    case 1
+      mechTF = obj.mechTF;
+    case 2
+      mechTF = obj.mechTFpit;
+    otherwise
+      error('nDOF must be 1 or 2, got %d', nDOF)
+  end
+      
   % dechipher mechanical response
   if isempty(mechTF)
     rsp = 0;
@@ -22,7 +36,7 @@ function rsp = getMechResp(obj, f)
   % make mechanical response a vector of length Naf
   if ndims(rsp) < 3
     % 1 input, 1 output
-    if prod(size(rsp)) == 1
+    if numel(rsp) == 1
       % convert scalar to vector
       rsp = ones(Naf, 1) * rsp;
     end
@@ -31,5 +45,5 @@ function rsp = getMechResp(obj, f)
   end
   
   if length(rsp) ~= Naf
-    error('Bad mechTF for %s', obj.Optic.name);
+    error('Bad mechTF DOF %d of %s', nDOF, obj.Optic.name);
   end

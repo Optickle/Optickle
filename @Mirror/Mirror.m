@@ -42,7 +42,7 @@
 function obj = Mirror(varargin)
 
   obj = struct('aoi', [], 'Chr', [], 'Thr', [], 'Lhr', [], ...
-    'Rar', [], 'Lmd', [], 'Nmd', []);
+    'Rar', [], 'Lmd', [], 'Nmd', [], 'dWaist', []);
 
   obj = class(obj, 'Mirror', Optic);
 
