@@ -6,6 +6,7 @@ function display(opt)
   Nprb = opt.Nprobe;				% number of probes
   Nlnk = opt.Nlink;				% number of links
   Nopt = opt.Noptic;				% number of optics
+  Ndrv = opt.Ndrive;				% number of optics
   Nrf  = length(vFrf);				% number of RF components
 
   if Nopt == 0
@@ -28,6 +29,18 @@ function display(opt)
     disp(sprintf('==== %d optics', Nopt))
     for n = 1:Nopt
       opt.optic{n}
+    end
+    
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    % ==== Drive points
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    disp(sprintf('==== %d drive points', Ndrv))
+    dNames = getDriveNames(opt);
+    dMap   = getDriveMap(opt);
+    for n = 1:Ndrv
+      str = sprintf('%d) %s drives %s (optic %d, drive index %d)',...
+            n,dNames{n},getOpticName(opt,dMap(n,1)),dMap(n,1),dMap(n,2));
+      disp(str)
     end
   
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
