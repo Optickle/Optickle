@@ -1,4 +1,4 @@
-% [mOscPhase, nDrive] = getOscPhaseTF(opt, fDC, sigAC)
+% [mOscPhase, nDrive] = getOscPhaseTF_DDM(opt, fDC, sigAC)
 %
 % Returns an oscillator phase noise matrix from all RFmodulators
 % to all probes with matching demodulation frequencies.  The
@@ -13,7 +13,7 @@
 % loglog(f, abs(m))
 % legend('I - optical', 'Q - optical', 'I - total', 'Q - total')
 
-function [mOscPhase, nDrive] = getOscPhaseTF(opt, fDC, sigAC)
+function [mOscPhase, nDrive] = getOscPhaseTF_DDM(opt, fDC, sigAC)
 
   % tickle like environment
   vDC = fDC(:);
