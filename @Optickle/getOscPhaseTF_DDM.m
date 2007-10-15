@@ -66,7 +66,7 @@ function [mOscPhase, nDrive] = getOscPhaseTF(opt, fDC, sigAC)
 	%if df < 1e-3
 	  % found match
 	  G=getLOCoupling(opt,prb.freq,fMod,f1,f2);
-	  [G,prb.freq/1e6,fMod/1e6]
+	  %[G,prb.freq/1e6,fMod/1e6]
 	  mOscPhase(m, n, :) = sigAC(m, nDrive(n), :) + sigQ(m)*G;
 	%end
       end
