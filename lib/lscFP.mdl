@@ -40,7 +40,7 @@ Model {
       Name		      "zEX"
     }
     ParameterArgumentNames  ""
-    ComputedModelVersion    "1.9"
+    ComputedModelVersion    "1.10"
     NumModelReferences	    0
     NumTestPointedSignals   0
   }
@@ -78,8 +78,8 @@ Model {
   ModifiedByFormat	  "%<Auto>"
   LastModifiedBy	  "Matt"
   ModifiedDateFormat	  "%<Auto>"
-  LastModifiedDate	  "Wed Aug 15 15:05:46 2007"
-  ModelVersionFormat	  "1.%<AutoIncrement:9>"
+  LastModifiedDate	  "Thu Nov 01 14:48:42 2007"
+  ModelVersionFormat	  "1.%<AutoIncrement:10>"
   ConfigurationManager	  "None"
   SimulationMode	  "normal"
   LinearizationMsg	  "none"
@@ -570,7 +570,7 @@ Model {
   }
   System {
     Name		    "lscFP"
-    Location		    [1497, 449, 2137, 707]
+    Location		    [1941, 711, 2581, 969]
     Open		    on
     ModelBrowserVisibility  off
     ModelBrowserWidth	    200
@@ -606,11 +606,11 @@ Model {
     }
     Block {
       BlockType		      ZeroPole
-      Name		      "CARM"
-      Position		      [275, 52, 335, 88]
+      Name		      "Servo"
+      Position		      [275, 52, 350, 88]
       Zeros		      "[-100]"
       Poles		      "[-1]"
-      Gain		      "[1e-7]"
+      Gain		      "[1e-10]"
     }
     Block {
       BlockType		      Outport
@@ -656,7 +656,7 @@ Model {
       SrcPort		      1
       Points		      [55, 0]
       Branch {
-	DstBlock		"CARM"
+	DstBlock		"Servo"
 	DstPort			1
       }
       Branch {
@@ -666,7 +666,7 @@ Model {
       }
     }
     Line {
-      SrcBlock		      "CARM"
+      SrcBlock		      "Servo"
       SrcPort		      1
       DstBlock		      "drive:EX"
       DstPort		      1

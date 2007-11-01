@@ -1,8 +1,6 @@
 % getReactMatrix method for TEM01 mode (pitch)
 %   returns a Ndrive x (Nrf * Nin) x Naf matrix
 %
-% HACK: using the TEM00 mechTF
-%
 % mDrv = getReactMatrix01(obj, pos, vBasis, par)
 
 function mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d)
@@ -26,12 +24,12 @@ function mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d)
   vBout(~isfinite(vBout)) = i;
   
   % mirror TEM01 mode reaction torque scales with beam size
-  %   torque = w * (A01 * A00)
+  %   torque = R * w * (A01 * A00)
   % so here the reaction is proportional to waist size
   %   w = sqrt(z0 * (1 + (z/z0)^2)) * sqrt(2 / k)
   % The sqrt(2 / k) part is done separately for each RF component
   % the sqrt(z0 * (1 + (z/z0)^2)) is done for each link using the
-  % the waist size matrix, mW, is computed below.
+  % the waist size matrix, mW, computed below.
   %
   %   the y-basis, vBout(:,2), is of interest for the vertical 01 mode
   z = real(vBout(:,2));

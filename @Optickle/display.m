@@ -16,7 +16,7 @@ function display(opt)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     % ==== Frequencies
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    disp(sprintf('==== %d RF freqiencies', Nrf))
+    disp(sprintf('==== %d RF frequencies', Nrf))
     for n = 1:Nrf
       str = sprintf('%d) %s with amplitude %g', n, ...
                     getFreqStr(vFrf(n)), vArf(n));

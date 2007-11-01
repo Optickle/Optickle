@@ -63,6 +63,8 @@
 %
 % % Example, initialize a model with 9MHz RF sidebands
 % opt = Optickle([-9e6, 0, 9e6]);
+%
+% see optFP for a more complete example
 
 function opt = Optickle(varargin)
 

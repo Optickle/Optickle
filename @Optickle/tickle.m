@@ -226,6 +226,9 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   hWaitBar = [];
   tLast = 0;
   
+  % prevent scale warnings
+  sWarn = warning('off', 'MATLAB:nearlySingularMatrix');
+
   % audio frequency loop
   for nAF = 1:Naf
     fAudio = f(nAF);
@@ -333,6 +336,9 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
     end
   end
     
+  % reset scale warning state
+  warning(sWarn.state, sWarn.identifier);
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Clean Up
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

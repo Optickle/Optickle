@@ -11,11 +11,20 @@ function [vLen, prbList, mapList] = convertLinks(opt)
   % ==== Sizes of Things
   Nopt = opt.Noptic;			% number of optics
   Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;				% number of links
+  Nlnk = opt.Nlink;			% number of links
   Nprb = opt.Nprobe;			% number of probes
   Nrf  = length(vFrf);			% number of RF components
-  Nfld = Nlnk * Nrf;            % number of RF fields
+  Nfld = Nlnk * Nrf;			% number of RF fields
   
+  % do a quick sanity check
+  if Nlnk == 0
+    error('There are no links in this model! (see Optickle)')
+  elseif Nprb == 0
+    error('There are no probes in this model! (see Optickle)')
+  elseif Nrf == 0
+    error('There are no RF components in this model! (see Optickle)')
+  end
+
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Link Conversion
   % vDist(n) is the propagation phases-per-frequency
