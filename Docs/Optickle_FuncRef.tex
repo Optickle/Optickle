@@ -1,0 +1,722 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+\documentclass[12pt]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Input Commands and Packages
+\input{mevansTex}
+\input{abbrev}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header
+
+\title{Optickle: Function Reference}
+\author{M.~Evans}
+%\address{$^1$MIT Kavli Institute (MKI), Massachusetts Institute of Technology %(MIT), Cambridge, USA;}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document
+
+\begin{document}
+
+\maketitle
+
+\abstract{
+Optickle is a general model for the electro-opto-mechanical part of an interferometric GW detector.
+It ventures into mechanics only as far as is necessary to include radiation pressure effects, and into electronics only far enough to produce demodulation
+signals, and into optics only up to first order.
+There are many other tools that do all these things in greater detail.
+Optickle is for quick, rough, but essentially complete \ifo\ design studies.}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction}
+
+As discussed elsewhere (to be written), Optickle can, in principal, simulate any \ifo.
+But to do so one must know how to configure it, and how to run it.
+This document provides a list of functions, ordered functionally for each class.
+All but two of these are types of optics used in Optickle, the other two are the Optickle class and the OpHG class.
+A brief description of what each function does is also given, for a more complete description
+use the Matlab {\it help} command.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The Optickle Class}
+
+An instance of the Optickle class represents a particular interferometer configuration.
+To simulate a Fabry-Perot cavity, for example, you start by creating an Optickle instance,
+which you then build into a cavity by adding a source, mirrors, etc.
+Once built, an Optickle instance contains the constituents of the system it represents.
+These are the optics which make up the system, the links that tie them together, and the probes which define how information is to be extracted from the simulation.
+Some demonstrations of how this is be done can be found in the function library discussed later in this document.
+
+An optic is a general optical component (mirror, lens, etc.).
+Each type of optic has a fixed number of inputs and outputs and a set of parameters which characterize a given instance.  The various types of optics are:
+\begin{itemize}
+  \item BeamSplitter - a beam-splitter
+  \item GouyPhase - an abstract telescope
+  \item Mirror - a general curved mirror
+  \item Modulator - audio frequency phase and amplitude modulation
+  \item RFModulator - radio frequency phase and amplitude modulation
+  \item Telescope - a lense or set of lenses
+  \item Sink - a field sink, used for detectors
+  \item Source - a field source
+\end{itemize}
+
+These optics are connected to one another by links.
+Technically speaking, a link is not a class, but rather a simple organizational structure used within Optickle.
+The members of this structure are:
+\begin{itemize}
+  \item sn = serial number of this link
+  \item snSource, portSource = serial number and port number of source optic
+  \item snSink, portSink = serial number and port number of sink (destination)
+  \item len = the length of the link
+\end{itemize}
+
+Probes define the output of Optickle.
+They can simulate simple intensity (a DC signal), or an RF demodulated signals.
+The output of a probe is in Watts, so to convert it into a photodiode voltage factors for the efficiency and transimpedance should be added by the user.  Like links, probes are data structures internal to the Optickle class.
+The probes are characterized by:
+\begin{itemize}
+  \item name, sn = name and serial number of this probe
+  \item nField = index of the sampled field
+  \item freq = demodulation frequency
+  \item phase = demodulation phase offset (degrees)
+\end{itemize}
+
+\subsection{Initializing a New Model}
+
+Creating a new Optickle model is easy.
+Like any other class, you need only call the class constructor, which is a function with the class as its name.
+
+\begin{funcinfo}{opt = Optickle(vFrf, lambda)}
+   \bf{vFrf} & vector of RF component frequencies \\
+   \bf{lambda} & carrier wave length (default 1064 nm) \\
+   \hline
+   \bf{opt} & empty Optickle model \\
+\end{funcinfo}
+
+\subsection{Adding Optics}
+
+After creating a shiny, new, empty, Optickle, you will need to fill it with optics.
+For each of the various classes of optics there is a function for adding it to your model.
+These functions work by returning a model which is like the one you pass them as the first argument, except for the added optic.
+The add functions also return the serial number of the new optic, which you can use for future reference instead of the optic's name.
+This is fine if you are concerned about computational efficiency, but I don't recommend it as you will probably not notice the speed difference and it may make your code slightly less readable.
+The general function for adding an optic is
+
+\begin{funcinfo}
+  {[opt, sn] = addOptic(opt, obj)}
+      \textbf{opt} & initial Optickle model (as argument)\\
+      \textbf{obj} & the new optic\\
+      \hline
+      \textbf{opt} & new Optickle model with optic (as return value)\\
+      \textbf{sn} & serial number of the new optic \\
+\end{funcinfo}\\
+But you will likely never need to use this function, as there are add functions for each type of optic. These are provided simply to shorten the process of creating an optic and adding it to the model to a single line.
+All add functions have the same first two arguments.
+Their return values are as for {\it addOptic}.
+
+\begin{funcinfo}
+  {[opt, sn] = addXXX(opt, name, ... optic specific arguments ...)}
+      \textbf{opt} & initial Optickle model (as argument)\\
+      \textbf{name} & name of the new optic \\
+\end{funcinfo}
+
+Beyond the first two arguments, the format of the add functions depends on the type of optic being added.
+Most of these arguments are optional.
+The various types of optics are discussed below, each of which has a constructor function with an argument list which matches the add functions listed below (less the Optickle model as first argument).
+
+\begin{funcinfo}
+  {[opt, sn] = addBeamSplitter(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)}
+  \bf{aio} & angle of incidence (in degrees) \\
+  \bf{Chr} & curvature of HR surface (Chr = 1 / radius of curvature) \\
+  \bf{Thr} & power transmission of HR surface \\
+  \bf{Lhr} & power loss on reflection from HR surface \\
+  \bf{Rar} & power reflection of AR surface \\
+  \bf{Nmd} & refractive index of medium (1.45 for fused silica, SiO2) \\
+  \bf{Lmd} & power loss in medium (one pass) \\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, sn] = addGouyPhase(opt, name, phi)}
+  \bf{phi} & Gouy phase (in radians) \\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, sn] = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)}
+  \bf{aio} & angle of incidence (in degrees) \\
+  \bf{Chr} & curvature of HR surface (Chr = 1 / radius of curvature) \\
+  \bf{Thr} & power transmission of HR surface \\
+  \bf{Lhr} & power loss on reflection from HR surface \\
+  \bf{Rar} & power reflection of AR surface \\
+  \bf{Nmd} & refractive index of medium (1.45 for fused silica, SiO2) \\
+  \bf{Lmd} & power loss in medium (one pass) \\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, sn] = addModulator(opt, name, cMod)}
+  \bf{cMod} & modulation coefficient (1 for amplitude, i for phase)\\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, sn] = addRFmodulator(opt, name, fMod, aMod)}
+  \bf{fMod} & modulation frequency \\
+  \bf{aMod} & modulation index (imaginary for phase, real for amplitude)\\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, sn] = addSink(opt, name, loss)}
+  \bf{loss} & power loss from input to output (default = 1) \\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, sn] = addSource(opt, name, vArf, z0, z)}
+  \bf{vArf} & amplitudes of each RF component \\
+  \bf{z0} & Rayleigh Range is $(waist size)^2 * \pi / \lambda$\\
+  \bf{z} & distance to waist (negative if beam is converging)\\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, sn] = addTelescope(opt, name, f, df)}
+  \bf{f} & focal length of first lens \\
+  \bf{df} & distances and focal lengths for lenses after the first\\
+\end{funcinfo}
+
+There are also two ``compound'' add functions, which are merely common combinations of the above.
+As with other Optickle functions, use the Matlab {\it help} command for a detailed description of what these functions do.
+You should feel free to use the Matlab {\it type} command, as they are quite simple and provide examples of how the other add commands can be used.
+
+\begin{funcinfo}
+  {opt = addReadout(opt, name, fphi, names)}
+  \bf{fphi} & demod frequency and phase (Nx2) \\
+  \bf{names} & optional cell array of probe suffixes (instead of 1:N)\\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {opt = addReadoutTelescope(opt, name, f, df, ts, ds, da, db)}
+  \bf{f} & focal length of first lens \\
+  \bf{df} & distances and focal lengths for lenses after the first\\
+  \bf{ds} & distance from telescope to splitter\\
+  \bf{da} & distance from splitter to sink A\\
+  \bf{db} & distance from splitter to sink B\\
+\end{funcinfo}
+
+
+\subsection{Adding Links and Probes}
+
+In addition to optics, an Optickle model is not complete without links to connect the optics and probes to extract information.
+The add functions for these are
+
+\begin{funcinfo}
+  {[opt, snLink] = addLink(opt, from, out, to, in, len)}
+  \bf{from} & serial number or name of the source optic (field origin)\\
+  \bf{out} & number or name of the output port (e.g., 1, 'fr', etc.)\\
+  \bf{to} & serial number or name of the sink optic (field destination)\\
+  \bf{in} & number or name of the input port (e.g., 2, 'bk', etc.)\\
+  \bf{len} & length of the link\\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, snProbe] = addProbeIn(opt, name, to, in, freq, phase)}
+  \bf{name} & name of the new probe\\
+  \bf{to} & serial number or name of the sink optic\\
+  \bf{in} & number or name of the input port\\
+  \bf{freq} & demodulation frequency\\
+  \bf{phase} & demodulation phase (in degrees)\\
+\end{funcinfo}
+
+\begin{funcinfo}
+  {[opt, snProbe] = addProbeOut(opt, name, from, out, freq, phase)}
+  \bf{name} & name of the new probe\\
+  \bf{from} & serial number or name of the source optic\\
+  \bf{out} & number or name of the output port\\
+  \bf{freq} & demodulation frequency\\
+  \bf{phase} & demodulation phase (in degrees)\\
+\end{funcinfo}
+
+The last of these is technically problematic and should be avoided, as it can always be replaced by {\it addProbeIn}, but sometimes it is convenient (see {\it help addProbeOut} for more information).
+
+\subsection{Model Modification: {\it set} Functions}
+
+There are some functions which allow you to modify optics after their addition to a model.
+The boundary between these functions and parameters to the add functions is not well defined, but the general idea is that these allow you to modify an existing model rather than create a new one (not that they cost much).
+Since these functions modify a model, they all share the same first argument (the model to modify) and they all return the modified model.
+
+\begin{funcinfo}{opt = setCavityBasis(opt, name1, name2)}
+  \bf{name1, name2} & names of Mirros that make a simple Fabry-Perot cavity\\
+\end{funcinfo}
+
+\begin{funcinfo}{opt = setGouyPhase(opt, name, phi)}
+  \bf{name} & name of the GouyPhase optic\\
+  \bf{phi} & new phase value (in radians)\\
+\end{funcinfo}
+
+\begin{funcinfo}{opt = setLinkLength(opt, snLink, len)}
+  \bf{snLink} & serial number of a link\\
+  \bf{len} & new length of this link\\
+\end{funcinfo}
+
+\begin{funcinfo}{opt = setMechTF(opt, name, mechTF, nDOF)}
+  \bf{name} & name of the optic\\
+  \bf{mechTF} & mechanical transfer function (see LTIMODELS)\\
+  \bf{nDOF} & 1 for position (default), 2 for pitch
+\end{funcinfo}
+
+\begin{funcinfo}{opt = setMinQuant(opt, minQuant)}
+  \bf{minQuant} & minimum loss used for evaluating quantum noise\\
+\end{funcinfo}
+
+
+\subsection{Information Retrieval: {\it get} Functions}
+
+Many functions help to get information about an Optickle model.
+Much of this information is just what we put in when constructing the model, and some of it has to do with the way Optickle arranges its components internally.
+Since these functions interrogate a model, they all share the same first argument.
+
+\begin{funcinfo}{vBasis = getAllFieldBases(opt)}
+  \bf{vBasis} & a Nfldx2 matrix of complex numbers (see also @OpHG/apply)\\
+\end{funcinfo}
+
+\begin{funcinfo}{n = getDriveIndex(opt, name, driveType)}
+  \bf{name} & name of the optic\\
+  \bf{driveType} & name of the drive (e.g., 'pos' or 'amp') (optional)\\
+  \hline
+  \bf{n} & index of this drive (e.g., in sigAC returned from tickle)\\
+\end{funcinfo}
+
+\begin{funcinfo}{strList = getDriveNames(opt)}
+  \bf{strList} & cell array of drive names for display, OpticName.DriveName\\
+\end{funcinfo}
+
+\begin{funcinfo}{n = getFieldIn(opt, name, inName)}
+  \bf{name} & name of the optic\\
+  \bf{inName} & name of an input to the optic\\
+  \hline
+  \bf{n} & index of input field (e.g., in fDC returned from tickle)\\
+\end{funcinfo}
+
+\begin{funcinfo}{n = getFieldOut(opt, name, outName)}
+  \bf{name} & name of the optic\\
+  \bf{outName} & name of an output from the optic\\
+  \hline
+  \bf{n} & index of output field\\
+\end{funcinfo}
+
+\begin{funcinfo}{n = getFieldProbed(opt, name)}
+  \bf{name} & name of the probe\\
+  \hline
+  \bf{n} & index of probed field\\
+\end{funcinfo}
+
+\begin{funcinfo}{str = getInputName(opt, name, inNum)}
+  \bf{name} & name of the optic\\
+  \bf{inNum} & input index\\
+  \hline
+  \bf{str} & display name for this input\\
+\end{funcinfo}
+
+\begin{funcinfo}{vDist = getLinkLengths(opt)}
+  \bf{vDist} & lengths of each link (used with library function getGouyPhase)\\
+\end{funcinfo}
+
+\begin{funcinfo}{n = getLinkNum(opt, nameSource, nameSink)}
+  \bf{nameSource} & name of source optic (link start)\\
+  \bf{nameSink} & name of sink optic (link end)\\
+  \hline
+  \bf{n} & array of link serial numbers\\
+\end{funcinfo}
+
+\begin{funcinfo}{obj = getOptic(opt, name)}
+  \bf{name} & name of the optic\\
+  \hline
+  \bf{obj} & copy of the optic with this name\\
+\end{funcinfo}
+
+\begin{funcinfo}{name = getOpticName(opt, sn)}
+  \bf{sn} & number of the optic (or vector, or cell array, or nothing)\\
+  \hline
+  \bf{name} & name of the optic (or cell array of names)\\
+\end{funcinfo}
+
+\begin{funcinfo}{par = getOptParam(opt)}
+  \bf{par} & a structure of data about this Optickle model\\
+\end{funcinfo}
+
+\begin{funcinfo}{str = getOutputName(opt, name, outNum)}
+  \bf{name} & name of the optic\\
+  \bf{inNum} & output index\\
+  \hline
+  \bf{str} & display name for this output\\
+\end{funcinfo}
+
+\begin{funcinfo}{name = getProbeName(opt, snPrb)}
+  \bf{snPrb} & number of the probe (or vector, or cell array, or nothing)\\
+  \hline
+  \bf{name} & name of the probe (or cell array of names)\\
+\end{funcinfo}
+
+\begin{funcinfo}{n = getProbeNum(opt, name)}
+  \bf{name} & name of the probe\\
+  \hline
+  \bf{n} & index of probed (e.g., in sigDC returned from tickle)\\
+\end{funcinfo}
+
+\begin{funcinfo}{phase = getProbePhase(opt, snPrb)}
+  \bf{snPrb} & number or name of probe (or vector, or cell array, or nothing)\\
+  \hline
+  \bf{phase} & phase of probe (or vector of phases)\\
+\end{funcinfo}
+
+\begin{funcinfo}{sn = getSerialNum(opt, name)}
+  \bf{name} & name of the optic\\
+  \hline
+  \bf{sn} & serial number of the optic\\
+\end{funcinfo}
+
+\begin{funcinfo}{[str, sn, port] = getSinkName(opt, snLink)}
+  \bf{snLink} & serial number of a link\\
+  \hline
+  \bf{str} & display name of the sink (see getInputName)\\
+  \bf{sn} & serial number of sink optic\\
+  \bf{port} & port number of sink\\
+\end{funcinfo}
+
+\begin{funcinfo}{[name, sn, port] = getSourceName(opt, snLink)}
+  \bf{snLink} & serial number of a link\\
+  \hline
+  \bf{str} & display name of the source (see getOutputName)\\
+  \bf{sn} & serial number of source optic\\
+  \bf{port} & port number of source\\
+\end{funcinfo}
+
+\begin{funcinfo}{[vFrf, vSrc] = getSourceInfo(opt)}
+  \bf{vFrf} & source frequency vector (Nrf x 1)\\
+  \bf{vSrc} & source amplitude vector (Nfld x 1) (Nrf x 1)\\
+\end{funcinfo}
+
+\subsection{Setting the Working Point}
+
+The optics in Optickle have two kinds of inputs: fields and drives.
+Fields, or beams, originate with {\it Source} optics and are routed from one optic to the next with the previously mentioned links.
+Other excitations to the system arrive in the form of a drive to an optic.
+A mirror, for instance, has a single drive, namely its location, while an RF modulator has two drives, amplitude and phase of the oscillator.
+Sources and sinks, on the other hand, have no drives.
+
+The static value of a drive is called its ``position'', which makes sense for mirrors, but is a bit of a stretch for modulators.
+The following are functions which allow you to manipulate the positions of the optics.
+
+\begin{funcinfo}{opt = addDriveOffset(opt, nDrv, pos)}
+  \bf nDrv & drive index\\
+  \bf pos & addition to zero position for this drive (see setDriveOffset)\\
+\end{funcinfo}
+
+\begin{funcinfo}{opt = addPosOffset(opt, name, pos)}
+  \bf name & name or serial number of optic\\
+  \bf pos & addition to zero position for this optic (see setPosOffset)\\
+\end{funcinfo}
+
+\begin{funcinfo2}
+  {opt = setDriveOffset(opt, nDrv, pos)}
+  {pos = getDriveOffset(opt, nDrv)}
+  \bf nDrv & drive index (or indices)\\
+  \bf pos & zero position for this drive (or drives)\\
+\end{funcinfo2}
+
+\begin{funcinfo2}
+  {opt = setPosOffset(opt, name, pos)}
+  {pos = getPosOffset(opt, name)}
+  \bf name & name or serial number of optic\\
+  \bf pos & zero position for this optic\\
+\end{funcinfo2}
+
+\begin{funcinfo2}
+  {[opt, pos] = setOperatingPoint(opt, mDrive, mSense, vOffset)}
+  {[opt, pos] = setOperatingPoint(opt, mDrive, nameErrFunc)}
+  \bf mDrive & drive matrix\\
+  \bf mSens & sensing matrix\\
+  \bf vOffset & offset vector ($vErr = mSense \times sigDC - vOffset$)\\
+  \bf nameErrFunc & name of error function
+\end{funcinfo2}
+
+The last of these, {\it setOperatingPoint}, is a simple solver that attempts to zero a set of error signals by moving some optics (i.e., to ``lock'' the interferometer).
+Usually locking is not necessary as error signals tend to be zero when cavities are on resonance, but when working with detuned cavities locking may be necessary (see {\it help setOperatingPoint} for details).
+
+\subsection{Response Evaluation}
+
+One the model is build and configured, you will probably want to compute something with it.
+The number of functions devoted to doing the real work is relatively small, but what happens inside is somewhat more complicated ({\it type} them at your own risk).
+The mathematics of these functions is discussed in the document "Optickle inner workings" (T070260).
+
+\begin{funcinfo}{sCon = convertSimulink(opt, sys, f)}
+  \bf{sys} & name of Simulink system\\
+  \bf{f} & vector of evaluation frequencies\\
+  \hline
+  \bf{sCon} & control structure to be used with {\it tickle} or {\it tickle01}\\
+\end{funcinfo}
+
+\begin{funcinfo}{[fDC, sigDC] = sweep(opt, pos)}
+  \bf{pos} & optic positions (Ndrive x Npos)\\
+  \hline
+  \bf{fDC} & DC fields at each position (Nlink x Nrf x Npos) \\
+  \bf{sigDC} & DC signals for each probe (Nprobe x Npos) \\
+\end{funcinfo}
+
+\begin{funcinfo}{[pos, sigDC, fDC] = sweepLinear(opt, posStart, posEnd, Npos)}
+  \bf{posStart} & sweep start positions (Ndrive x 1)\\
+  \bf{posEnd} & sweep end positions (Ndrive x 1)\\
+  \bf{Npos} & sweep points (including posStart and posEnd)\\
+  \hline
+  \bf{sigDC} & DC signals for each probe (Nprobe x Npos) \\
+  \bf{fDC} & DC fields at each position (Nlink x Nrf x Npos) \\
+\end{funcinfo}
+
+\begin{funcinfo2}
+  {[fDC, sigDC, sigAC, mMech, noiseAC, noiseMech] = tickle(opt, pos, f)}
+  {[fDC, sigDC, sOpt, noiseOut] = tickle(opt, pos, sCon)}
+  \bf{pos} & optic positions (Ndrive x 1 or empty for zeros)\\
+  \bf{f} & vector of evaluation frequencies (empty for DC only)\\
+  \bf{sCon} & control structure from {\it convertSimulink}\\
+  \hline
+  \bf{fDC} & DC fields (Nlink x Nrf) \\
+  \bf{sigDC} & DC signals for each probe (Nprobe x 1) \\
+  \bf{sigAC} & transfer matrix (Nprobe x Ndrive x Naf) \\
+  \bf{mMech} & modified drive transfer functions (Ndrv x Ndrv x Naf) \\
+  \bf{noiseAC} & quantum noise at each probe (Nprobe x Naf) \\
+  \bf{noiseMech} & quantum noise at each drive (Ndrv x Naf) \\
+  \bf{sOpt} & response structure \\
+  \bf{noiseOut} & quantum noise at each Simulink output \\
+\end{funcinfo2}
+
+\begin{funcinfo2}
+  {[sigAC, mMech] = tickle01(opt, pos, f)}
+  {sOpt = tickle01(opt, pos, sCon)}
+  \bf{pos} & optic positions (Ndrive x 1 or empty for zeros)\\
+  \bf{f} & vector of evaluation frequencies (empty for DC only)\\
+  \bf{sCon} & control structure from {\it convertSimulink}\\
+  \hline
+  \bf{sigAC} & TEM01 transfer matrix (Nprobe x Ndrive x Naf) \\
+  \bf{mMech} & modified pitch drive transfer functions (Ndrv x Ndrv x Naf) \\
+  \bf{sOpt} & response structure \\
+\end{funcinfo2}
+
+\subsection{Internal Data}
+
+The members of the Optickle class are:
+
+\begin{tabular}{ll}
+  \textbf{optic} & a cell array of optics \\
+  \textbf{Noptic} & number of optics \\
+  \textbf{Ndrive} & number of drives \\
+  \textbf{link} & an array of links \\
+  \textbf{Nlink} & number of links \\
+  \textbf{probe} & an array of probes \\
+  \textbf{Nprobe} & number of probes \\
+  \textbf{lambda} & carrier wave length \\
+  \textbf{vFrf} & RF components \\
+  \textbf{h} & Plank constant \\
+  \textbf{c} &speed of light \\
+  \textbf{k} & carrier wave-number \\
+  \textbf{minQuant} & minimum loss considered for quantum noise \\
+  \textbf{debug} & debugging level (not widely used) \\
+\end{tabular}\\
+Of these, only some can be reference directly.
+They are:  Noptic, Ndrive, Nlink, Nprobe, lambda, k, c, h, and debug.
+For others, use {\it get} functions (see previous section).
+\footnote{The reason for this is to protect Optickle users
+from developers who like to change the internal structures of things.
+The access functions define an interface that developers can try to maintain, even if the internals change.}
+If an access function does not exist for something you need, cheat and access it directly.
+This should produce a warning message, which will serve as your reminder either to create an access function to do what you need and send it to me, or to ask me to create an access function and send it to you.
+Typically these things are quick and easy to make.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Optics}
+
+This section has a list of types of optics, ordered alphabetically.
+The general purpose of each type is given, and any special functions related to the type of optic are listed.
+For more information use the Matlab help function, followed by the name of the class (e.g., help Mirror).
+At the end of the section, functions common to all types of optics are listed for reference, though casual Optickle users are not expected to need to know about them
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{BeamSplitter}
+
+The beam-splitter class is really a special type of mirror (see Mirror class).
+The thing that makes it special is that it has 4 input beams and 8 output beams (4 primary outputs, and 4 pick-off outputs).
+Despite the name, beam-splitters should not be used to split an input beam into two output beams, as a normal mirror can do this without problems.
+In fact, beam-splitters are only useful when you need to simulation a mirror at non-normal incidence with beams entering and exiting along the same paths (e.g., the beam-splitter in a Michelson interferometer).
+
+In many respects, a BeamSplitter object is like two Mirror object which share the same position and the same optical parameters (see Mirror, again).
+In terms of inputs and outputs, if call these two virtual mirrors A and B, then the I/O names for a beam-splitter are the same as those for these two mirrors (e.g., fr and bk) with A and B appended: frA, bkA, frB and bkB.
+
+[FIGURE OF BEAMSPLITTER]
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{GouyPhase}
+
+The GouyPhase object is an abstraction of an optical telescope (see Telescope class)
+ which simplifies the process of building an angular sensing system.
+The abstraction used is to ignore the lenses and distances that would actually be used to change the Gouy phase of a TEM01 mode, and simply add the desired phase.
+This can save time in the initial stages of interferometer design when the details of the optical chain are not critical.
+
+This object has two special functions associated with it.
+They are used to interact with its unusual (and unphysical) ability to change TEM01 phase.
+
+\begin{description}
+  \item[getPhase] return the phase added to the TEM01 mode by this optic (in radians)
+  \item[setPhase] assign the phase added to the TEM01 mode by this optic (in radians)
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Mirror}
+
+Mirrors are the bread and butter of optics.
+A Mirror object in Optickle has two input beams and 4 output beams (2 primary and 2 pick-off).
+
+[FIGURE OF MIRROR]
+
+Mirrors can be used for everything from core interferometer optics to simple 1-inch steering mirrors.
+The optical parameters used to describe a Mirror are
+
+\begin{description}
+  \item[aio] angle of incidence (in degrees)
+  \item[Chr] curvature of HR surface (Chr = 1 / radius of curvature)
+  \item[Thr] power transmission of HR suface
+  \item[Lhr] power loss on reflection from HR surface
+  \item[Rar] power reflection of AR surface
+  \item[Nmd] refractive index of medium (1.45 for fused silica, SiO2)
+  \item[Lmd] power loss in medium (one pass)
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Modulator}
+
+Modulators are used to make audio frequency modulation.
+Often, this means phase and amplitude noise.
+The only argument {\bf cMod} is the modulation coefficient.
+To made a phase modulator which produces with one radian of phase per unit of drive, set {\bf cMod = i}.
+For an amplitude modulator $\frac{dAmp}{drive} = Amp \times \mathbf{cMod}$, with {\bf cMod} real.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{RFmodulator}
+
+An RFmodulator is used to produce optical frequency components of different frequencies.
+Physically, this object is the same as modulator, but computationally they are quite different as an RF modulator results in RF sidebands while an audio modulator makes audio sidebands.
+RF modulators have 2 drives, ``amp'' for oscillator amplitude noise and ``phase'' for oscillator phase noise.
+
+\begin{description}
+  \item[vMod] modulation frequencies and amplitudes, Nmod x 2
+  \item[Nmod] number of RF modulation frequencies
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Sink}
+
+A Sink is a beam dump or attenuator.
+Sinks are often used in the place of a physical detector, but they can also be used as attenuators by setting the {\bf loss} parameter to something less than 1.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Source}
+
+A Source produces the carrier field which excites the optical system (i.e., PSL, laser, fiber, etc.)
+Sources have no inputs and no drives.
+
+\begin{description}
+  \item[vArf] amplitudes of the RF field components in the model
+  \item[z0] Rayleigh Range is $(waist size)^2 * \pi / \lambda$ (optional)\\
+  \item[z] distance to waist (negative if beam is converging) (optional)\\
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Telescope}
+
+Telescopes are used for changing the beam size to match cavities, or to add Gouy phase for readout.
+A telescope is made up of N + 1 lenses with N distances between them.
+
+The audio phase accumulated while propagating through a telescope is NOT included.
+Typically this phase is very small (e.g., for a 1 meter telescope, a 300Hz audio SB should gain 1e-6 radians of phase).
+In special cases where the audio phase is of interest, break the telescope into individual lenses and link them together with links of the correct distances.
+
+\begin{description}
+  \item[f] focal length of first lens
+  \item[df] distances from previous lens and lens focal length for lenses after the first
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optic Internals: Optical Properties}
+
+These functions are common to all optics, though each optic defines them differently.
+They represent each optic's input to output relations, and thus determine how the optics behave in the system.
+
+\begin{description}
+  \item[getBasisMatrix] basis transformation matrices (see OpHG)
+  \item[getDriveMatrix] drives and input fields are combined to make output audio sidebands
+  \item[getDriveMatrix01] as getDriveMatrix, but the outputs are TEM01
+  \item[getFieldMatrix] input field to output field matrix
+  \item[getFieldMatrix01] input field to output field matrix for a TEM01 field
+  \item[getNoiseMatrix] quantum noise inputs for this optic, as seen at its outputs
+  \item[getReactMatrix] input field to force matrix
+  \item[getReactMatrix01] as getDriveMatrix, but the outputs are torques
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Optic Internals: Matlab Mechanics}
+I'll only list these here, as they are the same for each class and of little interest.
+
+\begin{description}
+  \item[display] display information about an instance
+  \item[get] get member data
+  \item[set] set member data
+  \item[subsasgn] handle indexed assignment (set)
+  \item[subsref] handle indexed retrieval (get)
+\end{description}
+
+\end{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Library Functions}
+
+These functions help in the computations involving Hermite-Gauss modes.
+The first three are general tools, while getGouyPhase is designed to be used with Optickle as is described in its help text.
+
+\subsection{Hermite-Gauss Modes}
+\begin{description}
+  \item[beamRW]  Compute beam radius and wavefront radius of curvature for a TEM00 beam
+  \item[beamZ0] Compute TEM00 beam basis given beam radius and wavefront radius of curvature
+  \item[cavHG] Compute TEM00 basis for a cavity given mirror radii and cavity length
+  \item[getGouyPhase] Gouy phase for beam propagation over distance
+\end{description}
+
+The library includes a few pre-cooked examples of how to use Optickle.
+These examples are all based on the same Fabry-Perot cavity, constructed in optFP.
+\subsection{Optickle Demonstrations}
+\begin{description}
+  \item[demoDetunedFP] Demonstrate transfer function and noise computations with Optickle
+  \item[demoLscFP] Demonstrate Optickle's Simulink interface
+  \item[optFP] The Fabry-Perot cavity configuration used in the demonstrations
+\end{description}
+
+There are a few library functions which are provided for the user's convenience.
+Basically, these are things that I wrote because I got tired of doing them by hand, and then I used them for the demonstrations in the previous section.
+The full library of Evans' helper functions can be found elsewhere, but I try to keep it separate from Optickle.
+\subsection{Helpers}
+\begin{description}
+  \item[getTF] Extract transfer function vectors from sigAC, or similar frequency dependent transfer matrix.
+  \item[zplotlog] Plot complex transfer functions
+\end{description}
+
+There are times when Optickle needs functions which are not based on a particular class.
+These functions are also found in the library, but should only be of interest to the use with too much time and not enough to do (or with the same problem I had when I wrote the function).
+\subsection{Optickle Internals}
+\begin{description}
+  \item[blkdiagN] Construct a block diagonal matrix from N copies of a matrix
+  \item[dbessel] Derivative of bessel function
+  \item[getNoiseAmp] Returns the quantum noise power matrix for a mirror
+  \item[getPhaseMatrix] Returns the phase matrix used by tickle, tickle01 and sweep
+\end{description}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{The OpHG Class}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Alphabetical Listing}
+
