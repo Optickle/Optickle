@@ -15,9 +15,9 @@
 % The input/output ports of an optic depend on the type of optic.
 % See also addPortOut, addLink, Mirror, Sink, etc.
 %
-% opt = addProbeOut(opt, name, snOpt, nameOut, freq, phase);
+% [opt, snProbe] = addProbeOut(opt, name, snOpt, nameOut, freq, phase);
 
-function opt = addProbeOut(opt, name, snOpt, nameOut, freq, phase)
+function [opt, snProbe] = addProbeOut(opt, name, snOpt, nameOut, freq, phase)
 
   % check/parse field source
   snOpt = getSerialNum(opt, snOpt);
@@ -25,9 +25,9 @@ function opt = addProbeOut(opt, name, snOpt, nameOut, freq, phase)
 
   snLink = opt.optic{snOpt}.out(portFrom);
   if snLink == 0
-    error('Unavailable Field: %s not linked, so field is zero', ...
+    error('Unavailable Field: %s not linked, so field is unknown', ...
           getOutputName(opt, snOpt, portFrom));
   end
   
   % create new probe
-  opt = addProbe(opt, name, snLink, freq, phase);
+  [opt, snProbe] = addProbe(opt, name, snLink, freq, phase);

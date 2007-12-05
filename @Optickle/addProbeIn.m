@@ -11,9 +11,9 @@
 % The input/output ports of an optic depend on the type of optic.
 % See also addPortOut, addLink, Mirror, Sink, etc.
 %
-% opt = addProbeIn(opt, name, snOpt, nameIn, freq, phase);
+% [opt, snProbe] = addProbeIn(opt, name, snOpt, nameIn, freq, phase);
 
-function opt = addProbeIn(opt, name, snOpt, nameIn, freq, phase)
+function [opt, snProbe] = addProbeIn(opt, name, snOpt, nameIn, freq, phase)
 
   % check/parse field source
   snOpt = getSerialNum(opt, snOpt);
@@ -26,4 +26,4 @@ function opt = addProbeIn(opt, name, snOpt, nameIn, freq, phase)
   end
   
   % create new probe
-  opt = addProbe(opt, name, snLink, freq, phase);
+  [opt, snProbe] = addProbe(opt, name, snLink, freq, phase);

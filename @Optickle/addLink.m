@@ -14,7 +14,7 @@
 % The input/output ports of an optic depend on the type of optic.
 % See dispPortNames for more information.
 %
-% [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, dist)
+% [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
 
 function [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
 

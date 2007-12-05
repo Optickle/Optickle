@@ -1,9 +1,8 @@
-% set the mechanical transfer functions for an optic
+% opt = setMechTF(opt, name, mechTF, nDOF)
+%   set the mechanical transfer functions for an optic
 % 
-% opt = setMechTF(opt, name, mechTF)
 % name - name or serial number of an optic
 % mechTF - mechanical transfer function of this optic
-%   see Mirror for more information
 %
 % nDOF = 1 is for position (default)
 % nDOF = 2 is for pitch

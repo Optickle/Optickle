@@ -1,6 +1,6 @@
 % Add a general optic to the model.
 %
-% [opt, sn] = addOptic(opt, type, name, m, qm, inNames, outNames)
+% [opt, sn] = addOptic(opt, obj)
 %
 % This function is generally not used directly.  Use the add functions
 % for specific types of optics instead (e.g., addMirror).

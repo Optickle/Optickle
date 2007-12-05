@@ -10,9 +10,9 @@
 % The field index (nField) is not checked for validity.  Use addProbeIn
 % or addProbeOut instead.
 %
-% opt = addProbe(opt, name, nField, freq, phase);
+% [opt, snProbe] = addProbe(opt, name, nField, freq, phase);
 
-function opt = addProbe(opt, name, nField, freq, phase)
+function [opt, snProbe] = addProbe(opt, name, nField, freq, phase)
 
   % create new probe
   snProbe = opt.Nprobe + 1;		% probe serial number

@@ -26,9 +26,9 @@ function opt = optTest
   opt = addSink(opt, 'TRANS_90');
 
   opt = addLink(opt, 'PM', 'out', 'TRANS_T1', 'in', 0.3);
-  opt = addLink(opt, 'TRANS_T1', 'out', 'TRANS_S1', 'fr', 0.1);
-  opt = addLink(opt, 'TRANS_S1', 'fr', 'TRANS', 'in', 0.1);
-  opt = addLink(opt, 'TRANS_S1', 'bk', 'TRANS_90', 'in', 1.7);
+  opt = addLink(opt, 'TRANS_T1', 'out', 'TRANS_S1', 'bk', 0.1);
+  opt = addLink(opt, 'TRANS_S1', 'bk', 'TRANS', 'in', 0.1);
+  opt = addLink(opt, 'TRANS_S1', 'fr', 'TRANS_90', 'in', 1.7);
   
   % add TRANS probes
   opt = addProbeIn(opt, 'TRANS_DC', 'TRANS', 'in', 0, 0);	% DC

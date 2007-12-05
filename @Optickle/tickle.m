@@ -16,6 +16,8 @@
 %   Thus, sigAC is arranged such that sigAC(n, m, :)
 %   is the TF from the drive m to probe n.
 % mMech - modified drive transfer functions (Ndrv x Ndrv x Naf)
+% noiseAC - quantum noise at each probe (Nprb x Naf)
+% noiseMech - quantum noise at each drive (Ndrv x Naf)
 %
 % Example:
 % f = logspace(0, 3, 300);

@@ -17,8 +17,8 @@
 % obj = Telescope(name, f, df)
 %
 % A telescope has 1 input and 1 output.
-% Input:  1, in, fr
-% Output: 1, out, fr
+% Input:  1, in
+% Output: 1, out
 %
 % ==== Members
 % Optic - base class members

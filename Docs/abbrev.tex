@@ -88,3 +88,29 @@
 \newcommand{\fin}{\mathcal{F}}
 \newcommand{\Jmod}[1]{\fun{J_{#1}}{\Gamma_{mod}}}
 \newcommand{\wn}{k} 
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ENVIRONMENTS
+
+\newenvironment{funcinfo}[1]
+  {\vspace{0.1in}
+    \begin{tabular}{l}
+      \footnotesize \it #1\\
+      \hline
+      \scriptsize
+      \begin{tabular}{ll}}
+  {   \end{tabular}
+     \end{tabular}
+   \vspace{0.1in}}
+
+\newenvironment{funcinfo2}[2]
+  {\vspace{0.1in}
+    \begin{tabular}{l}
+      \footnotesize \it #1\\
+      \footnotesize \it #2\\
+      \hline
+      \scriptsize
+      \begin{tabular}{ll}}
+  {   \end{tabular}
+     \end{tabular}
+   \vspace{0.1in}}

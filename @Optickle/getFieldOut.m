@@ -1,12 +1,12 @@
 % returns the index of an output field
 %
-% n = getFieldIn(opt, name, inName)
+% n = getFieldOut(opt, name, outName)
 % name - optic name or serial number
 % outName - output name
 % n - field index
 %
 % Example:
-% n = getFieldIn(opt, 'PR', 'fr');
+% n = getFieldOut(opt, 'PR', 'fr');
 
 function n = getFieldOut(opt, name, outName)
 

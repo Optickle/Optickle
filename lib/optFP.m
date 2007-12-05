@@ -82,6 +82,13 @@ function opt = optFP
   opt = addProbeIn(opt, 'TRANSa_DC', 'TRANSa', 'in', 0, 0);	% DC
   opt = addProbeIn(opt, 'TRANSb_DC', 'TRANSb', 'in', 0, 0);	% DC
 
+  % add a source at the end, just for fun
+  opt = addSource(opt, 'FlashLight', (1e-3)^2 * (vMod == 1));
+  opt = addGouyPhase(opt, 'FrenchGuy', pi / 4);
+  opt = addLink(opt, 'FlashLight', 'out', 'FrenchGuy', 'in', 0.1);
+  opt = addLink(opt, 'FrenchGuy', 'out', 'EX', 'bk', 0.1);
+  opt = setGouyPhase(opt, 'FrenchGuy', pi / 8);
+  
   % add unphysical intra-cavity probes
   opt = addProbeIn(opt, 'IX_DC', 'IX', 'fr', 0, 0);
   opt = addProbeIn(opt, 'EX_DC', 'EX', 'fr', 0, 0);
