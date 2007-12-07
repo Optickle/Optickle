@@ -19,7 +19,7 @@
 % c - speed of light
 % k - carrier wave-number
 % minQuant - minimum loss considered for quantum noise (default = 1e-3)
-% debug - debugging level (not widely used)
+% debug - debugging level (default = 1, set to 0 for no tickle info)
 %
 % Of these, only some can be reference directly.  They are:
 %   Noptic, Ndrive, Nlink, Nprobe, lambda, k, c, h, and debug
@@ -80,7 +80,7 @@ function opt = Optickle(varargin)
                'probe', newProbe, 'Nprobe', 0, ...
                'snSource', [], 'lambda', 0, ...
                'k', 0, 'vFrf', [], 'c', 0, 'h', 0, ...
-               'minQuant', 1e-3, 'debug', 0);
+               'minQuant', 1e-3, 'debug', 1);
   opt.optic = {};
   opt.h = 6.62606891e-34;			% Plank constant [J*s]
   opt.c = 299792458;				% speed of light [m/s]

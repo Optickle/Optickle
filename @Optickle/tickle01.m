@@ -216,7 +216,7 @@ function varargout = tickle01(opt, pos, f)
     tNow = toc;
     frac = nAF / Naf;
     tRem = tNow * (1 / frac - 1);
-    if tNow > 2 && tRem > 2 && tNow - tLast > 0.5
+    if tNow > 2 && tRem > 2 && tNow - tLast > 0.5 && opt.debug > 0
       % wait bar string
       str = sprintf('%.1f s used, %.1f s left', tNow, tRem);
 
