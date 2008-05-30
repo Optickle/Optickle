@@ -35,7 +35,8 @@ function opt = addReadout(opt, name, fphi, names)
   end
 
   % add DC probe
-  opt = addProbeIn(opt, 'REFL_DC', name, 'in', 0, 0);
+  nameDC = sprintf('%s_DC', name);
+  opt = addProbeIn(opt, nameDC, name, 'in', 0, 0);
 
   % add demod probes
   for n = 1:N
