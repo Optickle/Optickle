@@ -7,8 +7,9 @@
 %  where z and z0 define the basis at the end of the propagation.
 %  For a complex basis vector,
 %    phi = angle(vBasis - vDist) - angle(vBasis);
+%  Note that Gouy phases in Optickle are always in radians.
 %
-% %% Example, Gouy phase of each propagation step:
+% Example, Gouy phase of each propagation step:
 % opt = optFP;
 % vDist = getLinkLengths(opt);
 % vBasis = getAllFieldBases(opt);
