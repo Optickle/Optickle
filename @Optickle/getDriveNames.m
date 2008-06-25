@@ -1,8 +1,7 @@
-% get list of drive names
+% nameList = getDriveNames(opt)
+%   get list of drive names
 %    returns a cell array of drive names
 %    the format of a drive name is OpticName.DriveName
-%
-% nameList = getDriveNames(opt)
 
 function nameList = getDriveNames(opt)
   

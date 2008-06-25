@@ -1,10 +1,10 @@
-% get drive map (see also getDriveNames)
-%   returns Ndrive x 2 matrix
-%   drvMap(:, 1) is the optic number
-%   drvMap(:, 2) is the drive number for that optic
-%
-%
 % drvMap = getDriveMap(opt)
+%   returns Ndrive x 2 matrix
+%
+% drvMap(:, 1) is the optic number
+% drvMap(:, 2) is the drive number for that optic
+%
+% see also getDriveNames
 
 function drvMap = getDriveMap(opt)
 

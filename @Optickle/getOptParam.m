@@ -2,6 +2,8 @@
 %
 % extract some basic parameters from an Optickle model
 %   used by getFieldMatrix, getDriveMatrix, etc.
+%
+% parameters are: h, c, minQuant, lambda, k, Nrf, vFrf
 
 function par = getOptParam(opt)
   

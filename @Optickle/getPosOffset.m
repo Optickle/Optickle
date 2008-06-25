@@ -1,7 +1,10 @@
-% get the position of optic's drive or drives
-% 
 % pos = getPosOffset(opt, name)
+%   get the position of optic's drive or drives
+% 
 % name - name or serial number of an optic
+%
+% Example:
+% getPosOffset(optFP, 'EX')
 
 function pos = getPosOffset(opt, varargin)
 

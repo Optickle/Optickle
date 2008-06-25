@@ -1,4 +1,5 @@
 % [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
+%   tickle internal function, not for direct use
 %
 % Convert Optics to Matrices
 %   mapList is from convertLinks

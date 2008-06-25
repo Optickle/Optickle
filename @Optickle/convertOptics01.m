@@ -1,4 +1,5 @@
 % [mOpt, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f)
+%   tickle01 internal function, not for direct use
 %
 % Convert Optics to Matrices for TEM01 propagation
 %   mapList is from convertLinks

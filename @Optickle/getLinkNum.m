@@ -1,9 +1,11 @@
-% returns the serial number of a link, given the name of its source and sink.
-%
 % n = getLinkNum(opt, nameSource, nameSink)
+%   returns the serial number of a link, given the name of its source and sink.
+%
 % nameSource - name or serial number of source optic (link start)
 % nameSink - name or serial number of sink optic (link end)
 % n - array of link serial numbers
+%
+% see also getFieldIn and getFieldOut
 
 function n = getLinkNum(opt, nameSource, nameSink)
 

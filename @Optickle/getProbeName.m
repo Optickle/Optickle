@@ -2,6 +2,8 @@
 %
 % Get the name of a probe
 %   sn may be a single serial number, a vector, or a cell array
+%
+% see also getProbeNum
 
 function name = getProbeName(opt, varargin)
 

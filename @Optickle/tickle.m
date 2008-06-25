@@ -23,7 +23,8 @@
 % f = logspace(0, 3, 300);
 % opt = optFP;
 % [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
-%
+
+
 % %%%%%%%%%%%%%%%%%%%% With control struct
 % [fDC, sigDC, sOpt, noiseOut] = tickle(opt, pos, sCon)
 %

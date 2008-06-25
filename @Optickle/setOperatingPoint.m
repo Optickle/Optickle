@@ -1,7 +1,7 @@
 % [opt, pos] = setOperatingPoint(opt, mDrive, mSense, vOffset)
 % [opt, pos] = setOperatingPoint(opt, mDrive, nameErrFunc)
+%   set some optic's position offsets to zero some error signals
 %
-% Set some optic's position offsets to zero some error signals.
 % The set of error signals is determined by mSense, which should
 % be Nlock x opt.Nprobe, where Nlock is the number of sensor
 % signals to zero and opt.Nprobe is the number of probes in the
@@ -13,7 +13,7 @@
 % Alternately, an error function may be given which takes sigDC
 % at each position (see sweep) as an argument and returns a matrix
 % of error signals (one for each position).  This may be useful for
-% more complex error signal which involve power normalization, etc.
+% more complex error signals which involve power normalization, etc.
 %
 % This is a very simple algorithm which explores with steps of
 % 1e-6 * opt.lambda in each drive DOF around the start point to

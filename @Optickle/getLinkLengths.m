@@ -1,7 +1,7 @@
 % vDist = getLinkLengths(opt)
 %   returns the lengths of each link
 %
-% %% Example, Gouy phase of each propagation step:
+% Example, Gouy phase of each propagation step:
 % opt = optFP;
 % vDist = getLinkLengths(opt);
 % vBasis = getAllFieldBases(opt);

@@ -1,5 +1,12 @@
 % phase = getProbePhase(opt, nPrb)
-%   returns the phase of a probe or collection of probes
+%   returns the demodulation phase of a probe or collection of probes
+%
+% Example:
+% opt = optFP;
+% getProbePhase(opt, 'REFL_I')
+% getProbePhase(opt, {'REFL_I', 'REFL_Q'})
+% getProbePhase(opt)
+
 
 function phase = getProbePhase(opt, varargin)
 

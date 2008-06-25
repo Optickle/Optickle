@@ -1,5 +1,9 @@
 % sCon = convertSimulink(opt, sys, f)
 %
+% ===> DO NOT USE THIS FUNCTION <===
+% This is only here for testing and may be removed in a future
+% version of Optickle.
+%
 % Converts a simulink model to a Optickle control struct.
 % If f is given in Hz, the simulink model is assumed to be in Hz.
 % 
@@ -40,11 +44,35 @@
 %  InputName - input names, from linmod
 %  OutputName - output names, from linmod
 
-function sCon = convertSimulink(opt, sys, f)
+function sCon = convertSimulink(opt, sys, f, addAll)
 
   % sizes of things
   Ndrv = opt.Ndrive;
   Nprb = opt.Nprobe;
+
+  % make sure Optickle IO comes last
+  load_system(sys);
+  blks = find_system(sys, 'BlockType', 'Inport');
+  Nblks = length(blks);
+  NinOpt = 0;
+  for n = 1:Nblks
+    name = remSysName(blks{n});
+    if strncmp('probe:', name, 6) || strncmp('sense:', name, 6)
+      set_param(blks{n}, 'Port', int2str(Nblks))
+    end
+    NinOpt = NinOpt + 1;
+  end
+
+  blks = find_system(sys, 'BlockType', 'Outport');
+  Nblks = length(blks);
+  NoutOpt = 0;
+  for n = 1:Nblks
+    name = remSysName(blks{n});
+    if strncmp('drive:', name, 6) || strncmp('phase:', name, 6)
+      set_param(blks{n}, 'Port', int2str(Nblks))
+    end
+    NoutOpt = NoutOpt + 1;
+  end
 
   % get linmod struct and control matrix
   sWarn = warning('off', 'Simulink:SL_UsingDefaultMaxStepSize');
@@ -71,7 +99,12 @@ function sCon = convertSimulink(opt, sys, f)
     mDrvOut(getSimDriveIndex(opt, slin.OutputName{n}, 'drive:'), n) = 1;
   end
     
-  % make control struct
+  %%%%% if requested, add other inputs and outputs
+  if nargin > 4 && addAll
+    
+  end
+  
+  %%%%% make control struct
   sCon.f = f;
   sCon.Nin = Nin;
   sCon.Nout = Nout;
@@ -86,13 +119,20 @@ function sCon = convertSimulink(opt, sys, f)
   sCon.OutputName = slin.OutputName;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function m = getSimProbeIndex(opt, name, prefix)
+function name = remSysName(name)
 
   % remove system name
   nSep = strfind(name, '/');
   if ~isempty(nSep)
     name = name(nSep(end) + 1:end);
   end
+  
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function m = getSimProbeIndex(opt, name, prefix)
+
+  % remove system name
+  name = remSysName(name);
   
   % look for probe names
   Npre = length(prefix);
@@ -106,10 +146,7 @@ function m = getSimProbeIndex(opt, name, prefix)
 function m = getSimDriveIndex(opt, name, prefix)
 
   % remove system name
-  nSep = strfind(name, '/');
-  if ~isempty(nSep)
-    name = name(nSep(end) + 1:end);
-  end
+  name = remSysName(name);
   
   % look for drive names
   Npre = length(prefix);

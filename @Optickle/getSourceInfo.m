@@ -1,9 +1,8 @@
-% returns the information about source fields
+% [vFrf, vSrc] = getSourceInfo(opt)
+%   returns information about source fields
 %
 % vFrf - source frequency vector (Nrf x 1)
 % vSrc - source amplitude vector (Nfld x 1)
-%
-% [vFrf, vSrc] = getSourceInfo(opt)
 
 function [vFrf, vSrc] = getSourceInfo(opt)
 

@@ -1,7 +1,6 @@
-% returns the serial number of an optic,
-% given the optic's name or serial number
-%
 % n = getSerialNum(opt, name)
+%   returns the serial number of an optic,
+%   given the optic's name or serial number
 
 function n = getSerialNum(opt, name)
 

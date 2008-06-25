@@ -1,6 +1,6 @@
 % opt = setPosOffset(opt, name, pos)
 %
-% set the position offset of optic's drive or drives
+% set the position offset of an optic's drive or drives
 % name - name or serial number of an optic
 % pos - zero position for this optic
 %

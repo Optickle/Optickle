@@ -3,6 +3,8 @@
 % Gets the display name of the sink for the specified link.
 %   Also available are the sink optic's serial number,
 %   and the input port to which this like is connected.
+%
+% see also getSourceName
 
 function [name, sn, port] = getSinkName(opt, snLink)
 

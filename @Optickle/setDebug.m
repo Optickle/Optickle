@@ -1,5 +1,5 @@
-% set the debug level
 % opt = setDebug(opt, debug)
+%   set the debug level
 
 function opt = setDebug(opt, debug)
 

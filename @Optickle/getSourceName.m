@@ -1,8 +1,12 @@
+% [name, sn, port] = getSourceName(opt, snLink)
+%
 % Gets the display name of the source for the specified link.
 %   Also available are the source optic's serial number,
 %   and the output port to which this like is connected.
 %
-% [name, sn, port] = getSourceName(opt, snLink)
+% Example:
+% opt = optFP;
+% getSourceName(opt, getFieldOut(opt, 'EX', 'fr'))
 
 function [name, sn, port] = getSourceName(opt, snLink)
 

@@ -7,7 +7,17 @@
 % The "basis vector" is a Nfldx2 matrix of complex numbers.
 % The vector vBasis(:, 1) contains the x-axis bases.
 % The vector vBasis(:, 2) contains the y-axis bases.
-%   see also @OpHG/apply
+%
+% NOTE: At present Optickle only uses the y-axis bases.  These
+% are used in tickle01.  The x-axis bases are not used.
+%
+%   see also @OpHG/apply, getLinkLengths, getGouyPhase
+%
+% Example, Gouy phase of each propagation step:
+% opt = optFP;
+% vDist = getLinkLengths(opt);
+% vBasis = getAllFieldBases(opt);
+% vPhiGouy = getGouyPhase(vDist, vBasis(:, 2)) * 180 / pi
 
 function vBasis = getAllFieldBases(opt)
 

@@ -84,10 +84,10 @@ function opt = optFP
 
   % add a source at the end, just for fun
   opt = addSource(opt, 'FlashLight', (1e-3)^2 * (vMod == 1));
-  opt = addGouyPhase(opt, 'FrenchGuy', pi / 4);
-  opt = addLink(opt, 'FlashLight', 'out', 'FrenchGuy', 'in', 0.1);
-  opt = addLink(opt, 'FrenchGuy', 'out', 'EX', 'bk', 0.1);
-  opt = setGouyPhase(opt, 'FrenchGuy', pi / 8);
+  opt = addGouyPhase(opt, 'FakeTele', pi / 4);
+  opt = addLink(opt, 'FlashLight', 'out', 'FakeTele', 'in', 0.1);
+  opt = addLink(opt, 'FakeTele', 'out', 'EX', 'bk', 0.1);
+  opt = setGouyPhase(opt, 'FakeTele', pi / 8);
   
   % add unphysical intra-cavity probes
   opt = addProbeIn(opt, 'IX_DC', 'IX', 'fr', 0, 0);

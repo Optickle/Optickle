@@ -16,7 +16,8 @@
 % f = logspace(0, 3, 300);
 % opt = optFP;
 % [sigAC, mMech] = tickle01(opt, [], f);
-%
+
+
 % %%%%%%%%%%%%%%%%%%%% With control struct
 % sOpt = tickle(opt, pos, sCon)
 %

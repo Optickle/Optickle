@@ -1,4 +1,5 @@
-% Add a probe of some field.
+% [opt, snProbe] = addProbe(opt, name, nField, freq, phase);
+%   Add a probe of some field.
 %
 % Arguments:
 % opt - the optickle model
@@ -7,10 +8,8 @@
 % freq - demodulation frequency (Hz)
 % phase - demodulation phase offset (degrees)
 %
-% The field index (nField) is not checked for validity.  Use addProbeIn
-% or addProbeOut instead.
-%
-% [opt, snProbe] = addProbe(opt, name, nField, freq, phase);
+% This is an internal function and the field index (nField) is not
+% checked for validity.  Use addProbeIn or addProbeOut instead.
 
 function [opt, snProbe] = addProbe(opt, name, nField, freq, phase)
 

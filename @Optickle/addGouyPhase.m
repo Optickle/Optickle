@@ -1,7 +1,9 @@
-% Add a Gouy phase adjuster to the model.
-%
 % [opt, sn] = addGouyPhase(opt, name, phi)
-%   phi - Gouy phase in radians, see also GouyPhase and setGouyPhase
+%   Add a Gouy phase adjuster to the model.
+%
+% phi - Gouy phase in radians
+%
+% see also GouyPhase and setGouyPhase
 
 function [opt, sn] = addGouyPhase(opt, name, varargin)
 

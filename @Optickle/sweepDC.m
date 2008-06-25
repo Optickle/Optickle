@@ -1,17 +1,19 @@
 % compute signals from DC fields as a function of optic positions
 %   this is a backward compatability wrapper on sweepLinear
 %
+% ===> DO NOT USE THIS FUNCTION IN NEW CODE <===
+% It is only here for backward compoatability and will be removed
+% in a future version of Optickle.  Use sweepLinear instead.
+%
 % [pos, sigDC, fDC] = sweepDC(opt, posStart, posEnd, Npos)
 % pos - optic position sweep (Noptic x Npos)
 % sigDC - signal vectors (Nprobe x Npos)
 % fDC - field matrices (Nlnk x Nrf x Npos)
 %
-% see also sweepLinear and sweep
-%
 % Example:
 % opt = optFP;
 % pos = zeros(opt.Noptic, 1);
-% pos(getDriveIndex(opt, 'EX')) = 1e-10;
+% pos(getSerialNum(opt, 'EX')) = 1e-10;
 % [xpos, sigDC] = sweepDC(opt, -pos, pos, 101);
 
 function [pos, sigDC, fDC] = sweepDC(opt, posStart, posEnd, Npos)

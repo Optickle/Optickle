@@ -1,7 +1,8 @@
-% returns the serial number of a probe,
-% given the probes's name or serial number
-%
 % n = getProbeNum(opt, name)
+%   returns the serial number of a probe,
+%   given the probes's name or serial number
+%
+% see also getProbeName
 
 function n = getProbeNum(opt, name)
 

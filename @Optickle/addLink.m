@@ -1,4 +1,5 @@
-% Add a link between two optickle nodes.
+% [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
+%   Add a link between two optickle nodes.
 %
 % Arguments:
 % opt - the optickle model
@@ -12,9 +13,6 @@
 % returned by addOptic.  The name of the optic can also be used.
 %
 % The input/output ports of an optic depend on the type of optic.
-% See dispPortNames for more information.
-%
-% [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
 
 function [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
 

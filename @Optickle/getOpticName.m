@@ -11,7 +11,7 @@ function name = getOpticName(opt, varargin)
     sn = varargin{1};
   end
 
-  if isstr(sn) || length(sn) == 1
+  if ischar(sn) || length(sn) == 1
     % a single number or name
     sn = getSerialNum(opt, sn);
     name = opt.optic{sn}.name;

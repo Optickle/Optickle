@@ -1,5 +1,11 @@
 % opt = setGouyPhase(opt, name, phi)
 %   set Gouy phase of an existing GouyPhase object
+%
+% Gouy phases are expressed in radians.  see also getGouyPhase
+%
+% Example:
+% opt = optFP;
+% opt = setGouyPhase(opt, 'FakeTele', pi / 4);
 
 function opt = setGouyPhase(opt, name, phi)
 

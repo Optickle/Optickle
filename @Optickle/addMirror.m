@@ -1,6 +1,6 @@
-% Add a mirror to the model.
-%
 % [opt, sn] = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
+%   Add a mirror to the model.
+%
 % aio - angle of incidence (in degrees)
 % Chr - curvature of HR surface (Chr = 1 / radius of curvature)
 % Thr - power transmission of HR suface

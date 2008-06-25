@@ -1,7 +1,8 @@
-% returns the drive index an optic,
-% given the optic's name or serial number and driveNum (optional)
-%
 % n = getDriveIndex(opt, name, driveType)
+%   returns the drive index an optic,
+%   given the optic's name or serial number and driveNum (optional)
+%
+% see also getDriveNames and getDriveOffset
 
 function n = getDriveIndex(opt, name, driveType)
 

@@ -1,7 +1,8 @@
+% [vLen, prbList, mapList] = convertLinks(opt)
+%   tickle internal function, not for direct use
+%
 % Convert Optickle model to links and probes to matrix form
 %   and construct input and output maps for optics
-%
-% [vLen, prbList, mapList] = convertLinks(opt)
 
 function [vLen, prbList, mapList] = convertLinks(opt)
 

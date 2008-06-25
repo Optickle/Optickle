@@ -3,6 +3,12 @@
 % Sets the basis as determined by the two mirrors
 % (specified by name1 and name2).  The two mirrors must
 % make a simple 2 mirror cavity, connected front-to-front.
+%
+% The modal basis used for tickle01 can be set at the
+% field source (see addSource).  Or with setCavityBasis.
+%
+% Example (from optFP):
+% opt = setCavityBasis(opt, 'IX', 'EX');
 
 function opt = setCavityBasis(opt, name1, name2)
 

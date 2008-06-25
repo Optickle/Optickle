@@ -1,8 +1,11 @@
+% [opt, snProbe] = addProbeOut(opt, name, snOpt, nameOut, freq, phase);
+%
 % Add a probe of an optic's output field.  The probe is currently
 % located at the end of the link carrying the output field (e.g.,
 % at the input to the next optic).  This is because optic output
 % fields are link input fields, which are not evaluated.  The only
-% difference is the propagation phase...
+% difference is the propagation phase, but it is better to use
+% addProbeIn for clarity.
 %
 % Arguments:
 % opt - the optickle model
@@ -13,9 +16,7 @@
 % phase - demodulation/RF phase offset (degrees)
 %
 % The input/output ports of an optic depend on the type of optic.
-% See also addPortOut, addLink, Mirror, Sink, etc.
-%
-% [opt, snProbe] = addProbeOut(opt, name, snOpt, nameOut, freq, phase);
+% see also addProbeIn
 
 function [opt, snProbe] = addProbeOut(opt, name, snOpt, nameOut, freq, phase)
 

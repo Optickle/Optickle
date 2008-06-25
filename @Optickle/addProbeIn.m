@@ -1,4 +1,5 @@
-% Add a probe of an optic's input/incident field.
+% [opt, snProbe] = addProbeIn(opt, name, snOpt, nameIn, freq, phase);
+%   Add a probe of an optic's input/incident field.
 %
 % Arguments:
 % opt - the optickle model
@@ -9,9 +10,7 @@
 % phase - demodulation/RF phase offset (degrees)
 %
 % The input/output ports of an optic depend on the type of optic.
-% See also addPortOut, addLink, Mirror, Sink, etc.
-%
-% [opt, snProbe] = addProbeIn(opt, name, snOpt, nameIn, freq, phase);
+% see also addProbeOut, addLink, Mirror, Sink, etc.
 
 function [opt, snProbe] = addProbeIn(opt, name, snOpt, nameIn, freq, phase)
 

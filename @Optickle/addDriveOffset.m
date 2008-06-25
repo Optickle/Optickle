@@ -1,9 +1,10 @@
-% add a position offset via drive index
-%   see also addPosOffset
-%
 % opt = addDriveOffset(opt, nDrv, pos)
+%   add a position offset via drive index
+%
 % nDrv - drive index
 % pos - addition to zero position for this drive
+%
+% see also addPosOffset
 %
 % How it works:
 %  pos = getPosOffset(opt);        % get all pos offsets

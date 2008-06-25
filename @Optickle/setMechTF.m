@@ -3,6 +3,8 @@
 % 
 % name - name or serial number of an optic
 % mechTF - mechanical transfer function of this optic
+%  this transfer function is from radiation pressure to position
+%  (or radiation torque to angle)
 %
 % nDOF = 1 is for position (default)
 % nDOF = 2 is for pitch

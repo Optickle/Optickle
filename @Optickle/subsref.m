@@ -1,4 +1,5 @@
-% generic subsref for open access
+% subsref for Optickle
+%   this is a class support function and not intended for direct use
 
 function val = subsref(obj, s)
 

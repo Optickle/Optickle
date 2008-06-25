@@ -5,7 +5,7 @@
 % This function is generally not used directly.  Use the add functions
 % for specific types of optics instead (e.g., addMirror).
 %
-% see also addBeamSplitter, addMirror, addModulator, addSink, addSource
+% see also addBeamSplitter, addMirror, addModulator, addSink, addSource, etc.
 
 function [opt, sn] = addOptic(opt, obj)
 
