@@ -2,7 +2,10 @@
 %
 % derivative of bessel function
 % dbdx = d/dx [bessel(n, gamma * (1 + x)] at x = 0
+
+%%%%%%%%%%%%%%%%%%%
+% exact equation contributed by François Bondu
+
 function dbdx = dbessel(n, gamma)
-  eps = 1e-3;
-  dbdx = (bessel(n, gamma * (1 + eps)) - ...
-          bessel(n, gamma * (1 - eps))) / (2 * eps);
+
+  dbdx = gamma .* bessel(n - 1, gamma) - n .* bessel(n, gamma);

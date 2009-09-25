@@ -7,17 +7,10 @@
 % The "basis vector" is a Nfldx2 matrix of complex numbers.
 % The vector vBasis(:, 1) contains the x-axis bases.
 % The vector vBasis(:, 2) contains the y-axis bases.
-%
-% NOTE: At present Optickle only uses the y-axis bases.  These
-% are used in tickle01.  The x-axis bases are not used.
-%
-%   see also @OpHG/apply, getLinkLengths, getGouyPhase
-%
-% Example, Gouy phase of each propagation step:
-% opt = optFP;
-% vDist = getLinkLengths(opt);
-% vBasis = getAllFieldBases(opt);
-% vPhiGouy = getGouyPhase(vDist, vBasis(:, 2)) * 180 / pi
+%   see also @OpHG/apply
+% WANRING!!!
+% Check Consistency function modified with respect to the standard one, opt
+% is now an argument
 
 function vBasis = getAllFieldBases(opt)
 
@@ -92,7 +85,7 @@ function vBasis = getAllFieldBases(opt)
 	  isSet(nOut) = true;
 	  %disp(sprintf('Set %d from %d (forward).', nOut, n));
 	else
-	  checkConsistency(vBasis(nOut, :), qOut, n, nOut);
+	  checkConsistency(vBasis(nOut, :), qOut, n, nOut, opt);
 	end
       end
       
@@ -119,7 +112,9 @@ function vBasis = getAllFieldBases(opt)
 	  isSet(nOut) = true;
 	  %disp(sprintf('Set %d from %d (backward).', nOut, n));
 	else
-	  checkConsistency(vBasis(nOut, :), qOut, n, nOut);
+%fprintf('Parameters %g, %g, %g, %g\n ', vBasis(nOut, 1), qOut, n, nOut);
+checkConsistency(vBasis(nOut, :), qOut, n, nOut, opt);
+
 	end
       end
     end
@@ -134,12 +129,20 @@ function vBasis = getAllFieldBases(opt)
   end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-function b = checkConsistency(q1, q2, n, nOut)
+function b = checkConsistency(q1, q2, n, nOut, opt)
 
-  qc = abs(q1 + q2);
-  qd = abs(q1 - q2);
-  err = max(qd ./ qc);
-  if err > 1e-2
+qc = abs(q1 + q2);
+qd = abs(q1 - q2);
+%err = max(qd ./ qc);
+%Use only Y basis (Optickle does TEM 10)
+err = qd(2) ./ qc(2);
+if err > 5e-3
     warning('Consistency check failed for field %d from %d (err = %g)!', ...
-      nOut, n, err);
-  end
+        nOut, n, err);
+    sourceOut = getSourceName(opt, nOut);
+    sinkOut =  getSinkName(opt, nOut);
+    sourceIn = getSourceName(opt, n);
+    sinkIn =  getSinkName(opt, n);
+    disp(sprintf('q1 is the basis for field %d (from %s to %s): the distance past the waist is %g m, the Rayleigh range is %g m' , n, sourceIn, sinkIn, real(q1(2)), imag(q1(2))));
+    disp(sprintf('q2 is the basis for field %d (from %s to %s): the distance past the waist is %g m, the Rayleigh range is %g m' , nOut, sourceOut, sinkOut, real(q2(2)), imag(q2(2))));
+end
