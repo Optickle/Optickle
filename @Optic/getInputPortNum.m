@@ -34,3 +34,5 @@ function n = getInputPortNum(obj, name)
     % ==== name is not a number or a string...
     error('Invalid argument of type %s', class(name));
   end
+  
+end

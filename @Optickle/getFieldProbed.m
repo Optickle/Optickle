@@ -11,5 +11,12 @@
 
 function n = getFieldProbed(opt, name)
 
+  % get probe numbers
   sn = getProbeNum(opt, name);
-  n = opt.probe(sn).nField;
+  
+  % convert to link numbers
+  n = zeros(size(sn));
+  for nn = 1:numel(sn)
+    n(nn) = opt.probe(sn(nn)).nField;
+  end
+end

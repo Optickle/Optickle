@@ -18,23 +18,6 @@
 % [sigAC, mMech] = tickle01(opt, [], f);
 
 
-% %%%%%%%%%%%%%%%%%%%% With control struct
-% sOpt = tickle(opt, pos, sCon)
-%
-% An alternate means of using tickle01 is to pass a control struct
-% as the third argument.  See tickle and convertSimulink for details.
-%
-% As with tickle, but for the pitch degree-of-freedom, the result is
-% Optickle system struct which contains the following fields:
-%   mPlant - transfer from control outputs to control inputs
-%            this is taken from sigAC and mMech
-%   mOpenLoop - open loop tranfer at control outputs
-%               mOpenLoop = sCon.mCon * mPlant
-%   mCloseLoop - close loop transfer at control outputs
-%                mCloseLoop = inv(eye(mCon.Nout) - mOpenLoop)
-%   mInOut - transfer from control inputs to control outputs with loops
-%            mInOut = mCloseLoop * sCon.mCon;
-
 function varargout = tickle01(opt, pos, f)
 
   % === Argument Handling
@@ -42,13 +25,6 @@ function varargout = tickle01(opt, pos, f)
     error('No frequency vector given.  Use tickle for DC results.')
   end
 
-  % third argument is actually control struct (see convertSimulink)
-  isCon = isstruct(f);
-  if isCon
-    sCon = f;
-    f = sCon.f;
-  end
-  
   % === Field Info
   [vFrf, vSrc] = getSourceInfo(opt);
   LIGHT_SPEED = opt.c;
@@ -139,23 +115,9 @@ function varargout = tickle01(opt, pos, f)
   eyeNdof = speye(Ndof);
 
   % intialize result space
-  if ~isCon
-    % full results: all probes, all drives
-    mExc = eyeNdof(:, jDrv);
-    sigAC = zeros(Nprb, Ndrv, Naf);
-    mMech = zeros(Ndrv, Ndrv, Naf);
-  else
-    % reduced results for control struct
-    mExc = eyeNdof(:, jDrv) * sCon.mDrvOut;
-
-    sOpt.mInOut = zeros(sCon.Nout, sCon.Nin, Naf);
-    sOpt.mPlant = zeros(sCon.Nin, sCon.Nout, Naf);
-    sOpt.mOpenLoop = zeros(sCon.Nout, sCon.Nout, Naf);
-    sOpt.mCloseLoop = zeros(sCon.Nout, sCon.Nout, Naf);
-    
-    eyeNout = eye(sCon.Nout);
-    mPrbPrb = sCon.mPrbIn * sparse(diag(sigQ)) * sCon.mPrbOut;
-  end
+  mExc = eyeNdof(:, jDrv);
+  sigAC = zeros(Nprb, Ndrv, Naf);
+  mMech = zeros(Ndrv, Ndrv, Naf);
   
   % since this can take a while, let's time it
   tic;
@@ -190,27 +152,8 @@ function varargout = tickle01(opt, pos, f)
     tfAC = (eyeNdof - mDof) \ mExc;
 
     % extract optic to probe transfer functions
-    if ~isCon
-      % no control struct, return TFs to all probes and drives
-      sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
-      mMech(:, :, nAF) = tfAC(jDrv, :);
-    else
-      % reduce probes and drives to those required by control struct
-      mPlant = sCon.mPrbIn * mPrb * tfAC(jAsb, :) + ...
-	sCon.mDrvIn * tfAC(jDrv, :) + mPrbPrb;
-      
-      % compute closed loop response of outputs
-      mCon = sCon.mCon(:, :, nAF);
-      mOL = mCon * mPlant;
-      mCL = inv(eyeNout - mOL);
-      mInOut = mCL * mCon;
-      
-      % store into the sOpt struct
-      sOpt.mInOut(:, :, nAF) = mInOut;
-      sOpt.mPlant(:, :, nAF) = mPlant;
-      sOpt.mOpenLoop(:, :, nAF) = mOL;
-      sOpt.mCloseLoop(:, :, nAF) = mCL;
-    end
+    sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
+    mMech(:, :, nAF) = tfAC(jDrv, :);
         
     % ==== Timing and User Interaction
     % NO MODELING HERE (just let the user know how long this will take)
@@ -265,9 +208,6 @@ function varargout = tickle01(opt, pos, f)
   drawnow
 
   % build outputs
-  if ~isCon
-    varargout{1} = sigAC;
-    varargout{2} = mMech;
-  else
-    varargout{1} = sOpt;
-  end    
+  varargout{1} = sigAC;
+  varargout{2} = mMech;
+end    

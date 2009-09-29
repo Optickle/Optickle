@@ -10,4 +10,4 @@ function mOpt = getFieldMatrix01(obj, pos, vBasis, par)
   phi = getTelescopePhase(obj, vBasis);
   
   % send inputs to outputs with Gouy phase (y-basis... TEM01 mode)
-  mOpt = getFieldMatrix(obj, pos, par) * exp(i * phi(2));
+  mOpt = getFieldMatrix(obj, pos, par) * exp(1i * phi(2));

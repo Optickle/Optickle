@@ -8,9 +8,6 @@
 % The vector vBasis(:, 1) contains the x-axis bases.
 % The vector vBasis(:, 2) contains the y-axis bases.
 %   see also @OpHG/apply
-% WANRING!!!
-% Check Consistency function modified with respect to the standard one, opt
-% is now an argument
 
 function vBasis = getAllFieldBases(opt)
 
@@ -111,9 +108,9 @@ function vBasis = getAllFieldBases(opt)
 	  isNew(nOut) = true;
 	  isSet(nOut) = true;
 	  %disp(sprintf('Set %d from %d (backward).', nOut, n));
-	else
-%fprintf('Parameters %g, %g, %g, %g\n ', vBasis(nOut, 1), qOut, n, nOut);
-checkConsistency(vBasis(nOut, :), qOut, n, nOut, opt);
+    else
+      %fprintf('Parameters %g, %g, %g, %g\n ', vBasis(nOut, 1), qOut, n, nOut);
+      checkConsistency(vBasis(nOut, :), qOut, n, nOut, opt);
 
 	end
       end
@@ -127,22 +124,26 @@ checkConsistency(vBasis(nOut, :), qOut, n, nOut, opt);
     end
     error('Some fields have no basis!  see @Mirror/setFrontBasis')
   end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 function b = checkConsistency(q1, q2, n, nOut, opt)
 
-qc = abs(q1 + q2);
-qd = abs(q1 - q2);
-%err = max(qd ./ qc);
-%Use only Y basis (Optickle does TEM 10)
-err = qd(2) ./ qc(2);
-if err > 5e-3
+  qc = abs(q1 + q2);
+  qd = abs(q1 - q2);
+  %err = max(qd ./ qc);
+  %Use only Y basis (Optickle does TEM 10)
+  err = qd(2) / qc(2);
+  if err > 5e-3
     warning('Consistency check failed for field %d from %d (err = %g)!', ...
-        nOut, n, err);
+      nOut, n, err);
     sourceOut = getSourceName(opt, nOut);
     sinkOut =  getSinkName(opt, nOut);
     sourceIn = getSourceName(opt, n);
     sinkIn =  getSinkName(opt, n);
-    disp(sprintf('q1 is the basis for field %d (from %s to %s): the distance past the waist is %g m, the Rayleigh range is %g m' , n, sourceIn, sinkIn, real(q1(2)), imag(q1(2))));
-    disp(sprintf('q2 is the basis for field %d (from %s to %s): the distance past the waist is %g m, the Rayleigh range is %g m' , nOut, sourceOut, sinkOut, real(q2(2)), imag(q2(2))));
+    disp(sprintf('q1 is the basis for field %d (from %s to %s): the distance past the waist is %g m, the Rayleigh range is %g m' , ...
+      n, sourceIn, sinkIn, real(q1(2)), imag(q1(2))));
+    disp(sprintf('q2 is the basis for field %d (from %s to %s): the distance past the waist is %g m, the Rayleigh range is %g m' , ...
+      nOut, sourceOut, sinkOut, real(q2(2)), imag(q2(2))));
+  end
 end

@@ -1,8 +1,8 @@
-% [w, z0, z, R] = beamSize(opt, name, inName)
+% [w, z0, z, R] = getBeamSize(opt, name, inName)
 %
 % Determine the beam size on a given optic
-% name = name of the optic
-% inName = input name (fr or frA for BS)
+% name = name of the optic, or cell array of names
+% inName = input name (fr or frA for BS), or cell array of names
 %
 % w = beam radius on that optic
 % z = distance from beam waist to optic (negative means optic is before waist)
@@ -18,7 +18,7 @@
 %%%%%%%%%%%%%%%%%%%
 % contributed by Lisa Barsotti
 
-function [w, z0, z, R] = beamSize(opt, name, inName)
+function [w, z0, z, R] = getBeamSize(opt, name, inName)
   
   % get the basis functions
   vBasis = getAllFieldBases(opt);

@@ -7,8 +7,8 @@
 % beam among detectors you need only one input and 2 outputs, so a
 % Mirror object is sufficient, will reduce complexity as it does not
 % have A and B sides, and will save computation time.  Typically, an
-% interferometer simulation, including readout, requires only ONE
-% BeamSplitter object.
+% interferometer simulation requires only a few BeamSplitter objects
+% (e.g., 1), and none of them are in the readout!
 %
 % aio - angle of incidence (in degrees)
 % Chr - curvature of HR surface (Chr = 1 / radius of curvature)
