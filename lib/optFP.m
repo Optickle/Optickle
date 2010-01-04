@@ -20,13 +20,13 @@ function opt = optFP
   opt = addLink(opt, 'Laser', 'out', 'AM', 'in', 0);
 
   % add an PM modulator (for frequency control and noise)
-  opt = addModulator(opt, 'PM', i);
+  opt = addModulator(opt, 'PM', 1i);
   opt = addLink(opt, 'AM', 'out', 'PM', 'in', 0);
 
   % add an RF modulator
   %   opt = addRFmodulator(opt, name, fMod, aMod)
   gamma = 0.2;
-  opt = addRFmodulator(opt, 'Mod1', fMod, i * gamma);
+  opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
   opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
 
   % add mirrors
@@ -92,3 +92,5 @@ function opt = optFP
   % add unphysical intra-cavity probes
   opt = addProbeIn(opt, 'IX_DC', 'IX', 'fr', 0, 0);
   opt = addProbeIn(opt, 'EX_DC', 'EX', 'fr', 0, 0);
+
+end

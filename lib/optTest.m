@@ -16,7 +16,7 @@ function opt = optTest
   opt = addLink(opt, 'Laser', 'out', 'AM', 'in', 0);
 
   % add an PM modulator
-  opt = addModulator(opt, 'PM', i);
+  opt = addModulator(opt, 'PM', 1i);
   opt = addLink(opt, 'AM', 'out', 'PM', 'in', 0);
 
   % add TRANS optics
@@ -33,3 +33,5 @@ function opt = optTest
   % add TRANS probes
   opt = addProbeIn(opt, 'TRANS_DC', 'TRANS', 'in', 0, 0);	% DC
   opt = addProbeIn(opt, 'TRANS_90_DC', 'TRANS_90', 'in', 0, 0);	% DC
+
+end

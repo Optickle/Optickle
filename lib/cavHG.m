@@ -3,6 +3,7 @@
 % L - length of the cavity
 % R1 - radius of curvature of the first mirror
 % R2 - radius of curvature of the second mirror
+%
 % z0 - Rayleigh Range of the beam
 % z1 - distance the first mirror is past the waist
 %      (negative if the waist is inside the cavity)

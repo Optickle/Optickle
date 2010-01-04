@@ -21,3 +21,5 @@ function [mOpt, mRct, mDrv, mQuant] = getMatrices(obj, pos, par)
     mDrv = [];
     mQuant = [];
   end
+
+end

@@ -10,3 +10,5 @@ function val = get(obj, str)
     error(['Reference to non-existent field ''%s''' ...
       ' in object of type ''%s'''], str, class(obj));
   end
+
+end

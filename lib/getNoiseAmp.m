@@ -19,7 +19,7 @@ function mNP = getNoiseAmp(Thr, Lhr, Rar, Lmd, phi, in, minQuant)
   
   % ==== From getFieldMatrix
   % reflection phases
-  frp = exp(i * phi);
+  frp = exp(1i * phi);
   brp = conj(frp);
   
   % amplitude reflectivities, transmissivities and phases

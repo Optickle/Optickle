@@ -23,4 +23,6 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   mNA = blkdiagN(mNP, par.Nrf);
   
   % these noises are unsqueezed, so make amplitude and phase
-  mQuant = [mNA, i * mNA];
+  mQuant = [mNA, 1i * mNA];
+
+end

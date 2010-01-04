@@ -14,3 +14,5 @@ function [mOpt, mRct, mDrv] = getMatrices01(obj, pos, vBasis, par)
   % reaction, drive and noise matrices (only used in AC computation)
   mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d);
   mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d);
+
+end

@@ -86,6 +86,9 @@ function varargout = tickle01(opt, pos, f)
     mIn_k = prbList(k).mIn;
     mPrb_k = prbList(k).mPrb;
     
+    % HACK: TEM01 does not have factor of 2 for DC
+    mPrb_k(mPrb_k == 2) = 1;
+    
     vDCin = mIn_k * vDC;
     mPrb(k, 1:Nfld) = (mPrb_k * conj(vDCin)).' * mIn_k;
     mPrb(k, (1:Nfld) + Nfld) = (mPrb_k.' * vDCin).' * mIn_k;

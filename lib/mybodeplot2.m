@@ -4,11 +4,9 @@ function [varargout] = mybodeplot2(varargin)
 % and a vector 'z' of complex numbers
 % z can also be a bunch of columns 
 % e.g. mybodeplot2(f,[hDARM hCARM hPRC hMICH]) 
+% (see also zplotlog)
 %
 % Syntax: mybodeplot2(f,z)  or [top,bottom] = mybodeplot2(f,z)
-%
-
-
 
 deg = 180/pi;
 
@@ -51,4 +49,4 @@ else
   error('Needs 0 or 2 output args')
 end
 
-return
+end

@@ -7,4 +7,4 @@
 function mOpt = getFieldMatrix01(obj, pos, vBasis, par)
   
   % send inputs to outputs with Gouy phase
-  mOpt = getFieldMatrix(obj, pos, par) * exp(i * obj.phi);
+  mOpt = getFieldMatrix(obj, pos, par) * exp(1i * obj.phi);

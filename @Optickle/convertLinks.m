@@ -12,7 +12,7 @@ function [vLen, prbList, mapList] = convertLinks(opt)
   % ==== Sizes of Things
   Nopt = opt.Noptic;			% number of optics
   Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;			% number of links
+  Nlnk = opt.Nlink;				% number of links
   Nprb = opt.Nprobe;			% number of probes
   Nrf  = length(vFrf);			% number of RF components
   Nfld = Nlnk * Nrf;			% number of RF fields
@@ -54,8 +54,8 @@ function [vLen, prbList, mapList] = convertLinks(opt)
   % loop over probes
   for k = 1:Nprb
     prb = opt.probe(k);
-    phi = exp(i * pi * prb.phase / 180);
-    phi_quad = exp(i * pi * (prb.phase + 90) / 180);
+    phi = exp(1i * pi * prb.phase / 180);
+    phi_quad = exp(1i * pi * (prb.phase + 90) / 180);
 
     % loop over RF components
     for n = 1:Nrf
@@ -77,7 +77,7 @@ function [vLen, prbList, mapList] = convertLinks(opt)
         elseif df_m < 1e-3
           prbList(k).mPrb(m, n) = conj(phi);
           prbList(k).mPrbQ(m, n) = conj(phi_quad);
-        elseif df_p < 1 || df_m < 1
+        elseif df_p < 1e3 || df_m < 1e3
           warning(['Demodulation frequency near-miss for probe %d ' ... 
             'with RF components %d and %d.'], k, n, m)
         end
@@ -134,3 +134,5 @@ function [vLen, prbList, mapList] = convertLinks(opt)
     % store DOF in list
     mapList(n).mDOF = mDOF;
   end
+
+end

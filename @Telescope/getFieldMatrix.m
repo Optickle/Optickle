@@ -1,7 +1,7 @@
 % getFieldMatrix method
 %   returns a mOpt, the field transfer matrix for this optic
 %
-% mOpt = getFieldMatrix(obj, par)
+% mOpt = getFieldMatrix(obj, pos, par)
 
 function mOpt = getFieldMatrix(obj, pos, par)
   
@@ -11,7 +11,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
   else
     % account for RF propagation phase
     d = sum(obj.df(:, 1));
-    v = exp(i * d * par.vFrf);
+    v = exp(1i * d * par.vFrf);
     
     % send inputs to outputs
     mOpt = sparse(diag(v));

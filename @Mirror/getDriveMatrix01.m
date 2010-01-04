@@ -2,7 +2,13 @@
 %   returns a matrix, (Nrf * obj.Nout) x (Nrf * obj.Nin) x Ndrive
 %   in this case, Nrf * (4 x 2)
 %
-% mDrv = getDriveMatrix01(obj, pos, par)
+% arguments not in @Optic/getDriveMatrix01
+%   (these are optional and are needed only for optimization)
+%   mOpt = optical matrix from getFieldMatrix
+%   d = dl/dx (non-zero for reflected fields), from getFieldMatrix
+%     = -2 from the front of a mirror at normal incidence (aoi = 0)
+%
+% mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
 
 function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
   
@@ -18,12 +24,12 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
 
   % output basis, where the basis is undefined, put z = 0, z0 = 1
   vBout = apply(getBasisMatrix(obj), vBasis);
-  vBout(~isfinite(vBout)) = i;
+  vBout(~isfinite(vBout)) = 1i;
   
   % mirror TEM01 mode injections at the waist are
   %   theta / theta0 = theta * sqrt(k * z0 / 2)
   % adding a non-zero distance from the waist, we must scale by
-  %   sqrt(1 + (z/z0)^2)
+  %   w(z) / w0 = sqrt(1 + (z/z0)^2)
   % The sqrt(k / 2) part is done separately for each RF component
   % the sqrt(z0 * (1 + (z/z0)^2)) is done for each link using the
   % the injection matrix, mInj, computed below.
@@ -37,10 +43,12 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
   mDrv = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
-    drp = -i * sqrt(par.k(n) / 2) * (mInj * d / 2);
+    drp = -0.5i * sqrt(par.k(n) / 2) * (mInj * d);
 
     % enter this submatrix into mDrv
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
     mDrv(nn, mm) = mOpt(nn, mm) .* drp;
   end
+  
+end

@@ -18,10 +18,12 @@ function mDrv = getDriveMatrix(obj, pos, par, mOpt, d)
   mDrv = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
-    drp = i * par.k(n) * d / 2;
+    drp = 1i * par.k(n) * d / 2;
 
     % enter this submatrix into mDrv
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
     mDrv(nn, mm) = mOpt(nn, mm) .* drp;
   end
+  
+end

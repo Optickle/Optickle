@@ -1,5 +1,5 @@
 % vNoiseOut = convNoise(vNoiseA, vNoiseB)
-%
+%   convolution of 2 noise spectra
 %
 
 function [vNoiseOut, fLin, linAB] = convNoise(f, dfLin, vNoiseA, vNoiseB)

@@ -21,7 +21,7 @@ function mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d)
   
   % output basis, where the basis is undefined, put z = 0, z0 = 1
   vBout = apply(getBasisMatrix(obj), vBasis);
-  vBout(~isfinite(vBout)) = i;
+  vBout(~isfinite(vBout)) = 1i;
   
   % mirror TEM01 mode reaction torque scales with beam size
   %   torque = R * w * (A01 * A00)

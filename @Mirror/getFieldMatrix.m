@@ -49,11 +49,13 @@ function [mOpt, d] = getFieldMatrix(obj, pos, par)
   mOpt = sparse(par.Nrf * Nout, par.Nrf * Nin);
   for n = 1:par.Nrf
     % reflection phase due to mirror position
-    rp = exp(i * par.k(n) * pos * d);
-    rp = exp(i * (2 * pi / par.lambda) * pos * d);
+    rp = exp(1i * par.k(n) * pos * d);
+    %rp = exp(1i * (2 * pi / par.lambda) * pos * d);
 
     % enter this submatrix into mOpt
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
     mOpt(nn, mm) = m .* rp;
   end
+
+end
