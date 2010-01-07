@@ -40,3 +40,4 @@ function [z0, z1, z2] = cavHG(L, R1, R2)
     z2 =  L * LR1 / LRR;
   end
   
+end

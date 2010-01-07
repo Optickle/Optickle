@@ -28,3 +28,5 @@ function [R, w] = beamRW(z0, z, lambda)
   wb = z0 .* (1 + zb.^2);
   R  = wb ./ zb;
   w  = sqrt(wb * lambda / pi);
+
+end

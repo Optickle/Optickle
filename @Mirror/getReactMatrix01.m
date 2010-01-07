@@ -33,7 +33,7 @@ function mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d)
   %
   %   the y-basis, vBout(:,2), is of interest for the vertical 01 mode
   z = real(vBout(:,2));
-  z0 = imag(vBout(:,2));
+  z0 = -imag(vBout(:,2));
   mW = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
   
   % field matrix and derivatives

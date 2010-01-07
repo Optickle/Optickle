@@ -23,11 +23,11 @@ function mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d)
   
   % output basis, where the basis is undefined, put z = 0, z0 = 1
   vBout = apply(getBasisMatrix(obj), vBasis);
-  vBout(~isfinite(vBout)) = i;
+  vBout(~isfinite(vBout)) = 1i;
   
   % mirror TEM01 mode reaction matrix (see @Mirror/getReactMatrix01)
   z = real(vBout(:,2));
-  z0 = imag(vBout(:,2));
+  z0 = -imag(vBout(:,2));
   mW = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
   
   % field matrix and derivatives

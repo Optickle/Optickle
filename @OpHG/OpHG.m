@@ -31,7 +31,7 @@ function op = OpHG(varargin)
     elseif isnan(arg)
       op.x = NaN;
       op.y = NaN;
-    elseif all(size(arg) == [2, 2])  & isa(arg, 'double')
+    elseif all(size(arg) == [2, 2]) && isa(arg, 'double')
       op.x = arg;				% basis specified
       op.y = arg;				%   with op.x == op.y
     else
@@ -42,8 +42,8 @@ function op = OpHG(varargin)
    case 2
     arg1 = varargin{1};
     arg2 = varargin{2};
-    if all(size(arg1) == [2, 2]) & isa(arg1, 'double') & ...
-          all(size(arg2) == [2, 2]) & isa(arg2, 'double')
+    if all(size(arg1) == [2, 2]) && isa(arg1, 'double') && ...
+          all(size(arg2) == [2, 2]) && isa(arg2, 'double')
       op.x = arg1;				% basis specified
       op.y = arg2;
     else
@@ -54,3 +54,5 @@ function op = OpHG(varargin)
    otherwise					% wrong number of input args
     error([errstr '%d input arguments.'], nargin);
   end
+
+end

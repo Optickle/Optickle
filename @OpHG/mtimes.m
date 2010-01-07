@@ -50,3 +50,5 @@ function op = mtimes(op, opRHS)
   else
     error('Size mismatch... cannot multiply.')
   end
+  
+end

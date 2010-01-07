@@ -6,7 +6,7 @@
 %    phi = atan(z / z0) - atan((z - d) / z0)
 %  where z and z0 define the basis at the end of the propagation.
 %  For a complex basis vector,
-%    phi = angle(vBasis - vDist) - angle(vBasis);
+%    phi = angle(vBasis) - angle(vBasis - vDist);
 %  Note that Gouy phases in Optickle are always in radians.
 %
 % Example, Gouy phase of each propagation step:
@@ -17,4 +17,4 @@
 
 function vPhiGouy = getGouyPhase(vDist, vBasis)
   
-  vPhiGouy = angle(vBasis - vDist) - angle(vBasis);
+  vPhiGouy = angle(vBasis) - angle(vBasis - vDist);

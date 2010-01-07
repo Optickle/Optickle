@@ -25,3 +25,5 @@ function op = focus(op, curvX, curvY)
 
   op.x = [1, 0; -curvX, 1] * op.x;
   op.y = [1, 0; -curvY, 1] * op.y;
+
+end

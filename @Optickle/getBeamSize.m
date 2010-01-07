@@ -26,7 +26,7 @@ function [w, z0, z, R] = getBeamSize(opt, name, inName)
   
   % Distance past the waist and Rayleigh range, Y axis
   z = real(vBasis(n, 2));
-  z0 = imag(vBasis(n, 2));
+  z0 = -imag(vBasis(n, 2));
   
   % compute 
   [R, w] = beamRW(z0, z, opt.lambda);

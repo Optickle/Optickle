@@ -49,7 +49,8 @@ function [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
   % link the optics
   opt.optic{snFrom}.out(portFrom) = snLink;
   opt.optic{snTo}.in(portTo) = snLink;
-  
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % modal stuff for next version
 function modalStuff
@@ -57,7 +58,7 @@ function modalStuff
   % update sink output basis
   qx = opt.optic(snFrom).qx(portFrom);
   qy = opt.optic(snFrom).qy(portFrom);
-  if qx == 0 | qy == 0
+  if qx == 0 || qy == 0
     error('%s basis not yet defined.  Try linking an input to %s.', ...
           getOutputName(opt, snFrom, portFrom), opt.optic(snFrom).name);
   end
@@ -72,12 +73,14 @@ function modalStuff
         opt.optic(snTo).qx(n) = newQX;
       elseif abs(newQX - oldQX) / abs(oldQX) > 0.01
         warning('Basis badly matched qa = (%f, %f), qb = (%f, %f)', ...
-                real(oldQX), imag(oldQX), real(newQX), imag(newQX))
+                real(oldQX), -imag(oldQX), real(newQX), -imag(newQX))
       end
     end
   
     % y-axis
-    if opt.optic(snTo).qy(n) == 0 & ~isempty(qm(n).y)
+    if opt.optic(snTo).qy(n) == 0 && ~isempty(qm(n).y)
       opt.optic(snTo).qy(n) = applyOpHG(qm(n).y, qy + len);
     end
   end
+  
+end

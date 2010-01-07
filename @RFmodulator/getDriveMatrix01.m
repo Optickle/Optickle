@@ -34,8 +34,8 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par)
       r_df = abs(df - n_df * fMod);
       if r_df < 1e-3 && n_df ~= 0
 	% phase and amplitude audio SBs on RF phase modulation
-        mPhi(m, n) = bessel(n_df, pMod) * i^n_df * n_df / 2;
-        mAmp(m, n) = dbessel(n_df, pMod) * i^n_df / 2;
+        mPhi(m, n) = bessel(n_df, pMod) * 1i^n_df * n_df / 2;
+        mAmp(m, n) = dbessel(n_df, pMod) * 1i^n_df / 2;
 
 	% phase and amplitude audio SBs on RF amplitude modulation
 	if n_df == 1 || n_df == -1
@@ -49,4 +49,4 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par)
   % build drive matrix
   mDrv = zeros(Nrf, Nrf, 2);
   mDrv(:, :, 1) = mAmp;
-  mDrv(:, :, 2) = i * mPhi;
+  mDrv(:, :, 2) = 1i * mPhi;

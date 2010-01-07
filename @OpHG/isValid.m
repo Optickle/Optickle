@@ -7,3 +7,4 @@ function b = isValid(op)
 
   b = ~(any(isnan(op.x(:))) || any(isnan(op.y(:))));
   
+end

@@ -3,7 +3,7 @@
 %
 % A complex basis is given by the distance past the waist
 % (z) and the Rayleigh Range of the beam (z0), such that
-% q = z + i * z0
+% q = z - i * z0
 %
 % see also beamZ0, beamRW and cavHG
 
@@ -40,8 +40,12 @@ function q = apply(op, q)
     error('Basis vector must be Nx2 or 2xN')
   end
   
+end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % apply a single operator
 function q = applySingle(op, q)
     q = op * [q; ones(size(q))];
     q = q(1, :) ./ q(2, :);
+
+end

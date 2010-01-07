@@ -69,7 +69,7 @@ function varargout = tickle01(opt, pos, f)
   % optic conversion
   mOpt = convertOptics(opt, mapList, pos, []);
   [m01, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f);
-
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== DC Fields and Signals
   % duplicated from tickle
@@ -105,6 +105,7 @@ function varargout = tickle01(opt, pos, f)
   for n = 1:Ndrv
     mGen(:, n) = drvList(n).m * vDC;
   end
+  full(mGen)
   
   % useful indices
   jAsb = 1:Narf;

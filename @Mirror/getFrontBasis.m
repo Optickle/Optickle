@@ -31,7 +31,7 @@ function qxy = getFrontBasis(obj)
 	'to mirror with curvature %g.'], obj.Optic.name, z, obj.Chr);
     end
     z0 = sqrt(z02);
-    q = z + 1i * z0;
+    q = z - 1i * z0;
     qxy = [q q];
   end
   

@@ -46,7 +46,7 @@ function obj = Source(varargin)
     case 4
       % ==== name, vArf, z0, z
       [name, obj.vArf, z0x, zx] = deal(varargin{:});
-      obj.qxy = [zx + i * z0x, zx + i * z0x];
+      obj.qxy = [zx - 1i * z0x, zx - 1i * z0x];
       
       % build optic (a source has no inputs)
       outNames = {{'out', 'fr'}};
@@ -54,7 +54,7 @@ function obj = Source(varargin)
     case 6
       % ==== name, vArf, z0x, zx, z0y, zy
       [name, obj.vArf, z0x, zx, z0y, zy] = deal(varargin{:});
-      obj.qxy = [zx + i * z0x, zy + i * z0y];
+      obj.qxy = [zx - 1i * z0x, zy - 1i * z0y];
       
       % build optic (a source has no inputs)
       outNames = {{'out', 'fr'}};
@@ -63,3 +63,5 @@ function obj = Source(varargin)
       % wrong number of input args
       error([errstr '%d input arguments.'], nargin);
   end
+  
+end

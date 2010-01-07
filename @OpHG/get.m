@@ -2,4 +2,6 @@
 
 function val = get(op, str)
 
-     val = op.(str);
+  val = op.(str);
+
+end

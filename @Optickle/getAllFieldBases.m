@@ -142,8 +142,8 @@ function b = checkConsistency(q1, q2, n, nOut, opt)
     sourceIn = getSourceName(opt, n);
     sinkIn =  getSinkName(opt, n);
     disp(sprintf('q1 is the basis for field %d (from %s to %s): the distance past the waist is %g m, the Rayleigh range is %g m' , ...
-      n, sourceIn, sinkIn, real(q1(2)), imag(q1(2))));
+      n, sourceIn, sinkIn, real(q1(2)), -imag(q1(2))));
     disp(sprintf('q2 is the basis for field %d (from %s to %s): the distance past the waist is %g m, the Rayleigh range is %g m' , ...
-      nOut, sourceOut, sinkOut, real(q2(2)), imag(q2(2))));
+      nOut, sourceOut, sinkOut, real(q2(2)), -imag(q2(2))));
   end
 end

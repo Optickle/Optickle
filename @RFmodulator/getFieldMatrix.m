@@ -23,7 +23,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
       n_df = round(df / fMod);
       r_df = abs(df - n_df * fMod);
       if r_df < 1e-3 && n_df ~= 0
-        mOpt(m, n) = bessel(n_df, imag(aMod)) * i^n_df;
+        mOpt(m, n) = bessel(n_df, imag(aMod)) * 1i^n_df;
         if n_df == 1 || n_df == -1
           mOpt(m, n) = mOpt(m, n) + real(aMod) / 2;
         end

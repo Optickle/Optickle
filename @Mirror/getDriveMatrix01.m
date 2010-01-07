@@ -36,19 +36,21 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
   %
   %   the y-basis, vBout(:,2), is of interest for the vertical 01 mode
   z = real(vBout(:,2));
-  z0 = imag(vBout(:,2));
+  z0 = -imag(vBout(:,2));
   mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
   
   % drive matrix
+  obj.optic.name
   mDrv = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
-    drp = -0.5i * sqrt(par.k(n) / 2) * (mInj * d);
+    drp = 1i * sqrt(par.k(n) / 2) * (mInj * d / 2);
 
     % enter this submatrix into mDrv
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
     mDrv(nn, mm) = mOpt(nn, mm) .* drp;
+    
   end
   
 end

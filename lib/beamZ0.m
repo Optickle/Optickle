@@ -21,3 +21,5 @@ function [z0, z] = beamZ0(R, w, lambda)
   zb = wb ./ R;
   z0 = wb ./ (1 + zb.^2);
   z = zb * z0;
+
+end
