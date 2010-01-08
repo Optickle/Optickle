@@ -1,4 +1,4 @@
-% sNew = rebinSpec(fOld, sOld, fNew, useLinearInterp)
+% sNew = rebinPowerSpec(fOld, sOld, fNew, useLinearInterp)
 %   rebin power spectrum sOld sampled at fOld to a new power
 %   spectrum sampled at fNew
 %
@@ -10,15 +10,25 @@
 %   rebining from a linear spectrum to a log spectrum).
 %
 
-function sNew = rebinSpec(fOld, sOld, fNew, useLinearInterp)
+function sNew = rebinPowerSpec(fOld, sOld, fNew, useLinearInterp)
   
   % adjust shapes
-  fOld = fOld(:);
-  fNew = fNew(:);
+  if ~isvector(fOld)
+    error('fOld must be a vector')
+  end
+  if ~isvector(fNew)
+    error('fNew must be a vector')
+  end
   
-  if size(sOld, 1) ~= numel(fOld)
+  isOldTranspose = size(fOld, 2) ~= 1;
+  isNewTranspose = size(fNew, 2) ~= 1;
+  
+  fOld = fOld(:);
+  fNew = fNew(:);  
+  if isOldTranspose
     sOld = sOld.';
   end
+  
   if size(sOld, 1) ~= numel(fOld)
     error('frequency vector length does not match spectrum')
   end
@@ -71,4 +81,9 @@ function sNew = rebinSpec(fOld, sOld, fNew, useLinearInterp)
 %   hold off
 %   grid on
   
+  % transpose output if requested by input vector
+  if isNewTranspose
+    sNew = sNew.';
+  end
+
 end

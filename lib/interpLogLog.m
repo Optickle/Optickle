@@ -8,6 +8,27 @@
 
 function hNew = interpLogLog(fOld, hOld, fNew)
 
+  % adjust shapes
+  if ~isvector(fOld)
+    error('fOld must be a vector')
+  end
+  if ~isvector(fNew)
+    error('fNew must be a vector')
+  end
+  
+  isOldTranspose = size(fOld, 2) ~= 1;
+  isNewTranspose = size(fNew, 2) ~= 1;
+  
+  fOld = fOld(:);
+  fNew = fNew(:);  
+  if isOldTranspose
+    hOld = hOld.';
+  end
+  
+  if size(hOld, 1) ~= numel(fOld)
+    error('frequency vector length does not match amplitude vector')
+  end
+
   % complex log of hNew
   logNew = interp1(log(fOld), log(hOld), log(fNew));
 
@@ -19,6 +40,11 @@ function hNew = interpLogLog(fOld, hOld, fNew)
     hNew = real(hNew);
   end
   
+  % transpose output if requested by input vector
+  if isNewTranspose
+    hNew = hNew.';
+  end
+
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%

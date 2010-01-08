@@ -7,6 +7,22 @@
 
 function rms = ampSpectrumRMS(f, noiseAmp)
 
+  % adjust shapes
+  if ~isvector(f)
+    error('f must be a vector')
+  end
+  
+  isTranspose = size(f, 2) ~= 1;
+  
+  f = f(:);
+  if isTranspose
+    noiseAmp = noiseAmp.';
+  end
+  
+  if size(noiseAmp, 1) ~= numel(f)
+    error('frequency vector length does not match spectrum')
+  end
+  
   % number of spectra
   M = size(noiseAmp, 2);
   
@@ -20,6 +36,11 @@ function rms = ampSpectrumRMS(f, noiseAmp)
   
     % reverse
     rms(:, n) = rmsRev(end:-1:1, :);
+  end
+
+  % transpose output, if requested
+  if isTranspose
+    rms = rms.';
   end
 
 end
