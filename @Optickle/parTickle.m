@@ -55,7 +55,7 @@
 %  mInOut - transfer from control inputs to control outputs with loops
 %           mInOut = mCloseLoop * sCon.mCon;
 
-function [fDC, sigDC, varargout] = tickle(opt, pos, f)
+function [fDC, sigDC, varargout] = parTickle(opt, pos, f)
 
   % === Argument Handling
   if nargin < 2
@@ -169,6 +169,36 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   end
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % ==== Parallel Work Sizes
+  % This section defines the sizes of work batches for parallel
+  % processing.  The idea is to divide the work into batches such
+  % that each worker has roughly 10 batches to complete.  This
+  % allows faster workers to complete more batches (say 11 or 12)
+  % while slower workers complete fewer batches (8 or 9).  At the
+  % same time, batch size should be maximized to prevent significant
+  % thread switching overhead.
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  % mean number of batches per thread
+  meanBatchesPerThread = 10;
+  
+  % mean number of batches per thread
+  minBatchSize = 5;
+  
+  % number of threads
+  Nthread = max(matlabpool('size'), 1);
+
+  % batch size
+  batchSize = ceil(Naf / (meanBatchesPerThread * Nthread));
+  batchSize = max(batchSize, minBatchSize);
+  
+  % number of batches
+  Nbatch = ceil(Naf / batchSize);
+  
+  % last batch size
+  lastBatchSize = Naf - (batchSize * (Nbatch - 1));
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Audio Frequency Loop
   % This is the section in which the tranfer functions
   % from optic drives to signals and optic positions are
@@ -202,28 +232,60 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   if ~isCon
     % full results: all probes, all drives
     mExc = eyeNdof(:, jDrv);
-    sigAC = zeros(Nprb, Ndrv, Naf);
-    mMech = zeros(Ndrv, Ndrv, Naf);
-    noiseAC = zeros(Nprb, Naf);
-    noiseMech = zeros(Ndrv, Naf);
+
+    % make batches for parallel processing
+    parBatch.sigAC = zeros(Nprb, Ndrv, batchSize);
+    parBatch.mMech = zeros(Ndrv, Ndrv, batchSize);
+    parBatch.noiseAC = zeros(Nprb, batchSize);
+    parBatch.noiseMech = zeros(Ndrv, batchSize);
+    parBatch.nAF = [];
+    parBatch.f = [];
+    
+    parBatch(1:Nbatch) = parBatch;
+    
+    % make parfor happy
+    eyeNout = [];
+    mPrbPrb = [];
+    sCon = [];
+    shotPrbAmp = [];
   else
     % reduced results for control struct
     mExc = eyeNdof(:, jDrv) * sCon.mDrvOut;
 
-    sOpt.mInOut = zeros(sCon.Nout, sCon.Nin, Naf);
-    sOpt.mPlant = zeros(sCon.Nin, sCon.Nout, Naf);
-    sOpt.mOpenLoop = zeros(sCon.Nout, sCon.Nout, Naf);
-    sOpt.mCloseLoop = zeros(sCon.Nout, sCon.Nout, Naf);
+    % make batches for parallel processing
+    parBatch.mInOut = zeros(sCon.Nout, sCon.Nin, batchSize);
+    parBatch.mPlant = zeros(sCon.Nin, sCon.Nout, batchSize);
+    parBatch.mOpenLoop = zeros(sCon.Nout, sCon.Nout, batchSize);
+    parBatch.mCloseLoop = zeros(sCon.Nout, sCon.Nout, batchSize);
+    parBatch.noiseOut = zeros(sCon.Nout, batchSize);
+    parBatch.nAF = [];
+    parBatch.f = [];
+
+    parBatch(1:Nbatch) = parBatch;
     
+    % some computational aids
     eyeNout = eye(sCon.Nout);
     mPrbPrb = sCon.mPrbIn * sparse(diag(sigQ)) * sCon.mPrbOut;
 
     if isNoise
-      noiseOut = zeros(sCon.Nout, Naf);
       shotPrbAmp = sqrt(shotPrb);
+    else
+      shotPrbAmp = [];
     end
   end
   
+  % fill in the frequency vector for each batch
+  for mBatch = 1:Nbatch
+    if mBatch < Nbatch
+      nAF = batchSize * (mBatch - 1) + (1:batchSize);
+    else
+      % last batch
+      nAF = batchSize * (mBatch - 1) + (1:lastBatchSize);
+    end
+    parBatch(mBatch).nAF = nAF;
+    parBatch(mBatch).f = f(nAF);
+  end
+
   % since this can take a while, let's time it
   tic;
   hWaitBar = [];
@@ -232,113 +294,101 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   % prevent scale warnings
   sWarn = warning('off', 'MATLAB:nearlySingularMatrix');
 
-  % audio frequency loop
-  for nAF = 1:Naf
-    fAudio = f(nAF);
-
-    % propagation phase matrices
-    mPhim = getPhaseMatrix(vLen, vFrf - fAudio);
-    mPhip = getPhaseMatrix(vLen, vFrf + fAudio);
-
-    % field to optic position transfer
-    mFOm = rctList(nAF).m * conj(mDC) / LIGHT_SPEED;
-    mFOp = rctList(nAF).m * mDC / LIGHT_SPEED;
-
-    % field to field transfer
-    mFFm = mPhim * mOpt;
-    mFFp = conj(mPhip * mOpt);
-
-    % optic to field transfer
-    mOFm = mPhim * mGen;
-    mOFp = conj(mPhip * mGen);
+  %%%%%%%% parallel batch loop
+  parfor mBatch = 1:Nbatch
     
-    % ==== Put it together and solve
-    mDof = [mFFm, mFFz, mOFm; mFFz, mFFp, mOFp; mFOm, mFOp, mOOz];
-    tfAC = (eyeNdof - mDof) \ mExc;
-
-    % extract optic to probe transfer functions
-    if ~isCon
-      % no control struct, return TFs to all probes and drives
-      sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
-      mMech(:, :, nAF) = tfAC(jDrv, :);
-    else
-      % reduce probes and drives to those required by control struct
-      mPlant = sCon.mPrbIn * mPrb * tfAC(jAsb, :) + ...
-	sCon.mDrvIn * tfAC(jDrv, :) + mPrbPrb;
+    %%%% audio frequency loop
+    for nAF = 1:numel(parBatch(mBatch).nAF)
+      nnAF = parBatch(mBatch).nAF(nAF);
+      fAudio = parBatch(mBatch).f(nAF);
       
-      % compute closed loop response of outputs
-      mCon = sCon.mCon(:, :, nAF);
-      mOL = mCon * mPlant;
-      mCL = inv(eyeNout - mOL);
-      mInOut = mCL * mCon;
+      % propagation phase matrices
+      mPhim = getPhaseMatrix(vLen, vFrf - fAudio);
+      mPhip = getPhaseMatrix(vLen, vFrf + fAudio);
       
-      % store into the sOpt struct
-      sOpt.mInOut(:, :, nAF) = mInOut;
-      sOpt.mPlant(:, :, nAF) = mPlant;
-      sOpt.mOpenLoop(:, :, nAF) = mOL;
-      sOpt.mCloseLoop(:, :, nAF) = mCL;
-    end
-    
-    if isNoise
-      %%%% With Quantum Noise
-      mQinj = [mPhim * mQuant; conj(mPhip * mQuant); mQOz];
-      mNoise = (eyeNdof - mDof) \ mQinj;
-      noisePrb = mPrb * mNoise(jAsb, :);
-      noiseDrv = mNoise(jDrv, :);
+      % field to optic position transfer
+      mFOm = rctList(nnAF).m * conj(mDC) / LIGHT_SPEED;
+      mFOp = rctList(nnAF).m * mDC / LIGHT_SPEED;
       
-      % incoherent sum of amplitude and phase noise
+      % field to field transfer
+      mFFm = mPhim * mOpt;
+      mFFp = conj(mPhip * mOpt);
+      
+      % optic to field transfer
+      mOFm = mPhim * mGen;
+      mOFp = conj(mPhip * mGen);
+      
+      % ==== Put it together and solve
+      mDof = [mFFm, mFFz, mOFm; mFFz, mFFp, mOFp; mFOm, mFOp, mOOz];
+      tfAC = (eyeNdof - mDof) \ mExc;
+      
+      % extract optic to probe transfer functions
       if ~isCon
-        noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
-        noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+        % no control struct, return TFs to all probes and drives
+        parBatch(mBatch).sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
+        parBatch(mBatch).mMech(:, :, nAF) = tfAC(jDrv, :);
       else
-        % transfer noise to outputs
-        noiseAmp = mInOut * (sCon.mPrbIn * noisePrb + ...
-          sCon.mDrvIn * noiseDrv);
-        noisePrbAmp = mInOut * sCon.mPrbIn * shotPrbAmp;
-        noiseOut(:, nAF) = sqrt(sum(abs(noiseAmp).^2, 2) + ...
-          abs(noisePrbAmp).^2);
+        % reduce probes and drives to those required by control struct
+        mPlant = sCon.mPrbIn * mPrb * tfAC(jAsb, :) + ...
+          sCon.mDrvIn * tfAC(jDrv, :) + mPrbPrb;
+        
+        % compute closed loop response of outputs
+        mCon = sCon.mCon(:, :, nnAF);
+        mOL = mCon * mPlant;
+        mCL = inv(eyeNout - mOL);
+        mInOut = mCL * mCon;
+        
+        % store into the sOpt struct
+        parBatch(mBatch).mInOut(:, :, nAF) = mInOut;
+        parBatch(mBatch).mPlant(:, :, nAF) = mPlant;
+        parBatch(mBatch).mOpenLoop(:, :, nAF) = mOL;
+        parBatch(mBatch).mCloseLoop(:, :, nAF) = mCL;
       end
       
-      % HACK: noise probe
-      %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
-    end
-    
-    % ==== Timing and User Interaction
-    % NO MODELING HERE (just let the user know how long this will take)
-    tNow = toc;
-    frac = nAF / Naf;
-    tRem = tNow * (1 / frac - 1);
-    if tNow > 2 && tRem > 2 && tNow - tLast > 0.5 && opt.debug > 0
-      % wait bar string
-      str = sprintf('%.1f s used, %.1f s left', tNow, tRem);
-
-      % check and update waitbar
-      if isempty(hWaitBar)
-        % create wait bar
-        try
-          strWB = [str ' (close this window to stop)'];
-          hWaitBar = waitbar(frac, strWB, 'Name', 'Optickle: Computing...');
-          tLast = tNow;
-        catch
-          % can't make wait bar... use text
-          if tNow - tLast > 5
-            disp(str)
-            tLast = tNow;
-          end
-        end
-      else
-        try
-          strWB = [str ' (close this window to stop)'];
-          findobj(hWaitBar);			% error if wait bar closed
-          waitbar(frac, hWaitBar, strWB);	% update wait string
-          tLast = tNow;
-        catch
-          error('Wait bar closed by user.  Exiting.')
+      if isNoise
+        %%%% With Quantum Noise
+        mQinj = [mPhim * mQuant; conj(mPhip * mQuant); mQOz];
+        mNoise = (eyeNdof - mDof) \ mQinj;
+        noisePrb = mPrb * mNoise(jAsb, :);
+        noiseDrv = mNoise(jDrv, :);
+        
+        % incoherent sum of amplitude and phase noise
+        if ~isCon
+          parBatch(mBatch).noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+          parBatch(mBatch).noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+        else
+          % transfer noise to outputs
+          noiseAmp = mInOut * (sCon.mPrbIn * noisePrb + ...
+            sCon.mDrvIn * noiseDrv);
+          noisePrbAmp = mInOut * sCon.mPrbIn * shotPrbAmp;
+          parBatch(mBatch).noiseOut(:, nAF) = sqrt(sum(abs(noiseAmp).^2, 2) + ...
+            abs(noisePrbAmp).^2);
         end
       end
     end
   end
     
+  % incorporate parallel results into output variables
+  if ~isCon
+    sigAC = cat(3, parBatch.sigAC);
+    mMech = cat(3, parBatch.mMech);
+  else
+    sOpt.mInOut = cat(3, parBatch.mInOut);
+    sOpt.mPlant = cat(3, parBatch.mPlant);
+    sOpt.mOpenLoop = cat(3, parBatch.mOpenLoop);
+    sOpt.mCloseLoop = cat(3, parBatch.mCloseLoop);
+  end
+  
+  if isNoise
+    if ~isCon
+      noiseAC = cat(3, parBatch.noiseAC);
+      noiseMech = cat(3, parBatch.noiseMech);
+    else
+      noiseOut = cat(3, parBatch.noiseOut);
+    end
+  end
+  clear parBatch
+      
   % reset scale warning state
   warning(sWarn.state, sWarn.identifier);
   
