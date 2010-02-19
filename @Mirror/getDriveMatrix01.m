@@ -40,7 +40,6 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
   mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
   
   % drive matrix
-  obj.optic.name
   mDrv = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient

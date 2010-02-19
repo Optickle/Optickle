@@ -19,6 +19,10 @@
 %   theta0 = lambda / (pi * w0) = 2 / (k * w0)
 %          = sqrt(lambda / (pi * z0)) = sqrt(2 / (k * z0))
 %
+% And a further distraction, the FWHM of the intensity profile is
+%   dIntensity = sqrt(2 * log(2)) * w
+%              ~ 1.2 * w
+%
 % see also beamZ0 and cavHG
 
 function [R, w] = beamRW(z0, z, lambda)

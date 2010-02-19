@@ -6,3 +6,5 @@
 function mRct = getReactMatrix01(obj, pos, vBasis, par)
   
   mRct = zeros(obj.Ndrive, par.Nrf * obj.Nin, par.Naf);
+
+end
