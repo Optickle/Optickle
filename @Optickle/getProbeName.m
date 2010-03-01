@@ -23,5 +23,9 @@ function name = getProbeName(opt, varargin)
     name{n} = opt.probe(sn(n)).name;
   end
   
+  % looptickle doesn't like cells, change by Stefan Ballmer, 2010 Mar 1
+  if and(iscell(name),length(name)==1)
+    name=name{1};
+  end  
 end
   
