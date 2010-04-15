@@ -156,7 +156,7 @@
 
 % original version (Matlab 2009a, PCT)
 %   Copyright 1984-2007 The MathWorks, Inc.
-%   $Revision $ $Date: 2010/02/19 02:42:45 $
+%   $Revision $ $Date: 2010/04/15 16:25:20 $
 %
 % modified by Matthew Evans, Feb 2010
 %   adaptation of pforfun
@@ -170,8 +170,6 @@ function varargout = parallel_function(varargin)
   % if this isn't the simple case we are looking for,
   % call the real thing
   if nargin < 4 || nargin > 8 || nargout > 0 || ...   % wrong number of args
-      (nargin >= 3 && isempty(varargin{3})) || ...    % no consumer
-      (nargin >= 4 && isempty(varargin{4})) || ...    % no supplier
       (nargin >= 5 && ~isempty(varargin{5})) || ...   % has reducer
       (nargin >= 7 && ~isempty(varargin{7}))          % has concat
   
@@ -218,13 +216,13 @@ function varargout = parallel_function(varargin)
   end
   
   % Validate consume
-  if ~isa(consume, 'function_handle')
+  if ~isempty(consume) && ~isa(consume, 'function_handle')
     error('MATLAB:parfor:InvalidArgument', ...
       'CONSUME must be a function handle or [].');
   end
   
   % Validate supply
-  if ~isa(supply, 'function_handle')
+  if ~isempty(supply) && ~isa(supply, 'function_handle')
     error('MATLAB:parfor:InvalidArgument', ...
       'SUPPLY must be a function handle or [].');
   end
@@ -367,7 +365,7 @@ function varargout = parallel_function(varargin)
       close(stateInfo.wait.hWaitBar);
       drawnow     % make sure waitbar is closed
     end
-  end
+  end  
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -378,7 +376,22 @@ function output = iParFun(processInfo, input)
   tStart = cputime;
   
   % this is run worker-side... just pass on through
-  output.data = processInfo.fun(input.base, input.limit, input.data);
+  output.base = input.base;
+  output.limit = input.limit;
+  switch input.type
+    case 0
+      % supply and consume
+      output.data = processInfo.fun(input.base, input.limit, input.data);
+    case 1
+      % consume only
+      output.data = processInfo.fun(input.base, input.limit);
+    case 2
+      % supply only
+      processInfo.fun(input.base, input.limit, input.data);
+    case 3
+      % no supply and no consume
+      processInfo.fun(input.base, input.limit);
+  end
   
   % include execution time in output
   output.tExc = cputime - tStart;
@@ -392,15 +405,28 @@ end
 %   the data consumption function for parProcess
 function stateInfo = iConsume(stateInfo, output, n)
   
+  % check for clean-up interval
+  if isempty(output)
+    if ~isempty(stateInfo.consume)
+      stateInfo.consume([], [], []);
+    end
+    return
+  end
+  
   % extract base and limit for this interval
-  base = stateInfo.interval(n, 1);
-  limit = stateInfo.interval(n, 2);
+  base = output.base;
+  limit = output.limit;
   
   % consume the output
-  stateInfo.consume(base, limit, output.data);
+  if ~isempty(stateInfo.consume)
+    stateInfo.consume(base, limit, output.data);
+  end
   
   % save the interval execution time
-  stateInfo.interval(n, 3) = output.tExc;
+  if n <= size(stateInfo.interval, 1)
+    stateInfo.interval(n, 3) = output.tExc;
+  end
+  
   
   % update waitbar
   if stateInfo.config.enableWaitBar
@@ -480,9 +506,12 @@ function [stateInfo, input] = iSupply(stateInfo)
   end
   
   % make data struct
+  input.type = isempty(stateInfo.supply) + 2 * isempty(stateInfo.consume);
   input.base = base;
   input.limit = limit;
-  input.data = stateInfo.supply(base, limit);
+  if ~isempty(stateInfo.supply)
+    input.data = stateInfo.supply(base, limit);
+  end
   
   %fprintf('iSupply(%d, %d)\n', base, limit)
 end
@@ -568,8 +597,10 @@ function pfLang = getRealParallelFunction
     
     % save a pointer to the real parallel_function
     fileList = which('parallel_function', '-all');
-    if numel(fileList) < 2
+    if isempty(fileList)
       error('Unable to find the real parallel_function.  Damn.')
+    else
+      warning('Reverting to the real parallel_function for this.  Sorry.')
     end
     
     cd(fileparts(fileList{end}));

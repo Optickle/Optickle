@@ -1,9 +1,10 @@
 % Compute DC fields, and DC signals, and AC transfer functions
 %
-% [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech] = tickle(opt, pos, f)
+% [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech] = tickle(opt, pos, f, nDrive)
 % opt - Optickle model
 % pos - optic positions (Ndrive x 1, or empty)
 % f - audio frequency vector (Naf x 1)
+% nDrive - drive indices to consider (Nx1, default is all)
 %
 % fDC - DC fields at this position (Nlink x Nrf)
 %   where Nlink is the number of links, and Nrf
@@ -55,7 +56,7 @@
 %  mInOut - transfer from control inputs to control outputs with loops
 %           mInOut = mCloseLoop * sCon.mCon;
 
-function [fDC, sigDC, varargout] = tickle(opt, pos, f)
+function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
 
   % === Argument Handling
   if nargin < 2
@@ -64,13 +65,19 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   if nargin < 3
     f = [];
   end
-
+  if nargin < 4
+    nDrive = [];
+  end
+  
   % third argument is actually control struct (see convertSimulink)
   isCon = isstruct(f);
   if isCon
     sCon = f;
     f = sCon.f;
   end
+  
+  % forth and fith argument given, return tfAC as last return argument
+  isOut_tfAC = nargin >= 5;
   
   % === Field Info
   [vFrf, vSrc] = getSourceInfo(opt);
@@ -189,6 +196,12 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   % useful indices
   jAsb = 1:Narf;
   jDrv = (1:Ndrv) + Narf;
+  if ~isempty(nDrive)
+    jDrv = jDrv(nDrive);
+    NdrvOut = numel(nDrive);
+  else
+    NdrvOut = Ndrv;
+  end
   
   % main inversion tools
   mDC = sparse(1:Nfld, 1:Nfld, vDC, Nfld, Nfld);
@@ -202,10 +215,10 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   if ~isCon
     % full results: all probes, all drives
     mExc = eyeNdof(:, jDrv);
-    sigAC = zeros(Nprb, Ndrv, Naf);
-    mMech = zeros(Ndrv, Ndrv, Naf);
+    sigAC = zeros(Nprb, NdrvOut, Naf);
+    mMech = zeros(NdrvOut, NdrvOut, Naf);
     noiseAC = zeros(Nprb, Naf);
-    noiseMech = zeros(Ndrv, Naf);
+    noiseMech = zeros(NdrvOut, Naf);
   else
     % reduced results for control struct
     mExc = eyeNdof(:, jDrv) * sCon.mDrvOut;
@@ -224,6 +237,12 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
     end
   end
   
+  % is tfAC wanted?
+  if isOut_tfAC
+    tfACout = zeros(2 * numel(nField_tfAC), NdrvOut, Naf);
+    jAsbAC = [jAsb(nField_tfAC), jAsb(Nfld + nField_tfAC)];
+  end
+    
   % since this can take a while, let's time it
   tic;
   hWaitBar = [];
@@ -256,6 +275,11 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
     mDof = [mFFm, mFFz, mOFm; mFFz, mFFp, mOFp; mFOm, mFOp, mOOz];
     tfAC = (eyeNdof - mDof) \ mExc;
 
+    % field TF matrix wanted?
+    if isOut_tfAC
+      tfACout(:, :, nAF) = tfAC(jAsbAC, :);
+    end
+    
     % extract optic to probe transfer functions
     if ~isCon
       % no control struct, return TFs to all probes and drives
@@ -356,16 +380,23 @@ function [fDC, sigDC, varargout] = tickle(opt, pos, f)
   drawnow
 
   % build outputs
+  varargout{1} = fDC;
+  varargout{2} = sigDC;
+
   if ~isCon
-    varargout{1} = sigAC;
-    varargout{2} = mMech;
+    varargout{3} = sigAC;
+    varargout{4} = mMech;
     if isNoise
-      varargout{3} = noiseAC;
-      varargout{4} = noiseMech;
+      varargout{5} = noiseAC;
+      varargout{6} = noiseMech;
     end
   else
-    varargout{1} = sOpt;
+    varargout{3} = sOpt;
     if isNoise
-      varargout{2} = noiseOut;
+      varargout{4} = noiseOut;
     end
-  end    
+  end
+
+  if isOut_tfAC && nargout > 0
+    varargout{nargout} = tfACout;
+  end

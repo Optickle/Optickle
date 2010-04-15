@@ -43,8 +43,13 @@ function [fDC, sigDC] = sweep(opt, pos)
   for m = 1:Nopt
     obj = opt.optic{m};
     vDrvAll{m} = obj.drive;   % extracting these makes things much faster
-    mOptAll{m} = mapList(m).mOut * ...
-      getMatrices(obj, pos(vDrvAll{m}, 1), par) * mapList(m).mIn;
+
+    %mOptAll{m} = mapList(m).mOut * ...
+    %  getMatrices(obj, pos(vDrvAll{m}, 1), par) * mapList(m).mIn;
+    %
+    % == sparse goes faster! (Yoichi Aso, March 2010)
+    mOptAll{m} = sparse(mapList(m).mOut * ...
+      getMatrices(obj, pos(vDrvAll{m}, 1), par) * mapList(m).mIn);
   end
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -69,8 +74,12 @@ function [fDC, sigDC] = sweep(opt, pos)
     for m = 1:Nopt
       obj = opt.optic{m};
       if any(dpos(vDrvAll{m}))
-        mOptAll{m} = mapList(m).mOut * ...
-	  getFieldMatrix(obj, pos(vDrvAll{m}, n), par) * mapList(m).mIn;
+        %mOptAll{m} = mapList(m).mOut * ...
+        %  getFieldMatrix(obj, pos(vDrvAll{m}, n), par) * mapList(m).mIn;
+        %
+        % == sparse goes faster! (Yoichi Aso, March 2010)
+        mOptAll{m} = sparse(mapList(m).mOut * ...
+          getFieldMatrix(obj, pos(vDrvAll{m}, n), par) * mapList(m).mIn);
       end
       mOpt = mOpt + mOptAll{m};
     end

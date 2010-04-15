@@ -172,22 +172,22 @@ function stateInfo = parProcess(processFunc, consumeFunc, supplyFunc, ...
   end
   
   % distributed execution!
-  try
+%   try
     stateInfo = distributed_execution(parforObj, ...
       consumeFunc, supplyFunc, stateInfo);
-  catch err
-    if strcmp(err.identifier, 'distcomp:parfor:SourceCodeNotAvailable')
-      % Get function on which we are operating
-      info = functions(processFunc);
-      newErr = MException('distcomp:parfor:SourceCodeNotAvailable', ...
-        ['The source code (%s) for the parfor loop that is trying to execute '...
-        'on the worker could not be found'], info.file);
-      newErr = addCause(newErr, err);
-      throw(newErr);
-    else
-      throw(err);
-    end
-  end
+%   catch err
+%     if strcmp(err.identifier, 'distcomp:parfor:SourceCodeNotAvailable')
+%       % Get function on which we are operating
+%       info = functions(processFunc);
+%       newErr = MException('distcomp:parfor:SourceCodeNotAvailable', ...
+%         ['The source code (%s) for the parfor loop that is trying to execute '...
+%         'on the worker could not be found'], info.file);
+%       newErr = addCause(newErr, err);
+%       throw(newErr);
+%     else
+%       throw(err);
+%     end
+%   end
   
 end
 
@@ -235,12 +235,16 @@ function stateInfo = distributed_execution(parforObj, ...
   end
   
   % wait for all workers to finish
-  [n, data] = parforObj.getCompleteIntervals(Nsupplied - Nconsumed);
+  while Nconsumed < Nsupplied
+    [n, data] = parforObj.getCompleteIntervals(Nsupplied - Nconsumed);
   
-  % consume the processed data
-  for nn = 1:numel(n)
-    stateInfo = consumeFunc(stateInfo, data{nn}, n(nn));
-    Nconsumed = Nconsumed + 1;
+    % consume the processed data
+    for nn = 1:numel(n)
+      stateInfo = consumeFunc(stateInfo, data{nn}, n(nn));
+      if n(nn) <= Nsupplied
+        Nconsumed = Nconsumed + 1;
+      end
+    end
   end
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
