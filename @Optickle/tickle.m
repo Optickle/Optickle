@@ -170,6 +170,10 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   sigQ = real(mPrbQ * vDC) / 2;
   fDC = reshape(vDC, Nlnk, Nrf);		% DC fields for output
 
+  % Build DC outputs
+  varargout{1} = fDC;
+  varargout{2} = sigDC;
+  
   % if AC is not needed, just end here
   if ~isAC
     return
@@ -379,10 +383,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % make sure that the wait bar is closed
   drawnow
 
-  % build outputs
-  varargout{1} = fDC;
-  varargout{2} = sigDC;
-
+  % Build the rest of the outputs
   if ~isCon
     varargout{3} = sigAC;
     varargout{4} = mMech;
