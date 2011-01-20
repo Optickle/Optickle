@@ -21,7 +21,7 @@ function [opt,iqPhase] = setDemodPhases(opt,mIQ,mDOF,pos,f0)
 % For open loop stuff, one uses getTF on sigAC (instead of pickleTF on
 % results)
 %
-% $Id: setDemodPhases.m,v 1.1 2011/01/19 20:09:29 jkissel Exp $
+% $Id: setDemodPhases.m,v 1.2 2011/01/20 19:07:16 nsmith Exp $
 
 % Compute the DC signals and TFs on resonance
 [fDC, sigDC, sigAC] = tickle(opt, pos, f0);
@@ -29,7 +29,7 @@ function [opt,iqPhase] = setDemodPhases(opt,mIQ,mDOF,pos,f0)
 nProbes = size(mIQ,1);
 nOptics = size(mDOF,2);
 
-iqPhase = zeroes(1,nProbes);
+iqPhase = zeros(1,nProbes);
 
 for iProbe = 1:nProbes % Loop over probes
     signalOptTFi = 0;
@@ -49,15 +49,15 @@ for iProbe = 1:nProbes % Loop over probes
     end
     
     % Switch over which phase we want maximized
-    switch mIQ(iProbe,3) 
-        case {'I'} % Maximize the I phase
+    switch mIQ{iProbe,3} 
+        case 'I' % Maximize the I phase
             dPhase = findBestPhase(signalOptTFi,signalOptTFq);
             phase = getProbePhase(opt,iProbeSN);
             tunedPhase = phase + dPhase;
             opt = setProbePhase(opt,iProbeSN,tunedPhase);
             opt = setProbePhase(opt,qProbeSN,tunedPhase + 90);
             
-        case {'Q'} % Maximize the Q phase
+        case 'Q' % Maximize the Q phase
             dPhase = -1*findBestPhase(signalOptTFq,signalOptTFi);
             phase = getProbePhase(opt,qProbeSN);
             tunedPhase = phase + dPhase;
