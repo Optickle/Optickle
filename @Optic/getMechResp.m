@@ -25,12 +25,19 @@ function rsp = getMechResp(obj, f, nDOF)
   % dechipher mechanical response
   if isempty(mechTF)
     rsp = 0;
+    error('No mechTF for DOF %d of %s', nDOF, obj.name);
   elseif isa(mechTF, 'LTI') || isa(mechTF, 'lti') || isa(mechTF, 'zpk')
     rsp = freqresp(mechTF, 2 * pi * f);
   elseif isa(mechTF, 'struct')
     rsp = sresp(mechTF, f);
   elseif isa(mechTF, 'double')
     rsp = mechTF;
+    if length(rsp) ~= Naf
+      error(['mechTF vector for DOF %d of %s is not the ' ...
+          'same length as the frequency vector'], nDOF, obj.name);
+    end
+  else
+    error('Unknown mechTF for DOF %d of %s', nDOF, obj.name);
   end
   
   % make mechanical response a vector of length Naf
@@ -45,5 +52,5 @@ function rsp = getMechResp(obj, f, nDOF)
   end
   
   if length(rsp) ~= Naf
-    error('Bad mechTF DOF %d of %s', nDOF, obj.Optic.name);
+    error('Bad mechTF DOF %d of %s', nDOF, obj.name);
   end
