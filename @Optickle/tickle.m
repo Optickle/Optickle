@@ -1,29 +1,41 @@
 % Compute DC fields, and DC signals, and AC transfer functions
 %
 % [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech] = tickle(opt, pos, f, nDrive)
-% opt - Optickle model
-% pos - optic positions (Ndrive x 1, or empty)
-% f - audio frequency vector (Naf x 1)
-% nDrive - drive indices to consider (Nx1, default is all)
+% opt       - Optickle model
+% pos       - optic positions (Ndrive x 1, or empty)
+% f         - audio frequency vector (Naf x 1)
+% nDrive    - drive indices to consider (Nx1, default is all)
 %
-% fDC - DC fields at this position (Nlink x Nrf)
-%   where Nlink is the number of links, and Nrf
-%   is the number of RF frequency components.
-% sigDC - DC signals for each probe (Nprobe x 1)
-%  where Nprobe is the number of probes.
-% sigAC - transfer matrix (Nprobe x Ndrive x Naf),
-%   where Ndrive is the total number of optic drive
-%   inputs (e.g., 1 for a mirror, 2 for a RFmodulator).
-%   Thus, sigAC is arranged such that sigAC(n, m, :)
-%   is the TF from the drive m to probe n.
-% mMech - modified drive transfer functions (Ndrv x Ndrv x Naf)
-% noiseAC - quantum noise at each probe (Nprb x Naf)
+% fDC       - DC fields at this position (Nlink x Nrf)
+%             where Nlink is the number of links, and Nrf
+%             is the number of RF frequency components.
+% sigDC     - DC signals for each probe (Nprobe x 1)
+%             where Nprobe is the number of probes.
+% sigAC     - transfer matrix (Nprobe x Ndrive x Naf),
+%             where Ndrive is the total number of optic drive
+%             inputs (e.g., 1 for a mirror, 2 for a RFmodulator).
+%             Thus, sigAC is arranged such that sigAC(n, m, :)
+%             is the TF from the drive m to probe n.
+% mMech     - modified drive transfer functions (Ndrv x Ndrv x Naf)
+% noiseAC   - quantum noise at each probe (Nprb x Naf)
 % noiseMech - quantum noise at each drive (Ndrv x Naf)
 %
-% Example:
+% UNITS:
+% Assuming the input laser power is in Watts, and laser wavelength is in
+% meters, the outputs are generically 
+% fDC   - [sqrt(W)]
+% sigDC - [W]
+% sigAC - [W/m]
+% assuming the drive is a mirror. If the drive is a modulator, then sigAC
+% is [W/Rin] or [W/rad] for an amplitude or phase modulation, respectively.
+%
+% EXAMPLE:
 % f = logspace(0, 3, 300);
 % opt = optFP;
 % [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
+%
+% 
+% $Id: tickle.m,v 1.12 2011/01/21 18:35:22 jkissel Exp $
 
 
 % %%%%%%%%%%%%%%%%%%%% With control struct
