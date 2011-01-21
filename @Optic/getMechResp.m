@@ -24,8 +24,9 @@ function rsp = getMechResp(obj, f, nDOF)
       
   % dechipher mechanical response
   if isempty(mechTF)
+    % Any object who's opto-mechanical transfer function is not set ends up
+    % here (and is "taken care of" elsewhere)
     rsp = 0;
-    error('No mechTF for DOF %d of %s', nDOF, obj.name);
   elseif isa(mechTF, 'LTI') || isa(mechTF, 'lti') || isa(mechTF, 'zpk')
     rsp = freqresp(mechTF, 2 * pi * f);
   elseif isa(mechTF, 'struct')
