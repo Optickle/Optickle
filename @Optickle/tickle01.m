@@ -4,6 +4,7 @@
 % opt - Optickle model
 % pos - optic positions (Ndrive x 1, or empty)
 % f - audio frequency vector (Naf x 1)
+% nDrive - drive indices to consider (Nx1, default is all)
 %
 % sigAC - transfer matrix (Nprobe x Ndrive x Naf),
 %   where Ndrive is the total number of optic drive
@@ -17,12 +18,18 @@
 % opt = optFP;
 % [sigAC, mMech] = tickle01(opt, [], f);
 
+% 1/20/2011 N. Smith added nDrive as optional argument, allows calculation
+% to be performed faster if only a subset of the drive points will be used.
 
-function varargout = tickle01(opt, pos, f)
+
+function varargout = tickle01(opt, pos, f, nDrive)
 
   % === Argument Handling
   if nargin < 3
     error('No frequency vector given.  Use tickle for DC results.')
+  end
+  if nargin < 4
+    nDrive = [];
   end
 
   % === Field Info
@@ -110,18 +117,24 @@ function varargout = tickle01(opt, pos, f)
   % useful indices
   jAsb = 1:Narf;
   jDrv = (1:Ndrv) + Narf;
+  if ~isempty(nDrive)
+    jDrv = jDrv(nDrive);
+    NdrvOut = numel(nDrive);
+  else
+    NdrvOut = Ndrv;
+  end
   
   % main inversion tools
   mDC = sparse(1:Nfld, 1:Nfld, vDC, Nfld, Nfld);
 
   mFFz = sparse(Nfld, Nfld);
-  mOOz = sparse(Ndrv, Ndrv);
+  mOOz = sparse(NdrvOut, NdrvOut);
   eyeNdof = speye(Ndof);
 
   % intialize result space
   mExc = eyeNdof(:, jDrv);
-  sigAC = zeros(Nprb, Ndrv, Naf);
-  mMech = zeros(Ndrv, Ndrv, Naf);
+  sigAC = zeros(Nprb, NdrvOut, Naf);
+  mMech = zeros(NdrvOut, NdrvOut, Naf);
   
   % since this can take a while, let's time it
   tic;
