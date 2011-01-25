@@ -78,8 +78,8 @@ function [vLen, prbList, mapList] = convertLinks(opt)
           prbList(k).mPrb(m, n) = conj(phi);
           prbList(k).mPrbQ(m, n) = conj(phi_quad);
         elseif df_p < 1e3 || df_m < 1e3
-          warning(['Demodulation frequency near-miss for probe %d ' ... 
-            'with RF components %d and %d.'], k, n, m)
+          warning(['Demodulation frequency near-miss for probe %s ' ... 
+            'with RF components %d and %d.'], getProbeName(opt,k), n, m)
         end
       end
     end
