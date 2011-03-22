@@ -8,4 +8,4 @@
 
 function dbdx = dbessel(n, gamma)
 
-  dbdx = gamma .* bessel(n - 1, gamma) - n .* bessel(n, gamma);
+  dbdx = gamma .* besselj(n - 1, gamma) - n .* besselj(n, gamma);

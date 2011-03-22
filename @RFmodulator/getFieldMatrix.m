@@ -15,7 +15,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
   mOpt = zeros(Nrf, Nrf);
   for n = 1:Nrf
     % reduce input RF component
-    mOpt(n, n) = bessel(0, imag(aMod)) * (1 - real(aMod)^2 / 4);
+    mOpt(n, n) = besselj(0, imag(aMod)) * (1 - real(aMod)^2 / 4);
 
     % loop over RF components again to look for RF frequency matches
     for m = 1:Nrf
@@ -23,7 +23,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
       n_df = round(df / fMod);
       r_df = abs(df - n_df * fMod);
       if r_df < 1e-3 && n_df ~= 0
-        mOpt(m, n) = bessel(n_df, imag(aMod)) * 1i^n_df;
+        mOpt(m, n) = besselj(n_df, imag(aMod)) * 1i^n_df;
         if n_df == 1 || n_df == -1
           mOpt(m, n) = mOpt(m, n) + real(aMod) / 2;
         end
