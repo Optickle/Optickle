@@ -9,6 +9,26 @@
 %
 % Example (from optFP):
 % opt = setCavityBasis(opt, 'IX', 'EX');
+%
+%%%%%%% More words...
+% Optickle will try to find a consistent basis (Hermite-Gauss) for the beams
+%  in the IFO from whatever you tell it.  You can define the cavity basis at
+%  an optic's port and/or at the source.  As long as Optickle has enough
+% information to determine the basis everywhere, and there are no conflicts,
+%  it will be happy.
+% 
+% So, getting on to your question, it turns out that setting the basis at the
+%  source (which seems like a natural thing to do, since your laser produces
+%  some beam) can be troublesome because it requires that you do all the mode-matching
+%  calculations by hand.  SetCavityBasis is just a convenience function that sets
+%  the basis for the optics in a 2 mirror cavity, which Optickle can then propagate
+%  around the IFO (and back to the source).
+% 
+% That said, Optickle is not a mode-matching tool and its error messages about
+%  what is wrong with your mode-matching are not very useful, so if you have a
+%  system with multiple cavities you will have to do the mode-matching yourself.
+%  You can use getAllFieldBases to help... take a look at "help getLinkLengths"
+%  for an example usage.
 
 function opt = setCavityBasis(opt, name1, name2)
 

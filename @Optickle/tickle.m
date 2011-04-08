@@ -35,7 +35,7 @@
 % [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
 %
 % 
-% $Id: tickle.m,v 1.12 2011/01/21 18:35:22 jkissel Exp $
+% $Id: tickle.m,v 1.13 2011/04/08 21:59:05 mevans Exp $
 
 
 % %%%%%%%%%%%%%%%%%%%% With control struct
@@ -304,7 +304,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     else
       % reduce probes and drives to those required by control struct
       mPlant = sCon.mPrbIn * mPrb * tfAC(jAsb, :) + ...
-	sCon.mDrvIn * tfAC(jDrv, :) + mPrbPrb;
+        sCon.mDrvIn * tfAC(jDrv, :) + mPrbPrb;
       
       % compute closed loop response of outputs
       mCon = sCon.mCon(:, :, nAF);
