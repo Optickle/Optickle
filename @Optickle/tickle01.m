@@ -11,7 +11,14 @@
 %   inputs (e.g., 1 for a mirror, 2 for a RFmodulator).
 %   Thus, sigAC is arranged such that sigAC(n, m, :)
 %   is the TF from the drive m to probe n.
+%
 % mMech - modified drive transfer functions (Ndrv x Ndrv x Naf)
+%
+% NOTE: like tickle, sigAC is the product of the DC field amplitude
+% with the AC sideband amplitude.  This IGNORES the overlap integral
+% between the TEM00 and TEM01 modes on a given detector geometry.
+% For a half plane detector, the correction factor is sqrt(pi/2)
+%   === Thanks to Yuta Michimora!!! ===
 %
 % Example:
 % f = logspace(0, 3, 300);
@@ -92,9 +99,6 @@ function varargout = tickle01(opt, pos, f, nDrive)
   for k = 1:Nprb
     mIn_k = prbList(k).mIn;
     mPrb_k = prbList(k).mPrb;
-    
-    % HACK: TEM01 does not have factor of 2 for DC
-    mPrb_k(mPrb_k == 2) = 1;
     
     vDCin = mIn_k * vDC;
     mPrb(k, 1:Nfld) = (mPrb_k * conj(vDCin)).' * mIn_k;
