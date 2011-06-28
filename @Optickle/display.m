@@ -11,7 +11,12 @@ function display(opt)
   
   % Get the RF field amplitudes
   if ~isempty(opt.snSource)
-    [vFrf, vArf] = getFieldSource(opt);
+    % FIXME: This is a bit of a kludge.  We don't want to call the
+    % getFieldSource or getSourceInfo functions because they will trigger
+    % an error if the source is not yet defined or linked.  So, we violate
+    % the abstraction.  Also, this does not play well with multiple
+    % sources.
+    vArf = get(opt.optic{opt.snSource(1)}, 'vArf');
   else     
     vArf = zeros(size(vFrf));
   end
