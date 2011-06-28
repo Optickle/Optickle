@@ -19,7 +19,7 @@ function display(opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Frequencies
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  disp(sprintf('==== %d RF frequencies', Nrf))
+  disp(sprintf('==== %d RF frequencies', Nrf)) %#ok
   for n = 1:Nrf
     str = sprintf('%d) %s with amplitude %g', n, ...
                   getFreqStr(vFrf(n)), vArf(n));
@@ -29,15 +29,15 @@ function display(opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Optics
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  disp(sprintf('==== %d optics', Nopt))
+  disp(sprintf('==== %d optics', Nopt)) %#ok
   for n = 1:Nopt
-    opt.optic{n}
+    opt.optic{n} %#ok
   end
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Drive points
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  disp(sprintf('==== %d drive points', Ndrv))
+  disp(sprintf('==== %d drive points', Ndrv)) %#ok
   dNames = getDriveNames(opt);
   dMap   = getDriveMap(opt);
   for n = 1:Ndrv
@@ -49,7 +49,7 @@ function display(opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Links
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  disp(sprintf('==== %d links', Nlnk))
+  disp(sprintf('==== %d links', Nlnk)) %#ok
   for n = 1:Nlnk
     lnk = opt.link(n);
     str = sprintf('%d) %g meters from %s to %s', n, lnk.len, ...
@@ -60,7 +60,7 @@ function display(opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Probes
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  disp(sprintf('==== %d probes', Nprb))
+  disp(sprintf('==== %d probes', Nprb)) %#ok
   for n = 1:Nprb
     prb = opt.probe(n);
     if prb.freq == 0
