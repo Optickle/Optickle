@@ -24,7 +24,7 @@ function [opt, sn] = addSource(opt, name, vArf, varargin)
   
   % check for old-stype 2 column frequency specification
   if size(vArf, 2) == 2 && isempty(opt.vFrf)
-    warning('Using depricated RF component specification.\n%s.', ...
+    warning('Using deprecated RF component specification.\n%s.', ...
             'See Optickle for more information')
 
     % break into frequency and amplitude vectors
@@ -39,6 +39,10 @@ function [opt, sn] = addSource(opt, name, vArf, varargin)
     end
   end
   
+  if length(vArf) ~= length(opt.vFrf)
+      error('RF amplitudes vector is not the right length.');
+  end
+      
   % add new source object
   obj = Source(name, vArf, varargin{:});
   [opt, sn] = addOptic(opt, obj);
