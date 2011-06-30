@@ -15,6 +15,15 @@
 
 function [pos, sigDC, fDC] = sweepLinear(opt, posStart, posEnd, Npos)
 
+  % check that "posStart" and "posEnd" are the right length
+  if length(posStart) ~= opt.Ndrive
+      error('posStart is the wrong length; should have length(posStart)==opt.Ndrive.');
+  end
+  
+  if size(posStart) ~= size(posEnd),
+      error('posStart and posEnd should have the same dimensions');
+  end
+      
   % generate position vectors
   x = (0:Npos-1)' / (Npos - 1);
   dpos = posEnd - posStart;
