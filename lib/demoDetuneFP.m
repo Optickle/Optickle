@@ -21,16 +21,16 @@ function demoDetuneFP
 
   % compute the DC signals and TFs on resonance
   f = logspace(-1, 3, 200)';
-  [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = parTickle(opt, [], f);
+  [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
   
   % compute the same a little off resonance
   pos = zeros(opt.Ndrive, 1);
   pos(nEX) = 0.1e-9;
-  [fDC, sigDC1, sigAC1, mMech1, noiseAC1] = parTickle(opt, pos, f);
+  [fDC, sigDC1, sigAC1, mMech1, noiseAC1] = tickle(opt, pos, f);
   
   % and a lot off resonance
   pos(nEX) = 1e-9;
-  [fDC, sigDC2, sigAC2, mMech2, noiseAC2] = parTickle(opt, pos, f);
+  [fDC, sigDC2, sigAC2, mMech2, noiseAC2] = tickle(opt, pos, f);
   
   % make a response plot
   h0 = getTF(sigAC0, nREFL_I, nEX);
