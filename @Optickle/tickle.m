@@ -27,7 +27,7 @@
 % sigDC - [W]
 % sigAC - [W/m]
 % assuming the drive is a mirror. If the drive is a modulator, then sigAC
-% is [W/Rin] or [W/rad] for an amplitude or phase modulation, respectively.
+% is [W/AM] or [W/rad] for an amplitude or phase modulation, respectively.
 %
 % EXAMPLE:
 % f = logspace(0, 3, 300);
@@ -35,7 +35,7 @@
 % [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
 %
 % 
-% $Id: tickle.m,v 1.13 2011/04/08 21:59:05 mevans Exp $
+% $Id: tickle.m,v 1.14 2011/07/26 23:09:57 tfricke Exp $
 
 
 % %%%%%%%%%%%%%%%%%%%% With control struct
