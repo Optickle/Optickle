@@ -26,6 +26,6 @@ function mRct = getReactMatrix(obj, pos, par, mOpt, d)
       % enter this submatrix into mRct
       nn = (1:Nout) + Nout * (n - 1);
       mm = (1:Nin) + Nin * (n - 1);
-      mRct(1, mm, nAF) = rsp(nAF) * sum(abs(mOpt(nn, mm)).^2 .* d, 1);
+      mRct(1, mm, nAF) = 2 * rsp(nAF) * sum(abs(mOpt(nn, mm)).^2 .* d, 1);
     end
   end
