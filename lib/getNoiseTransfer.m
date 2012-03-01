@@ -4,7 +4,7 @@
 % Transfer noise power from incoherent sources through a Nout x Nin x Naf
 % frequency dependent transfer matrix.  (see also getTF, getProdTF)
 %
-% The input noise power may be frequency dependent (Naf x Nin), or
+% The input noise power may be frequency dependent (Nin x Naf), or
 % frequency independent (Nin x 1).  More generally, vNoiseIn maybe
 % three dimentional of size Nin x 1 x 1 or Nin x 1 x Naf.
 %
@@ -31,9 +31,9 @@ function vNoiseOut = getNoiseTransfer(varargin)
   
   % expand frequency dependent noise vectors
   if ndims(vNoiseIn) == 2 && size(vNoiseIn, 2) ~= 1
-    [Nfreq, Nin] = size(vNoiseIn);
-    vNoiseIn = reshape(vNoiseIn', Nin, 1, Nfreq);
+    [Nin, Naf] = size(vNoiseIn);
+    vNoiseIn = reshape(vNoiseIn, Nin, 1, Naf);
   end
   
   % compute output noise
-  vNoiseOut = getProdTF(abs(mTF), vNoiseIn);
+  vNoiseOut = squeeze(getProdTF(abs(mTF).^2, vNoiseIn));
