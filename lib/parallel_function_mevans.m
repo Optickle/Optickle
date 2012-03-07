@@ -156,7 +156,7 @@
 
 % original version (Matlab 2009a, PCT)
 %   Copyright 1984-2007 The MathWorks, Inc.
-%   $Revision $ $Date: 2010/04/15 16:25:20 $
+%   $Revision $ $Date: 2012/03/07 23:24:00 $
 %
 % modified by Matthew Evans, Feb 2010
 %   adaptation of pforfun
