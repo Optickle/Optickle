@@ -10,7 +10,7 @@
 % returns the index of a field which is NOT at the specified
 % output (since there is no field evaluated there), but rather
 % at the input to the optic at the end of the corresponding
-% link.  Where possible, use getFieldOut to improve clarity.
+% link.  Where possible, use getFieldIn to improve clarity.
 %
 % see also getFieldIn, getFieldProbed, getLinkNum
 %

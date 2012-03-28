@@ -73,7 +73,12 @@ function [opt, pos] = setOperatingPoint(opt, varargin)
     
     % invert and set new initial position
     dpos = dmErr \ vErr;
+    if ~all(isfinite(dpos))
+      error('Singular matrix')
+    end
+    
     pos(:, 1) = pos(:, 1) - mDelta * dpos;
+    
     
     if all(abs(dpos) < 1e-6)
       break
