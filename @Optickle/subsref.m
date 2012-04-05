@@ -13,7 +13,7 @@ function val = subsref(obj, s)
     case '.'
       % for debugging use only
       ok_list = {'Noptic', 'Ndrive', 'Nlink', 'Nprobe', ...
-                 'lambda', 'k', 'c', 'h', 'debug'};
+                 'minQuant', 'lambda', 'k', 'c', 'h', 'debug'};
       if obj.debug < 2 && isempty(strmatch(ss.subs, ok_list, 'exact'))
         warning('Direct reference to Optickle internals not allowed.');
       end

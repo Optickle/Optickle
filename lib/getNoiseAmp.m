@@ -96,3 +96,4 @@ function mNP = getNoiseAmp(Thr, Lhr, Rar, Lmd, phi, in, minQuant)
     mNP1 = [htbt * at; tbo * at; arf; tbo * arbt * hrbt * at];
     mNP = [mNP, mNP1];
   end
+end

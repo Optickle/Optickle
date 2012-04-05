@@ -10,3 +10,4 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   
   % default is no noise
   mQuant = zeros(par.Nrf * obj.Nout, 0);
+end

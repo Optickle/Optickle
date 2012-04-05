@@ -12,7 +12,7 @@
 %
 % [mOpt, mRct, mDrv, mQuant] = getMatrices(obj, pos, par);
 
-function [mOpt, mRct, mDrv, mQuant] = getMatrices(obj, pos, par);
+function [mOpt, mRct, mDrv, mQuant] = getMatrices(obj, pos, par)
 
   % optical field transfer matrix
   mOpt = getFieldMatrix(obj, pos, par);
@@ -27,3 +27,4 @@ function [mOpt, mRct, mDrv, mQuant] = getMatrices(obj, pos, par);
     mDrv = [];
     mQuant = [];
   end
+end
