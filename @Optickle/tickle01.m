@@ -120,7 +120,6 @@ function varargout = tickle01(opt, pos, f, nDrive)
   for n = 1:Ndrv
     mGen(:, n) = drvList(n).m * vDC;
   end
-  full(mGen)
   
   % useful indices
   jAsb = 1:Narf;
