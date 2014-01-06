@@ -7,7 +7,7 @@ many other tools that do all these things in greater detail.
 Optickle is for quick, rough, but essentially complete design
 studies.
 
-In Optickle you can, in principal, simulate any interferometer.
+In Optickle you can, in principle, simulate any interferometer.
 The provided example is a Fabry-Perot cavity, optFP.  There is
 currently only one demo file which you are encouraged to run and read:
 demoDetuneFP.  Alignment sensing and control demos are lacking,
