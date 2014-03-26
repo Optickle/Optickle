@@ -58,7 +58,7 @@ for jj=1:length(vFrf)
         fprintf('  DC     ');
     else
         [prefix, value] = metricize(vFrf(jj));
-        if value < 10
+        if abs(value) < 10
             precision = 1;
         else
             precision = 0;
