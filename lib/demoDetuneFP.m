@@ -23,6 +23,13 @@ function demoDetuneFP
   f = logspace(-1, 3, 200)';
   [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
   
+  % Print out the fields and probes, just to demonstrate these functions:
+  fprintf('DC fields (fDC matrix):\n');
+  showfDC(opt, fDC);
+  
+  fprintf('\nProbes (sigDC matrix):\n');
+  showsigDC(opt, sigDC0);
+  
   % compute the same a little off resonance
   pos = zeros(opt.Ndrive, 1);
   pos(nEX) = 0.1e-9;
