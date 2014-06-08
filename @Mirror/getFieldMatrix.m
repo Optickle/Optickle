@@ -6,9 +6,10 @@
 function [mOpt, d] = getFieldMatrix(obj, pos, par)
   
   % constants
-  Nin = 2;				% obj.Optic.Nin
-  Nout = 4;				% obj.Optic.Nout
-  pos = pos + obj.Optic.pos;		% mirror position, with offset
+  Nrf = par.Nrf;
+  Nin = 2;				% obj.Nin
+  Nout = 4;				% obj.Nout
+  pos = pos + obj.pos;		% mirror position, with offset
   
   % ==== Compute Coupling Matrix
   % amplitude reflectivities, transmissivities and phases
@@ -46,8 +47,8 @@ function [mOpt, d] = getFieldMatrix(obj, pos, par)
   d(2:4, 2) = 2 * cos(pi * obj.aoi / 180);
 
   % do all RF components
-  mOpt = sparse(par.Nrf * Nout, par.Nrf * Nin);
-  for n = 1:par.Nrf
+  mOpt = sparse(Nrf * Nout, Nrf * Nin);
+  for n = 1:Nrf
     % reflection phase due to mirror position
     rp = exp(1i * par.k(n) * pos * d);
     %rp = exp(1i * (2 * pi / par.lambda) * pos * d);
