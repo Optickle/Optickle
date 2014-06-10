@@ -99,13 +99,13 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
 
   % optic conversion
-  [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f);
+  mOpt = convertOpticsDC(opt, mapList, pos);
   
   % noise stuff
-  Nnoise = size(mQuant, 2);
+  %Nnoise = size(mQuant, 2); % mQuant came from AC part of convertOptics
   pQuant = opt.h * opt.c / (2 * opt.lambda);
   aQuant = sqrt(pQuant) / 2;
-  mQuant = mQuant * aQuant;
+  % mQuant = mQuant * aQuant; % same as above
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== DC Fields and Signals
