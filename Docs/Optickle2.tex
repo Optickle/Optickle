@@ -341,7 +341,7 @@ E_-^*
 \tilde{x}
 \eeq
  which is just a single element version of equations \eref{mOF}, \eref{mGen} and \eref{mDrv} in which
- $E_{in}$ is one element of $\vDC$, $r e^{-2 i k x}$ is one element of $\mOpt$,
+ $E_{in}$ is one element of $\vDC$, $-r e^{-2 i k x}$ is one element of $\mOpt$,
  and the propagation phase to the next FEP is not yet accounted for.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -398,15 +398,15 @@ For the AF fields, the situation is somewhat more complicated since
  without coming in the input
 \beqa{vAC_out}
 \vACn{n,in} &=&
-\matrixBegin{c}
-\mInn{n}  \\
-\mInn{n}^*
+\matrixBegin{cc}
+\mInn{n}  & 0 \\
+0 & \mInn{n}^*
 \matrixEnd
  \vAC \\
 \vACn{n,out} &=& 
-\matrixBegin{c}
-\mOptn{n} \\
-\mOptn{n}^*
+\matrixBegin{cc}
+\mOptn{n} & 0 \\
+0 & \mOptn{n}^*
 \matrixEnd
 \vACn{n,in} + 
 \sum_m \matrixBegin{c}
@@ -424,8 +424,8 @@ Before continuing with this math, we will, however, drop the optic index $n$;
  all of these matrices and vectors are for a particular optic.
 \beqa{force_in}
 \tilde{F}_{in} &=& \frac{2}{c} \matrixBegin{c}
-\vDCn{n,in}^\dagger \mDirn{in}, ~~~
-\vDCn{in}^T \mDirn{in}^*
+\vDCn{in}^\dagger \mDirn{in}, ~~~
+\vDCn{in}^T \mDirn{in}
 \matrixEnd
  \vACn{in} \\
  &=& \frac{2}{c} \matrixBegin{c}
@@ -537,9 +537,9 @@ This leads us to
 \tilde{F}_{AC} &=& \frac{2}{c} 
 \matrixBegin{cc}
  -(2 R + L)  E_{DC} \\
- t r^* + r t^*   E_{DC} \\
+ (t r^* + r t^*)   E_{DC} \\
  -(2 R + L)  E_{DC}^* \\
- t r^* + r t^*   E_{DC}^* \\
+ (t r^* + r t^*)   E_{DC}^* \\
 \matrixEnd^\dagger
 \matrixBegin{cc}
  E_+ \\
@@ -548,10 +548,10 @@ This leads us to
  0
 \matrixEnd  \\
 &=& -\frac{2}{c} (2 R + L)  (E_{DC}^* E_+ + E_{DC} E_-^*) \\
-&=& -\frac{2}{c} (2 R + L) \tilde{P}_{front_{in}}
+&=& -\frac{1}{c} (2 R + L) \tilde{P}_{front_{in}}
 \eeqa
 This matches the naive result:
- the radiation force is $2 P / c$ times the absorption coefficient $L$ and twice the reflectivity $R$.
+ the radiation force is $P / c$ times the absorption coefficient $L$ and twice the reflectivity $R$.
 
 The radiation force which results from production of AF fields by the optic is given by the second
  term in equation \eref{force_total}.
