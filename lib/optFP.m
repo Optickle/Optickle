@@ -17,6 +17,7 @@ function opt = optFP
   % add an AM modulator (for intensity control, and intensity noise)
   %   opt = addModulator(opt, name, cMod)
   opt = addModulator(opt, 'AM', 1);
+  return
   opt = addLink(opt, 'Laser', 'out', 'AM', 'in', 0);
 
   % add an PM modulator (for frequency control and noise)
