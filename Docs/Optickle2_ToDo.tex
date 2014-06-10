@@ -1,0 +1,117 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Preamble
+\documentclass[12pt]{article}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Packages
+\usepackage{amsmath, amssymb}
+\usepackage{units}
+%\usepackage{braket}
+
+\usepackage[pdftex]{color}              
+\usepackage[pdftex]{graphicx}
+\usepackage[pdftex,colorlinks=true,linkcolor=black,pdfview=FitH,pdfstartview=FitH]{hyperref}
+\usepackage[font=small]{caption}
+\usepackage{sidecap}
+\usepackage{times}
+
+\hypersetup{citecolor=black}
+
+\pdfcompresslevel 9
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Input Commands
+\input{mevansTex}
+\input{abbrev}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Header
+
+\title{Optickle 2: To Do List}
+\author{M.~Evans}
+%\address{$^1$MIT Kavli Institute (MKI), Massachusetts Institute of Technology %(MIT), Cambridge, USA;}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Document
+
+\begin{document}
+
+\maketitle
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{DC Field Calculation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{convertOpticsDC}
+
+Extract the DC part of convertOptics into a separate function.
+
+Investigate overlap with sweep functions.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{getFieldMatrixDC}
+
+This is just the current getFieldMatrix, but renamed.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{getPhaseMatrix}
+
+Update to deal with multiple wavelengths and polarizations.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{AC Field Calculation}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{convertOpticsAC}
+
+Extract the AC part of convertOptics into a separate function.
+Pass $\vDC$ along with other arguments to getMatrices.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{getFieldMatrixAC}
+
+This is just the current getFieldMatrix, but with more arguments and a larger return matrix (upper and lower ASB).
+Some Optics will use these to implement non-linear effects.
+
+The Optic base class should make this function call getFieldMatrixDC by default.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{getReactMatrix, getDriveMatrix, getNoiseMatrix}
+
+Update these to the new set of arguments.
+
+Write helper functions which can ``up convert'' smaller output matrixes to the required size,
+ assuming no RF/AF dependence.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Tickle}
+
+Remove simulink parts, and/or make them work with Nic's stuff.
+
+Rework to use convertOpticsDC and AC.
+
+Include drive and probe matrices.
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{New Optics}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Squeeze}
+
+Squeezer, non-linear crystal
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Wavelength}
+
+Multi-wavelength optics, coated optics
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{Polarization}
+
+PBS, waveplates
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\end{document}

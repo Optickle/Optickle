@@ -1,18 +1,21 @@
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages
+%\usepackage[pdftex]{color}
+%\usepackage[pdftex]{graphicx}
+%\usepackage[pdftex,colorlinks=true,linkcolor=black,pdfview=FitH,pdfstartview=FitH]{hyperref}
+%\hypersetup{citecolor=black}
+%\pdfcompresslevel 9
 
-\usepackage{epsfig}
+\usepackage{amsfonts}
 \usepackage{amsmath}
-\usepackage{amssymb}
-\usepackage{color}
-\usepackage{array}
+\usepackage{bm}                 % bold math
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Labels and References
 
 \newcommand{\alabel}[1]{\label{app:#1}}
 \newcommand{\clabel}[1]{\label{cpt:#1}}
-\newcommand{\slabel}[1]{\label{sec:#1}}
+\newcommand{\sslabel}[1]{\label{sec:#1}}
 \newcommand{\elabel}[1]{\label{eqn:#1}}
 \newcommand{\flabel}[1]{\label{fig:#1}}
 \newcommand{\tlabel}[1]{\label{tab:#1}}
@@ -24,7 +27,12 @@
 \newcommand{\fref}[1]{\ref{fig:#1}}
 \newcommand{\tref}[1]{\ref{tab:#1}}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% sections with labels
+\newcommand{\MEsec}[2]{\section{\sslabel{#2}#1}}
+\newcommand{\MEssec}[2]{\subsection{\sslabel{#2}#1}}
+\newcommand{\MEsssec}[2]{\subsubsection{\sslabel{#2}#1}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Structures
 
 % List
@@ -36,67 +44,105 @@
 \newcommand{\matrixBegin}[1]{\left[\!\!\left[ \begin{array}{#1}}
 \newcommand{\matrixEnd}{\end{array} \right]\!\!\right]}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Environments
+
+% equations
+\newcommand{\beq}[1]{\begin{equation}\elabel{#1}}
+\newcommand{\eeq}{\end{equation}}
+
+\newcommand{\beqa}[1]{\begin{eqnarray}\elabel{#1}}
+\newcommand{\eeqa}{\end{eqnarray}}
+
+% figures
+%  MEfig{figure args}{width}{fig name}{caption}
+%  MEfig{h}{0.9}{optFP}{A Fabry-Perot cavity.}
+\newcommand{\MEfig}[4]{\begin{figure}[#1] \begin{center}\includegraphics[width=#2\linewidth]{#3}
+ \vspace{-5pt} \caption{\flabel{#3}#4}\end{center}\end{figure}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Misc
 \newcommand{\vecv}[1]{\vec{v}_{#1}}
 \newcommand{\matm}[1]{\mathbf{M}_{#1}}
 \newcommand{\matI}{\mathbb{I}}
 
+% left-right groupings
 \newcommand{\abs}[1]{\left| #1 \right|}
-\newcommand{\group}[1]{\left[ #1 \right]}
+\newcommand{\grp}[1]{\left[ #1 \right]}
+\newcommand{\prn}[1]{\left( #1 \right)}
 \newcommand{\set}[1]{\left\{ #1 \right\}}
 
+\def\({\left(}
+\def\){\right)}
+\def\[{\left[}
+\def\]{\right]}
+
+% text in equations
+\def\where{\text{where}}
+\def\suchthat{\text{such that}}
+\def\with{\text{with}}
+\def\and{\text{and}}
+\def\for{\text{for}}
+\def\since{\text{since}}
+\newcommand{\undernote}[2]{\underbrace{#1}_{\text{#2}}}
+
+% functions
 \newcommand{\fun}[2]{\,{#1}\!\left( {#2} \right)}
 \newcommand{\funt}[1]{\fun{#1}{t}}
 \newcommand{\tfun}[2]{\fun{\textrm{#1}}{#2}}
 \newcommand{\tfunt}[1]{\funt{\textrm{#1}}}
 
-\newcommand{\fsin}[1]{\tfun{sin}{#1}}
-\newcommand{\fcos}[1]{\tfun{cos}{#1}}
-\newcommand{\imag}[1]{\fun{\mathcal{I}m}{#1}}
-\newcommand{\real}[1]{\fun{\mathcal{R}e}{#1}}
+\newcommand{\fsin}[1]{\sin\!\left( {#1} \right)}
+\newcommand{\fcos}[1]{\cos\!\left( {#1} \right)}
+\newcommand{\fexp}[1]{\mathcal{e}^{#1}}
 
+\newcommand{\imag}[1]{Im\!\left[ {#1} \right]}
+\newcommand{\real}[1]{Re\!\left[ {#1} \right]}
+
+% partial derivatives
 \newcommand{\deriv}[2]{\frac{d{#1}}{d{#2}}}
 \newcommand{\partderiv}[2]{\frac{\partial{#1}}{\partial{#2}}}
+\newcommand{\partderivT}[2]{\partial{#1}/\partial{#2}}
+\newcommand{\partderivS}[2]{\frac{\partial^2{#1}}{\partial{#2}^2}}
 
-\newcommand{\E}[2]{#1 \times 10^{#2}}
+\newcommand{\dint}[3]{\int_{#1}^{#2} \hspace{-2ex} #3 ~}
 
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% half and quarter
+\newcommand{\half}{\tfrac{1}{2}}
+\newcommand{\qtr}{\tfrac{1}{4}}
+
+% gravitational waves
+\def\gw{gravitational wave}
+\def\gws{gravitational waves}
+\def\GW{Gravitational Wave}
+\def\GWs{Gravitational Waves}
+
+% common symbols
+\def\kB{k_B}
+\def\fins{\mathcal{F}}
+
+% ordinal numbers
+\def\first{1\textsuperscript{st}}
+\def\second{2\textsuperscript{nd}}
+\def\third{3\textsuperscript{rd}}
+\def\forth{4\textsuperscript{th}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Units
-\newcommand{\unit}[1]{\,\mbox{#1}}
+\usepackage{siunitx}
 
-\newcommand{\second}{\unit{s}}
-\newcommand{\ms}{\unit{ms}}
-\newcommand{\us}{\unit{$\mu$s}}
+\sisetup{per-mode = symbol-or-fraction}
+\sisetup{load-configurations = abbreviations}
 
-\newcommand{\Hz}{\unit{Hz}}
-\newcommand{\kHz}{\unit{kHz}}
-\newcommand{\MHz}{\unit{MHz}}
+\DeclareSIUnit\rtHz{$\sqrt{\si{\Hz}}$}
+\DeclareSIUnit\mrtHz{\meter\per\rtHz}
 
-\newcommand{\meter}{\unit{m}}
-\newcommand{\mm}{\unit{mm}}
-\newcommand{\um}{\unit{$\mu$m}}
-\newcommand{\nm}{\unit{nm}}
-\newcommand{\km}{\unit{km}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Colored Text
+\definecolor{spring}{rgb}{0.7,0.9,0.7}
+\definecolor{brick}{rgb}{0.7,0.2,0.1}
+\definecolor{redHL}{rgb}{1.0,0.5,0.5}
+\newcommand{\markit}[1]{\colorbox{spring}{#1}}
+\newcommand{\fixme}[1]{\colorbox{redHL}{#1}}
 
-\newcommand{\gram}{\unit{g}}
-\newcommand{\kg}{\unit{kg}}
-
-\newcommand{\Newton}{\unit{N}}
-\newcommand{\mN}{\unit{mN}}
-
-\newcommand{\degree}{^\circ}
-\newcommand{\radian}{\unit{rad}}
-
-\newcommand{\Volt}{\unit{V}}
-\newcommand{\kV}{\unit{kV}}
-
-\newcommand{\Watt}{\unit{W}}
-\newcommand{\mW}{\unit{mW}}
-
-\newcommand{\Amp}{\unit{A}}
-\newcommand{\mA}{\unit{mA}}
-
-\newcommand{\dB}{\unit{dB}}
-
-\newcommand{\lps}{\unit{$\lambda/\mbox{s}$}}
