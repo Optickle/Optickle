@@ -126,7 +126,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % link and probe conversion
-  [vLen, prbList, mapList] = convertLinks(opt);
+  [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
 
   % optic conversion
   [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f);
@@ -151,7 +151,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
 
   % compute DC fields
   eyeNfld = speye(Nfld);			% a sparse identity matrix
-  mPhi = getPhaseMatrix(vLen, vFrf);		% propagation phase matrix
+  mPhi = getPhaseMatrix(vLen, vFrf,[],mPhiFrf);		% propagation phase matrix
   vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
 
   % compile system wide probe matrix and probe shot noise vector
@@ -272,8 +272,8 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     fAudio = f(nAF);
 
     % propagation phase matrices
-    mPhim = getPhaseMatrix(vLen, vFrf - fAudio);
-    mPhip = getPhaseMatrix(vLen, vFrf + fAudio);
+    mPhim = getPhaseMatrix(vLen, vFrf - fAudio,[],mPhiFrf);
+    mPhip = getPhaseMatrix(vLen, vFrf + fAudio,[],mPhiFrf);
 
     % field to optic position transfer
     mFOm = rctList(nAF).m * conj(mDC) / LIGHT_SPEED;
