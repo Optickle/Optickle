@@ -1,4 +1,4 @@
-classdef Optic
+classdef Optic < handle
 % This is the base class for optics used in Optickle
 %
 % An Optic is a general optical component (mirror, lens, etc.).

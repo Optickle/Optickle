@@ -65,7 +65,7 @@ classdef Telescope < Optic
       end
       
       % build optic (a telescope has no drives)
-      obj@Optic(name, {'in'}, {'out'}, {});
+      objOptic(name, {'in'}, {'out'}, {});
       obj.f = f_arg;
       obj.df = df_arg;
     end
