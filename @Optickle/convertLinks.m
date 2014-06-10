@@ -8,6 +8,8 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
 
   % === Field Info
   vFrf = getSourceInfo(opt);
+  vKrf = opt.k;
+  smallWaveNumber = 100e-3*2*pi/Optickle.c; % corresponds to 100mHz
   
   % ==== Sizes of Things
   Nopt = opt.Noptic;			% number of optics
@@ -61,34 +63,36 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
   prbList = repmat(prbElem, Nprb, 1);
   
   % loop over probes
-  for k = 1:Nprb
-    prb = opt.probe(k);
+  for jPrb = 1:Nprb
+    prb = opt.probe(jPrb);
     phi = exp(1i * pi * prb.phase / 180);
     phi_quad = exp(1i * pi * (prb.phase + 90) / 180);
 
-    % loop over RF components
+    % loop over RF components (wave numbers)
     for n = 1:Nrf
       % construct input matrix
-      prbList(k).mIn(n, prb.nField + Nlnk * (n - 1)) = 1;
+      prbList(jPrb).mIn(n, prb.nField + Nlnk * (n - 1)) = 1;
 
-      % loop over RF components again to look for demod matches
+      % loop over RF components (wave numbers) again to look for demod matches
       for m = 1:Nrf
-        df_p = abs(vFrf(m) - vFrf(n) + prb.freq);
-        df_m = abs(vFrf(m) - vFrf(n) - prb.freq);
-        if df_p < 1e-3 && df_m < 1e-3
+        dk_p = abs(vKrf(m) - vKrf(n) + 2*pi*prb.freq/Optickle.c);
+        dk_m = abs(vKrf(m) - vKrf(n) - 2*pi*prb.freq/Optickle.c);
+        if dk_p < smallWaveNumber && dk_m < smallWaveNumber
           if prb.phase ~= 0
-            warning('Non-zero demod phase for DC probe %k ignored.', k)
+            warning('Non-zero demod phase for DC probe %k ignored.', jPrb)
           end
-          prbList(k).mPrb(m, n) = 2;
-        elseif df_p < 1e-3
-          prbList(k).mPrb(m, n) = phi;
-          prbList(k).mPrbQ(m, n) = phi_quad;
-        elseif df_m < 1e-3
-          prbList(k).mPrb(m, n) = conj(phi);
-          prbList(k).mPrbQ(m, n) = conj(phi_quad);
-        elseif df_p < 1e3 || df_m < 1e3
+          prbList(jPrb).mPrb(m, n) = 2;
+        elseif dk_p < smallWaveNumber
+          prbList(jPrb).mPrb(m, n) = phi;
+          prbList(jPrb).mPrbQ(m, n) = phi_quad;
+        elseif dk_m < smallWaveNumber
+          prbList(jPrb).mPrb(m, n) = conj(phi);
+          prbList(jPrb).mPrbQ(m, n) = conj(phi_quad);
+        elseif dk_p < smallWaveNumber*1e3 || dk_m < smallWaveNumber*1e3
+            disp(dk_p)
+            disp(dk_m)
           warning(['Demodulation frequency near-miss for probe %s ' ... 
-            'with RF components %d and %d.'], getProbeName(opt,k), n, m)
+            'with RF components %d and %d.'], getProbeName(opt,jPrb), n, m)
         end
       end
     end
@@ -153,7 +157,7 @@ function linkPhiRf = getRfPhase(opt,link)
     lambda = opt.lambda;
     Nrf = length(lambda);
     
-    smallNumber = 1e-12;
+    smallNumberMeters = 1e-12;
     
     phaseSize = size(phase);
     
@@ -172,7 +176,7 @@ function linkPhiRf = getRfPhase(opt,link)
             % loop through lambda
             for jRf = 1:Nrf
                 % find the phase of this lambda
-                lamInd = find(abs(phase(:,1)-lambda(jRf))<smallNumber,1);
+                lamInd = find(abs(phase(:,1)-lambda(jRf))<smallNumberMeters,1);
                 
                 lamPhi = phase(lamInd,2);
                 
