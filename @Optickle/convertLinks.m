@@ -4,7 +4,7 @@
 % Convert Optickle model to links and probes to matrix form
 %   and construct input and output maps for optics
 
-function [vLen, prbList, mapList] = convertLinks(opt)
+function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
 
   % === Field Info
   vFrf = getSourceInfo(opt);
@@ -36,7 +36,16 @@ function [vLen, prbList, mapList] = convertLinks(opt)
 
   lnks = opt.link;
   vLen = 2 * pi  * [lnks.len]' / opt.c;  
+  
+  % additional phase matrix for each RF frequency
+  
+  mPhiFrf = zeros(Nlnk,Nrf); % size is Nlink x Nrf
 
+  for jLink = 1:Nlnk
+    mPhiFrf(jLink,:) = getRfPhase(opt,lnks(jLink));
+    
+  end
+  
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Probe Conversion
   % This is where the probe matrices are constructed.
@@ -135,4 +144,40 @@ function [vLen, prbList, mapList] = convertLinks(opt)
     mapList(n).mDOF = mDOF;
   end
 
+end
+
+function linkPhiRf = getRfPhase(opt,link)
+    % returns 1 x Nrf phase for a given link
+
+    phase = link.phase;
+    lambda = opt.lambda;
+    Nrf = length(lambda);
+    
+    smallNumber = 1e-12;
+    
+    phaseSize = size(phase);
+    
+    linkPhiRf = zeros(1,Nrf);
+    
+    % switch on second dimension
+    switch phaseSize(2)
+        case 0
+            % empty phase
+        case 1
+            % common phase
+            linkPhiRf = phase*ones('like',linkPhiRf);
+        case 2
+            % phase for every lambda
+            
+            % loop through lambda
+            for jRf = 1:Nrf
+                % find the phase of this lambda
+                lamInd = find(abs(phase(:,1)-lambda(jRf))<smallNumber,1);
+                
+                lamPhi = phase(lamInd,2);
+                
+                % now put this phase into the correct RF frequency index
+                linkPhiRf(jRf) = lamPhi;
+            end
+    end
 end
