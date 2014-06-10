@@ -68,8 +68,8 @@ classdef Mirror < Optic
       % Thr - power transmission of HR suface
       % Lhr - power loss on reflection from HR surface
       % Rar - power reflection of AR surface
-      % Nmd - refractive index of medium (1.45 for fused silica, SiO2)
       % Lmd - power loss in medium (one pass)
+      % Nmd - refractive index of medium (1.45 for fused silica, SiO2)
       %
       % default optical parameter values are:
       % [aio, Chr, Thr, Lhr, Rar, Lmd,  Nmd]
