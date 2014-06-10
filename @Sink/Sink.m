@@ -47,24 +47,24 @@ classdef Sink < Optic
     % deal with arguments
     errstr = 'Don''t know what to do with ';	% for argument error messages
     switch( nargin )
-    case 0					% default constructor, do nothing
-    case {1 2}
-      % copy constructor
-      %if( isa(arg, class(obj)) )
-      %  obj = arg;
-      %  return
-      %end
+      case 0					% default constructor, do nothing
+      case {1 2}
+        % copy constructor
+        %if( isa(arg, class(obj)) )
+        %  obj = arg;
+        %  return
+        %end
 
-      % loss
-      args = {1};
-      args(1:(nargin-1)) = varargin(1:end);
+        % loss
+        args = {1};
+        args(1:(nargin-1)) = varargin(1:end);
       
-      % store stuff in class
-      [obj.loss] = deal(args{:});
+        % store stuff in class
+        [obj.loss] = deal(args{:});
       
-    otherwise
-      % wrong number of input args
-      error([errstr '%d input arguments.'], nargin);
+      otherwise
+        % wrong number of input args
+        error([errstr '%d input arguments.'], nargin);
     end
     end
   end
