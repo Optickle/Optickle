@@ -73,6 +73,7 @@ classdef Optickle < handle
     Ndrive = 0;  % number of drives (inputs to optics)
     Nlink = 0;   % number of links
     Nprobe = 0;  % number of probes
+    snSource = []; % serial numbers of the sources
     
     optic = {};  % a cell array of optics
     link = [];   % an array of links

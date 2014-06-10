@@ -18,7 +18,7 @@ classdef Optic < handle
 %
 
   
-  properties (SetAccess = protected)
+  properties (SetAccess = {?Optic, ?Optickle})
      sn = 0;            % optic serial number
      name = '';         % optic name string
      
