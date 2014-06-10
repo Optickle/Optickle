@@ -9,25 +9,27 @@ function display(opt)
   Ndrv = opt.Ndrive;                % number of optics
   Nrf  = length(vFrf);              % number of RF components
   
-  % Get the RF field amplitudes
-  if ~isempty(opt.snSource)
-    % FIXME: This is a bit of a kludge.  We don't want to call the
-    % getFieldSource or getSourceInfo functions because they will trigger
-    % an error if the source is not yet defined or linked.  So, we violate
-    % the abstraction.  Also, this does not play well with multiple
-    % sources.
-    vArf = get(opt.optic{opt.snSource(1)}, 'vArf');
-  else     
-    vArf = zeros(size(vFrf));
-  end
+%   % Get the RF field amplitudes
+%   if ~isempty(opt.snSource)
+%     % FIXME: This is a bit of a kludge.  We don't want to call the
+%     % getFieldSource or getSourceInfo functions because they will trigger
+%     % an error if the source is not yet defined or linked.  So, we violate
+%     % the abstraction.  Also, this does not play well with multiple
+%     % sources.
+%     vArf = get(opt.optic{opt.snSource(1)}, 'vArf');
+%   else     
+%     vArf = zeros(size(vFrf));
+%   end
+  vArf = zeros(size(vFrf));
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Frequencies
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   disp(sprintf('==== %d RF frequencies', Nrf)) %#ok
   for n = 1:Nrf
-    str = sprintf('%d) %s with amplitude %g', n, ...
-                  getFreqStr(vFrf(n)), vArf(n));
+    str = sprintf('%d) %s', n, getFreqStr(vFrf(n)));
+%     str = sprintf('%d) %s with amplitude %g', n, ...
+%                   getFreqStr(vFrf(n)), vArf(n));
     disp(str)
   end
       
