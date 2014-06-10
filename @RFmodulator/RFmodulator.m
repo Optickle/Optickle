@@ -32,7 +32,7 @@ classdef RFModulator < Optic
   end
   
   methods
-    function obj = RFmodulator(varargin)
+    function obj = RFModulator(varargin)
       
       errstr = 'Don''t know what to do with ';	% for argument error messages
       switch nargin
