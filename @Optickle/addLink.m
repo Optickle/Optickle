@@ -1,4 +1,4 @@
-% [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
+% [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len, phase)
 %   Add a link between two optickle nodes.
 %
 % Arguments:
@@ -8,13 +8,18 @@
 % snTo - the serial number or name of the sink optic (field destination)
 % nameIn - the number or name of the input port (e.g., 2, 'bk', etc.)
 % len - the length of the link
+% phase - TODO DESCRIPTION
 %
 % The serial numbers of the optics (for snFrom and snTo) are
 % returned by addOptic.  The name of the optic can also be used.
 %
 % The input/output ports of an optic depend on the type of optic.
 
-function [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
+function [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len, phase)
+
+  if nargin < 7
+      phase = 0;
+  end
 
   % check/parse field source
   snFrom = getSerialNum(opt, snFrom);
@@ -35,6 +40,8 @@ function [opt, snLink] = addLink(opt, snFrom, nameOut, snTo, nameIn, len)
     error('Unavailable Sink: %s already linked to %s', ...
           getSourceName(opt, sn), getSinkName(opt, sn));
   end
+  
+  % TODO checking of phase definition matrix, need to know about lambda
 
   % create new link
   snLink = opt.Nlink + 1;    % link serial number
