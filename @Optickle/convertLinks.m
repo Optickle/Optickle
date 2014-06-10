@@ -165,7 +165,7 @@ function linkPhiRf = getRfPhase(opt,link)
             % empty phase
         case 1
             % common phase
-            linkPhiRf = phase*ones('like',linkPhiRf);
+            linkPhiRf = phase*ones(size(linkPhiRf));
         case 2
             % phase for every lambda
             
