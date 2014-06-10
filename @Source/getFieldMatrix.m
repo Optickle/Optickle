@@ -6,8 +6,9 @@
 function mOpt = getFieldMatrix(obj, pos, par)
 
   % constants
-  Nin = obj.Optic.Nin;		% always 0
-  Nout = obj.Optic.Nout;	% always 1
+  Nin = obj.Nin;		% always 0
+  Nout = obj.Nout;	% always 1
 
   % make empty sparse matrix with correct dimentions (Nrf x 0)
   mOpt = sparse(par.Nrf * Nout, par.Nrf * Nin);
+end

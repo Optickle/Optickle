@@ -18,7 +18,7 @@ function mQuant = getNoiseMatrix(obj, pos, par)
     mNP = zeros(1, 0);
     loss = 0;
   end
-  if obj.Optic.in == 0
+  if obj.in == 0
     mNP = [mNP, 1 - loss];
   end
   
@@ -26,4 +26,5 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   mNA = blkdiagN(sqrt(mNP), par.Nrf);
   
   % these noises are unsqueezed, so make amplitude and phase
-  mQuant = [mNA, i * mNA];
+  mQuant = [mNA, 1i * mNA];
+end

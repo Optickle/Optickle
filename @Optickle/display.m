@@ -16,16 +16,19 @@ function display(opt)
     % an error if the source is not yet defined or linked.  So, we violate
     % the abstraction.  Also, this does not play well with multiple
     % sources.
-    vArf = get(opt.optic{opt.snSource(1)}, 'vArf');
+    %vArf = get(opt.optic{opt.snSource(1)}, 'vArf');
+    vArf = opt.optic{opt.snSource(1)}.vArf;
   else     
     vArf = zeros(size(vFrf));
   end
+%   vArf = zeros(size(vFrf));
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Frequencies
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   disp(sprintf('==== %d RF frequencies', Nrf)) %#ok
   for n = 1:Nrf
+%    str = sprintf('%d) %s', n, getFreqStr(vFrf(n)));
     str = sprintf('%d) %s with amplitude %g', n, ...
                   getFreqStr(vFrf(n)), vArf(n));
     disp(str)
