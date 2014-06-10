@@ -69,20 +69,20 @@ classdef Optickle < handle
   % see optFP for a more complete example
 
   properties (SetAccess = protected)
-    Noptic = 0;  % number of optics
-    Ndrive = 0;  % number of drives (inputs to optics)
-    Nlink = 0;   % number of links
-    Nprobe = 0;  % number of probes
+    Noptic = 0;    % number of optics
+    Ndrive = 0;    % number of drives (inputs to optics)
+    Nlink = 0;     % number of links
+    Nprobe = 0;    % number of probes
     snSource = []; % serial numbers of the sources
     
-    optic = {};  % a cell array of optics
-    link = [];   % an array of links
-    probe = [];  % an array of probes
+    optic = {};    % a cell array of optics
+    link = [];     % an array of links
+    probe = [];    % an array of probes
     
-    lambda = []; % carrier wave lengths
-    pol = [];    % polarization of each field component
-    vFrf = [];   % RF frequency offsets
-    k = [];      % wave-number of each field component (lambda and RF)
+    lambda = [];   % carrier wave lengths
+    pol = [];      % polarization of each field component
+    vFrf = [];     % RF frequency offsets
+    k = [];        % wave-number of each field component (lambda and RF)
     
     minQuant = 1e-3; % minimum loss considered for quantum noise
     debug = 1;       % debugging level (set to 0 for no tickle info)

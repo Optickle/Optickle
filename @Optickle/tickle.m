@@ -38,36 +38,6 @@
 % $Id: tickle.m,v 1.14 2011/07/26 23:09:57 tfricke Exp $
 
 
-% %%%%%%%%%%%%%%%%%%%% With control struct
-% [fDC, sigDC, sOpt, noiseOut] = tickle(opt, pos, sCon)
-%
-% An alternate means of using tickle is to pass a control struct
-% as the third argument.  This control struct describes a controller
-% which takes the outputs of the Optickle model (probe signals) and 
-% precesses them to produce inputs to the model (drive signals).  See
-% convertSimulink for more details.
-%
-% The control struct must contain the following fields:
-%  f - frequency vector (Naf x 1)
-%  Nin - control system inputs
-%  Nout - control system outputs
-%  mCon - control matrix for each f value (Nin x Nout x Naf)
-%  mPrbIn - probe output to control system input map (Nin x Nprobe)
-%  mDrvIn - drive output to control system input map (Nin x Ndrive)
-%  mPrbOut - control system output to probe input map (Nprobe x  Nout)
-%  mDrvOut - control system output to drive input map (Ndrive x  Nout)
-%
-% The results are the usual fDC and sigDC, along with an Optickle
-% system struct which contains the following fields:
-%  mPlant - transfer from control outputs to control inputs
-%           this is taken from sigAC and mMech
-%  mOpenLoop - open loop tranfer at control outputs
-%              mOpenLoop = sCon.mCon * mPlant
-%  mCloseLoop - close loop transfer at control outputs
-%               mCloseLoop = inv(eye(mCon.Nout) - mOpenLoop)
-%  mInOut - transfer from control inputs to control outputs with loops
-%           mInOut = mCloseLoop * sCon.mCon;
-
 function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
 
   % === Argument Handling
@@ -93,7 +63,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   
   % === Field Info
   [vFrf, vSrc] = getSourceInfo(opt);
-  LIGHT_SPEED = opt.c;
+  LIGHT_SPEED = Optickle.c;
   
   % ==== Sizes of Things
   Ndrv = opt.Ndrive;	% number of drives (internal DOFs)
