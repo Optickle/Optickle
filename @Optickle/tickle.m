@@ -96,14 +96,14 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   LIGHT_SPEED = opt.c;
   
   % ==== Sizes of Things
-  Ndrv = opt.Ndrive;		% number of drives (internal DOFs)
+  Ndrv = opt.Ndrive;	% number of drives (internal DOFs)
   Nlnk = opt.Nlink;		% number of links
-  Nprb = opt.Nprobe;		% number of probes
-  Nrf  = length(vFrf);		% number of RF components
+  Nprb = opt.Nprobe;	% number of probes
+  Nrf  = length(vFrf);	% number of RF components
   Naf  = length(f);		% number of audio frequencies
-  Nfld = Nlnk * Nrf;		% number of RF fields
+  Nfld = Nlnk * Nrf;	% number of RF fields
   Narf = 2 * Nfld;		% number of audio fields
-  Ndof = Narf + Ndrv;		% number of degrees-of-freedom
+  Ndof = Narf + Ndrv;	% number of degrees-of-freedom
   
   % decide which calculation is necessary
   isAC = ~isempty(f) && nargout > 2;

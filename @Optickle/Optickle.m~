@@ -2,9 +2,7 @@
 %
 % opt = Optickle(vFrf, lambda)
 % vFrf - RF frequency components
-% lambda - carrier wave length,
-%          or base wavelengths for each RF component (default 1064 nm)
-% pol - polarization for each RF component (default is S)
+% lambda - carrier wave length (default 1064 nm)
 %
 % Class fields are:
 %
@@ -80,12 +78,13 @@ function opt = Optickle(varargin)
   opt = struct('optic', 0, 'Noptic', 0, 'Ndrive', 0, ...
                'link', newLink, 'Nlink', 0, ...
                'probe', newProbe, 'Nprobe', 0, ...
-               'snSource', [], 'lambda', [], 'pol', [], ...
-               'k', [], 'vFrf', [], 'c', 0, 'h', 0, ...
+               'snSource', [], 'lambda', 0, ...
+               'k', 0, 'vFrf', [], 'c', 0, 'h', 0, ...
                'minQuant', 1e-3, 'debug', 1);
   opt.optic = {};
   opt.h = 6.62606891e-34;			% Plank constant [J*s]
   opt.c = 299792458;				% speed of light [m/s]
+  opt.lambda = 1064e-9;             % default wavelength
 
   opt = class(opt, 'Optickle');
 
@@ -99,31 +98,26 @@ function opt = Optickle(varargin)
       if( isa(arg, class(opt)) )
         opt = arg;
       elseif( isnumeric(arg) )	% modulation vector
-      % vFrf, lambda = 1064e-9
-      [opt.vFrf, opt.lambda, opt.pol] = makeRFvector(arg, 1064e-9, 1);
+        opt.vFrf = arg(:);
       else
         error([errstr 'an argument of type %s.'], class(arg));
       end
     case 2
       % vFrf, lambda
-      [opt.vFrf, opt.lambda, opt.pol] = makeRFvector(varargin{:}, 1);
-    case 3
-      % vFrf, lambda, pol
-      [opt.vFrf, opt.lambda, opt.pol] = makeRFvector(varargin{:});
+      [vFrf, lambda, pol] = makeRFvector(varargin{:}, 1);
+      opt.vFrf = arg(:);
+      opt.lambda = varargin{2};
     otherwise					% wrong number of input args
       error([errstr '%d input arguments.'], nargin);
   end
 
-  % wave number [1/m]
-  opt.k = 2 * pi * (1 ./ opt.lambda + opt.vFrf / opt.c);
+  opt.k = 2 * pi / opt.lambda;			% wave number [1/m]
 end
 
 function [vFrf, lambda, pol] = makeRFvector(vFrf, lambda, pol)
 
-  % make column vectors
+  % make vFrf a column vector
   vFrf = vFrf(:);
-  lambda = lambda(:);
-  pol = pol(:);
 
   % expand single lambda
   if numel(lambda) == 1

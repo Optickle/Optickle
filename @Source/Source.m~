@@ -13,59 +13,60 @@ classdef Source < Optic
   % Output: 1, out, fr
   % Drives: none
   %
-  % ==== Properties
+  % ==== Members
   % Optic - base class members
   %
-  % ==== Methods, those in Optic
+  % ==== Functions, those in Optic
   %
   % % Example: a source at the REFL port
   % obj = Source('Laser', [0,0,0,1,0,0,0], 1.5e3, 0);
 
   properties
     vArf = [];   % RF field componenet amplitude vector
+    qxy = [];    % HG field basis
   end
   
   methods
     function obj = Source(varargin)
       
-      % a default basis
-      qxy = [0 - 1i, 0 - 1i];
-      
-      % switch on arguments
       errstr = 'Don''t know what to do with ';	% for argument error messages
       switch( nargin )
         case 0					% default constructor, do nothing
-          name = 'src';
-          vArf = [];
         case 1
           % ==== copy constructor
-          error([errstr 'a %s.'], class(arg));
+          arg = varargin{1};
+          if( isa(arg, class(obj)) )
+            obj = arg;
+          else
+            error([errstr 'a %s.'], class(arg));
+          end
         case 2
           % ==== name, vArf
-          [name, vArf] = deal(varargin{:});
+          [name, obj.vArf] = deal(varargin{:});
+          
+          % build optic (a source has no inputs)
+          outNames = {{'out', 'fr'}};
         case 4
           % ==== name, vArf, z0, z
           [name, vArf, z0x, zx] = deal(varargin{:});
           qxy = [zx - 1i * z0x, zx - 1i * z0x];
+          
+          % build optic (a source has no inputs)
+          outNames = {{'out', 'fr'}};
         case 6
           % ==== name, vArf, z0x, zx, z0y, zy
           [name, vArf, z0x, zx, z0y, zy] = deal(varargin{:});
           qxy = [zx - 1i * z0x, zy - 1i * z0y];
           
+          % build optic (a source has no inputs)
+          outNames = {{'out', 'fr'}};
         otherwise
           % wrong number of input args
           error([errstr '%d input arguments.'], nargin);
       end
       
-      % build optic (a source has no inputs)
-      outNames = {{'out', 'fr'}};
-      
       % call superclass constructor
       obj@Optic(name, {}, outNames, []);
-      
-      % set vArf and qxy
-      obj.vArf = vArf;
-      obj.qxy = qxy;
     end
       
     end     % methods

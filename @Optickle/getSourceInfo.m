@@ -39,3 +39,4 @@ function [vFrf, vSrc] = getSourceInfo(opt)
   if sum(abs(vSrc)) == 0
     error('All sources have zero amplitude (see addSource).');
   end
+end

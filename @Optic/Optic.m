@@ -57,14 +57,14 @@ classdef Optic
       errstr = 'Don''t know what to do with ';	% for argument error messages
       switch( nargin )
         case 0					% default constructor, do nothing
-        case 1
-          % copy constructor
-          arg = varargin{1};
-          if( isa(arg, class(obj)) )
-            obj = arg;
-          else
-            error([errstr 'a %s.'], class(arg));
-          end
+%         case 1
+%           % copy constructor
+%           arg = varargin{1};
+%           if( isa(arg, class(obj)) )
+%             obj = arg;
+%           else
+%             error([errstr 'a %s.'], class(arg));
+%           end
         case 4
           % sn, name, inNames, outNames, driveNames
           [obj.name, obj.inNames, obj.outNames, obj.driveNames] = ...
