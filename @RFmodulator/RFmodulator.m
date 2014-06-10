@@ -1,4 +1,4 @@
-classdef RFModulator < Optic
+classdef RFmodulator < Optic
   % RFmodulator is a type of Optic used in Optickle
   %
   % RFmodulators can be used to modulate a beam at RF frequencies.
@@ -21,10 +21,10 @@ classdef RFModulator < Optic
   % ==== Functions, those in Optic
   %
   % % Example: an RF phase modulator, modulation amplitude 0.2
-  % obj = RFModulator('RFpm20MHz', 20e6, i * 0.2);
+  % obj = RFmodulator('RFpm20MHz', 20e6, i * 0.2);
   %
   % % Example: an RF amplitude modulator
-  % obj = RFModulator('RFam20MHz', 20e6, 0.1]);
+  % obj = RFmodulator('RFam20MHz', 20e6, 0.1]);
   
   properties
     fMod = 0;    % modulation frequency
@@ -32,7 +32,7 @@ classdef RFModulator < Optic
   end
   
   methods
-    function obj = RFModulator(varargin)
+    function obj = RFmodulator(varargin)
       
       errstr = 'Don''t know what to do with ';	% for argument error messages
       switch nargin
