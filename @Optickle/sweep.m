@@ -49,7 +49,7 @@ function [fDC, sigDC] = sweep(opt, pos)
     %
     % == sparse goes faster! (Yoichi Aso, March 2010)
     mOptAll{m} = sparse(mapList(m).mOut * ...
-      getMatrices(obj, pos(vDrvAll{m}, 1), par) * mapList(m).mIn);
+      getFieldMatrix(obj, pos(vDrvAll{m}, 1), par) * mapList(m).mIn);
   end
     
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
