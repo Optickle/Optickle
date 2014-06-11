@@ -5,7 +5,7 @@
 %
 % [mRad,mResp,mFrc] = getReactMatrix(obj, pos, par)
 
-function [mRadAC,mFrc,mRsp] = getReactMatrix(obj, pos, par, mOptAC, mDirIn, mDirOut)
+function [mRadAC,mFrc,mRsp] = getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOut, mGen)
   
   % check for optional arguments
   if nargin < 5
@@ -33,7 +33,6 @@ function [mRadAC,mFrc,mRsp] = getReactMatrix(obj, pos, par, mOptAC, mDirIn, mDir
   mRadAC = 2 / LIGHT_SPEED * ctranspose([mRad;conj(mRad)]);
   
   % radiation reaction force matrix
-  [~,mGen] = getGenMatrix(obj, pos, par, mOpt, dldx);
   mFrc = 4 / LIGHT_SPEED * real(ctranspose(vDCin) * ctranspose(mOptAC(1:Nout, 1:Nin)) * mDirOut * mGen);
   
 end
