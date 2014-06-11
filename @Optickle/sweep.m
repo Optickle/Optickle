@@ -30,8 +30,8 @@ function [fDC, sigDC] = sweep(opt, pos)
   end
 
   % link converstion
-  [vLen, prbList, mapList] = convertLinks(opt);
-  mPhi = getPhaseMatrix(vLen, vFrf);	% propagation phase matrix
+  [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
+  mPhi = getPhaseMatrix(vLen, vFrf, [], mPhiFrf);	% propagation phase matrix
 
   % parameters for construction
   par = getOptParam(opt);
