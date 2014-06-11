@@ -1,4 +1,4 @@
-This is e-pTeX, Version 3.1415926-p3.3-110825-2.5 (sjis) (TeX Live 2012/W32TeX) (format=platex 2012.8.4)  11 JUN 2014 10:46
+This is e-pTeX, Version 3.1415926-p3.3-110825-2.5 (sjis) (TeX Live 2012/W32TeX) (format=platex 2012.8.4)  11 JUN 2014 16:13
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -826,10 +826,10 @@ Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 790.
 Here is how much of TeX's memory you used:
  15379 strings out of 494055
  300515 string characters out of 3159354
- 326790 words of memory out of 3000000
+ 325790 words of memory out of 3000000
  18591 multiletter control sequences out of 15000+200000
  34753 words of font info for 122 fonts, out of 3000000 for 9000
  745 hyphenation exceptions out of 8191
  40i,14n,40p,380b,766s stack positions out of 5000i,500n,10000p,500000b,50000s
 
-Output written on Optickle2.dvi (16 pages, 67732 bytes).
+Output written on Optickle2.dvi (16 pages, 67784 bytes).

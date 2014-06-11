@@ -298,7 +298,7 @@ where $\mDrvn{n}$ is the matrix which maps the internal \dsf\ of the $n^{th}$ op
 \end{equation}
 where
 \begin{equation}
-\mGenn{n,m} = \mCpln{n,m} \vDCn{n}
+\mGenn{n,m} = \mCpln{n,m} \vDCn{n,in}
 \end{equation}
 Here, $\mCpln{n,m}$ is the modulation produced by driving optic $n$, \dof\ $m$.
 The indices are $n \in 1:\Nopt$, $m \in 1:N_{dof_n}$.
@@ -588,7 +588,7 @@ Finally, we can return to the initial problem of finding $\mRadn{n}$ for a given
 We can see from equation \eref{force_total} that the force driven by incoming audio fields has
  a transfer matrix given by
 \beq{mRad}
-\mRadn{n,m} = \matrixBegin{c}
+\mRadn{n,m} = \frac{2}{c} \matrixBegin{c}
 (\mOpt^\dagger \mDirn{out} \mOpt + \mDirn{in})_{n,m} ~ \mInn{n} \vDC \\
 (\mOpt^T \mDirn{out} \mOpt^* + \mDirn{in})_{n,m} ~ \mInn{n}^* \vDC^*
 \matrixEnd^\dagger
