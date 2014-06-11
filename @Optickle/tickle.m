@@ -132,10 +132,17 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f);
   
   % noise stuff
-  Nnoise = size(mQuant, 2);
-  pQuant = opt.h * opt.c / (2 * opt.lambda);
+  Nnoise = size(mQuant, 2)
+  pQuant  = opt.h * opt.k * opt.c / (4 * pi);
   aQuant = sqrt(pQuant) / 2;
-  mQuant = mQuant * aQuant;
+  aQuantTemp = repmat(aQuant',opt.Nlink,1); % aQuant is
+                                             % Nrfx1. mQuant is
+                                             % Nlink*Nrf x number
+                                             % of loss points*2
+
+  aQuantMatrix = diag(aQuantTemp(:));
+  whos
+  mQuant = aQuantMatrix * mQuant;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== DC Fields and Signals
