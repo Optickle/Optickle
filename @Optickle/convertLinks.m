@@ -75,24 +75,29 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
 
       % loop over RF components (wave numbers) again to look for demod matches
       for m = 1:Nrf
-        dk_p = abs(vKrf(m) - vKrf(n) + 2*pi*prb.freq/Optickle.c);
-        dk_m = abs(vKrf(m) - vKrf(n) - 2*pi*prb.freq/Optickle.c);
-        if dk_p < smallWaveNumber && dk_m < smallWaveNumber
-          if prb.phase ~= 0
-            warning('Non-zero demod phase for DC probe %k ignored.', jPrb)
-          end
-          prbList(jPrb).mPrb(m, n) = 1;
-        elseif dk_p < smallWaveNumber
-          prbList(jPrb).mPrb(m, n) = phi;
-          prbList(jPrb).mPrbQ(m, n) = phi_quad;
-        elseif dk_m < smallWaveNumber
-          prbList(jPrb).mPrb(m, n) = conj(phi);
-          prbList(jPrb).mPrbQ(m, n) = conj(phi_quad);
-        elseif dk_p < smallWaveNumber*1e3 || dk_m < smallWaveNumber*1e3
+        % only bother with same polarization fields
+        if opt.pol(n) == opt.pol(m)
+          
+          % wave number differences
+          dk_p = abs(vKrf(m) - vKrf(n) + 2*pi*prb.freq/Optickle.c);
+          dk_m = abs(vKrf(m) - vKrf(n) - 2*pi*prb.freq/Optickle.c);
+          if dk_p < smallWaveNumber && dk_m < smallWaveNumber
+            if prb.phase ~= 0
+              warning('Non-zero demod phase for DC probe %k ignored.', jPrb)
+            end
+            prbList(jPrb).mPrb(m, n) = 1;
+          elseif dk_p < smallWaveNumber
+            prbList(jPrb).mPrb(m, n) = phi;
+            prbList(jPrb).mPrbQ(m, n) = phi_quad;
+          elseif dk_m < smallWaveNumber
+            prbList(jPrb).mPrb(m, n) = conj(phi);
+            prbList(jPrb).mPrbQ(m, n) = conj(phi_quad);
+          elseif dk_p < smallWaveNumber*1e3 || dk_m < smallWaveNumber*1e3
             disp(dk_p)
             disp(dk_m)
-          warning(['Demodulation frequency near-miss for probe %s ' ... 
-            'with RF components %d and %d.'], getProbeName(opt,jPrb), n, m)
+            warning(['Demodulation frequency near-miss for probe %s ' ...
+              'with RF components %d and %d.'], getProbeName(opt,jPrb), n, m)
+          end
         end
       end
     end
@@ -134,7 +139,7 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
       end
     end
 
-    % drive DOF map
+    % drive map
     mDrv = sparse(Ndrv, obj.Ndrive);
     for m = 1:obj.Ndrive
       mDrv(obj.drive(m), m) = 1;
@@ -144,44 +149,44 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
     mapList(n).mIn = blkdiagN(mIn, Nrf);
     mapList(n).mOut = blkdiagN(mOut, Nrf);
     
-    % store DOF in list
+    % store drive maps in list
     mapList(n).mDrv = mDrv;
   end
 
 end
 
 function linkPhiRf = getRfPhase(opt,link)
-    % returns 1 x Nrf phase for a given link
+  % returns 1 x Nrf phase for a given link
 
-    phase = link.phase;
-    lambda = opt.lambda;
-    Nrf = length(lambda);
-    
-    smallNumberMeters = 1e-12;
-    
-    phaseSize = size(phase);
-    
-    linkPhiRf = zeros(1,Nrf);
-    
-    % switch on second dimension
-    switch phaseSize(2)
-        case 0
-            % empty phase
-        case 1
-            % common phase
-            linkPhiRf = phase*ones(size(linkPhiRf));
-        case 2
-            % phase for every lambda
-            
-            % loop through lambda
-            for jRf = 1:Nrf
-                % find the phase of this lambda
-                lamInd = find(abs(phase(:,1)-lambda(jRf))<smallNumberMeters,1);
-                
-                lamPhi = phase(lamInd,2);
-                
-                % now put this phase into the correct RF frequency index
-                linkPhiRf(jRf) = lamPhi;
-            end
-    end
+  phase = link.phase;
+  lambda = opt.lambda;
+  Nrf = length(lambda);
+  
+  smallNumberMeters = 1e-12;
+  
+  phaseSize = size(phase);
+  
+  linkPhiRf = zeros(1,Nrf);
+  
+  % switch on second dimension
+  switch phaseSize(2)
+    case 0
+      % empty phase
+    case 1
+      % common phase
+      linkPhiRf = phase*ones(size(linkPhiRf));
+    case 2
+      % phase for every lambda
+      
+      % loop through lambda
+      for jRf = 1:Nrf
+        % find the phase of this lambda
+        lamInd = find(abs(phase(:,1)-lambda(jRf))<smallNumberMeters,1);
+        
+        lamPhi = phase(lamInd,2);
+        
+        % now put this phase into the correct RF frequency index
+        linkPhiRf(jRf) = lamPhi;
+      end
+  end
 end
