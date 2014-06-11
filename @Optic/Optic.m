@@ -188,6 +188,36 @@ classdef Optic < handle
       mOptAC(NoutRF + (1:NoutRF), NinRF + (1:NinRF)) = conj(mOpt);
     end
     
+    function mGen = buildGenMatrix(varargin)
+      % builds the audio SB generation matrix from
+      % multiple coupling matrices and the input DC fields
+      %
+      % last argument is vDC, others are coupling matrices
+      % drive matrices should be NoutRF x NinRF
+      % returned mGen is (2 * NoutRF) x Ndrv
+      %
+      % Example:
+      % mGen = buildGenMatrix(mCpl1, mCpl2, vDC)
+      
+      % convert arguments
+      if nargin < 2
+        error('Need at least one coupling matrix and vDC')
+      else
+        mCplList = varargin(1:(end - 1));
+        vDC = varargin{end};
+      end
+      
+      % number of outputs and drives
+      NoutRF = size(mCplList{1}, 1);
+      Ndrv = numel(mCplList);
+      
+      % fill in the generation matrix
+      mGen = zeros(NoutRF, Ndrv);
+      for n = 1:Ndrv
+        mGen(:, n) = mCplList{n} * vDC;
+      end
+    end
+    
     function m = blkdiagN(m0, N)
       % construct a block diagonal matrix with N copies of
       %   the input matrix.  See also blkdiag.
