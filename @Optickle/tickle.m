@@ -173,6 +173,9 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % drive m to probe n, at all frequencies.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+  % get optic matricies for AC part
+  [mOptGen, mRadFrc, mResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC);
+  
   % prepare generation matrix (part of optic-field matrix)
   mGen = sparse(Nfld, Ndrv);
   for n = 1:Ndrv
