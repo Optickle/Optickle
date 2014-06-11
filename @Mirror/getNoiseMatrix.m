@@ -13,15 +13,24 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   
 
   pos = pos + obj.pos;		% mirror position, with offset
-  phi = -2 * (2 * pi / par.lambda) * pos * cos(pi * obj.aoi / 180);
-  
-  % get noise powers
-  mNP = getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi, ...
-    obj.in, par.minQuant);
 
-  % convert to noise amplitudes for all RF components
-  mNA = blkdiagN(mNP, par.Nrf);
+  phi = -2 * par.k * pos * cos(pi * obj.aoi / 180);
   
+  % Calculate noise powers for all rf components and put them in a
+  % block-diagonal matrix
+
+  % Loop over rf frequencies (which now include other wavelengths)
+  mNA = []; % should pre-allocate and/or avoid loop
+  for iLoop = 1:par.Nrf
+
+      % get noise powers
+      mNP = getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi(iLoop), ...
+                                 obj.in, par.minQuant);
+      
+      
+      mNA = blkdiag(mNA,mNP);
+  end
+
   % these noises are unsqueezed, so make amplitude and phase
   mQuant = [mNA, 1i * mNA];
 
