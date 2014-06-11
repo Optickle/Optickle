@@ -162,13 +162,14 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % noise stuff
   Nnoise = size(mQuant, 2);
   pQuant  = opt.h * opt.k * opt.c / (4 * pi);
-  aQuant = sqrt(pQuant) / 2;
-  aQuantTemp = repmat(aQuant',opt.Nlink,1); % aQuant is
+  aQuant = sqrt(pQuant) ;
+  aQuantTemp = repmat(aQuant.',opt.Nlink,1); % aQuant is
                                              % Nrfx1. mQuant is
                                              % Nlink*Nrf x number
                                              % of loss points*2
 
-  aQuantMatrix = diag(aQuantTemp(:));
+  % get both upper and lower sidebands
+  aQuantMatrix = diag([aQuantTemp(:);aQuantTemp(:)]); 
   mQuant = aQuantMatrix * mQuant;
   
   % compile probe shot noise vector
@@ -244,7 +245,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     
     % ==== Put it together and solve
     mDof = [  mPhi * mOptGen
-             mResp * mRadFrc / LIGHT_SPEED ];
+             mResp * mRadFrc ];
     
     tfAC = (eyeNdof - mDof) \ mExc;
 
@@ -259,7 +260,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     
     if isNoise
       %%%% With Quantum Noise
-      mQinj = [mPhim * mQuant; conj(mPhip * mQuant); mQOz];
+      mQinj = [mPhi * mQuant;  mQOz];
       mNoise = (eyeNdof - mDof) \ mQinj;
       noisePrb = mPrb * mNoise(jAsb, :);
       noiseDrv = mNoise(jDrv, :);
@@ -325,19 +326,13 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   drawnow
 
   % Build the rest of the outputs
-  if ~isCon
-    varargout{3} = sigAC;
-    varargout{4} = mMech;
-    if isNoise
+  varargout{3} = sigAC;
+  varargout{4} = mMech;
+  if isNoise
       varargout{5} = noiseAC;
       varargout{6} = noiseMech;
-    end
-  else
-    varargout{3} = sOpt;
-    if isNoise
-      varargout{4} = noiseOut;
-    end
   end
+  
 
   if isOut_tfAC && nargout > 0
     varargout{nargout} = tfACout;

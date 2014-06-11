@@ -17,6 +17,7 @@ function [mRadAC,mFrc,vRspAF] = getReactMatrix(obj, pos, par, mOpt, mDirIn, mDir
   Nrf = par.Nrf;
   Nin = 2;							% obj.Optic.Nin
   Nout = 4;							% obj.Optic.Nout
+  Ndrv = 1;
   vDC = par.vDC;
   LIGHT_SPEED = Optickle.c;
   
@@ -24,16 +25,16 @@ function [mRadAC,mFrc,vRspAF] = getReactMatrix(obj, pos, par, mOpt, mDirIn, mDir
   vRspAF = getMechResp(obj, par.vFaf);
   
   % field matrix and derivatives
-  mRad = zeros(1, Nrf * Nin);
+  mRad = zeros(Nrf * Nin, Ndrv);
   for n = 1:Nrf
     % enter this submatrix into mRad1
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
-    mRad(1, mm) = (ctranspose(mOpt(nn, mm)) * mDirOut * mOpt(nn, mm) + mDirIn) * vDC;
+    mRad(mm, 1) = (ctranspose(mOpt(nn, mm)) * mDirOut * mOpt(nn, mm) + mDirIn) * vDC(mm);
   end
   mRadAC = 2 / LIGHT_SPEED * ctranspose([mRad;conj(mRad)]);
   
   % radiation reaction force matrix
-  mFrc = 4 / LIGHT_SPEED * real(ctranspose(vDCin) * ctranspose(mOptAC(1:Nout, 1:Nin)) * mDirOut * mGen);
+  mFrc = 4 / LIGHT_SPEED * real(ctranspose(mOpt * vDC) * blkdiagN(mDirOut,Nrf) * mGen);
   
 end

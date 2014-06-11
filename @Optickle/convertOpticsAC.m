@@ -59,7 +59,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   
   lResp = zeros(Naf,Ndrv);
 
-  mQuant = sparse(Nfld, 0);
+  mQuant = sparse(Narf, 0);
   
   % build system matrices
   for n = 1:Nopt
