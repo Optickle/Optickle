@@ -114,9 +114,9 @@ classdef Optic < handle
       mOptAC = expandFieldMatrixAF(mOpt);
     end
     
-    function mGenAC = getGenMatrix(obj, pos, par)
+    function [mGenAC, mGen] = getGenMatrix(obj, pos, par, varargin)
       % return default expansion of the field matrix
-      mCplMany = getDriveMatrix(obj, pos, par);
+      mCplMany = getDriveMatrix(obj, pos, par, varargin{:});
       
       %%% Expand 3D coupling matrix to mGen
       
