@@ -3,11 +3,11 @@
 %
 % mCpl = getDriveMatrix(obj, pos, par)
 
-function mCpl = getDriveMatrix(obj, pos, par, mOptAC, dldx)
+function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   
   % check for optional arguments
   if nargin < 5
-    [mOptAC, ~, ~, dldx] = getFieldMatrixAC(obj, pos, par);
+    [mOpt, ~, ~, dldx] = getFieldMatrix(obj, pos, par);
   end
   
   % constants
@@ -23,7 +23,7 @@ function mCpl = getDriveMatrix(obj, pos, par, mOptAC, dldx)
     % enter this submatrix into mDrv
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
-    mCpl(nn, mm) = mOptAC(nn, mm) .* drp;
+    mCpl(nn, mm) = mOpt(nn, mm) .* drp;
   end
   
 end
