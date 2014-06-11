@@ -51,13 +51,6 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     nDrive = [];
   end
   
-  % third argument is actually control struct (see convertSimulink)
-  isCon = isstruct(f);
-  if isCon
-    sCon = f;
-    f = sCon.f;
-  end
-  
   % forth and fith argument given, return tfAC as last return argument
   isOut_tfAC = nargin >= 5;
   
@@ -220,30 +213,11 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   eyeNdof = speye(Ndof);
 
   % intialize result space
-  if ~isCon
-    % full results: all probes, all drives
-    mExc = eyeNdof(:, jDrv);
-    sigAC = zeros(Nprb, NdrvOut, Naf);
-    mMech = zeros(NdrvOut, NdrvOut, Naf);
-    noiseAC = zeros(Nprb, Naf);
-    noiseMech = zeros(NdrvOut, Naf);
-  else
-    % reduced results for control struct
-    mExc = eyeNdof(:, jDrv) * sCon.mDrvOut;
-
-    sOpt.mInOut = zeros(sCon.Nout, sCon.Nin, Naf);
-    sOpt.mPlant = zeros(sCon.Nin, sCon.Nout, Naf);
-    sOpt.mOpenLoop = zeros(sCon.Nout, sCon.Nout, Naf);
-    sOpt.mCloseLoop = zeros(sCon.Nout, sCon.Nout, Naf);
-    
-    eyeNout = eye(sCon.Nout);
-    mPrbPrb = sCon.mPrbIn * sparse(diag(sigQ)) * sCon.mPrbOut;
-
-    if isNoise
-      noiseOut = zeros(sCon.Nout, Naf);
-      shotPrbAmp = sqrt(shotPrb);
-    end
-  end
+  mExc = eyeNdof(:, jDrv);
+  sigAC = zeros(Nprb, NdrvOut, Naf);
+  mMech = zeros(NdrvOut, NdrvOut, Naf);
+  noiseAC = zeros(Nprb, Naf);
+  noiseMech = zeros(NdrvOut, Naf);
   
   % is tfAC wanted?
   if isOut_tfAC
@@ -289,27 +263,8 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     end
     
     % extract optic to probe transfer functions
-    if ~isCon
-      % no control struct, return TFs to all probes and drives
-      sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
-      mMech(:, :, nAF) = tfAC(jDrv, :);
-    else
-      % reduce probes and drives to those required by control struct
-      mPlant = sCon.mPrbIn * mPrb * tfAC(jAsb, :) + ...
-        sCon.mDrvIn * tfAC(jDrv, :) + mPrbPrb;
-      
-      % compute closed loop response of outputs
-      mCon = sCon.mCon(:, :, nAF);
-      mOL = mCon * mPlant;
-      mCL = inv(eyeNout - mOL);
-      mInOut = mCL * mCon;
-      
-      % store into the sOpt struct
-      sOpt.mInOut(:, :, nAF) = mInOut;
-      sOpt.mPlant(:, :, nAF) = mPlant;
-      sOpt.mOpenLoop(:, :, nAF) = mOL;
-      sOpt.mCloseLoop(:, :, nAF) = mCL;
-    end
+    sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
+    mMech(:, :, nAF) = tfAC(jDrv, :);
     
     if isNoise
       %%%% With Quantum Noise
@@ -319,17 +274,8 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
       noiseDrv = mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise
-      if ~isCon
-        noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
-        noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
-      else
-        % transfer noise to outputs
-        noiseAmp = mInOut * (sCon.mPrbIn * noisePrb + ...
-          sCon.mDrvIn * noiseDrv);
-        noisePrbAmp = mInOut * sCon.mPrbIn * shotPrbAmp;
-        noiseOut(:, nAF) = sqrt(sum(abs(noiseAmp).^2, 2) + ...
-          abs(noisePrbAmp).^2);
-      end
+      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
       
       % HACK: noise probe
       %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
