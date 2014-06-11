@@ -73,20 +73,22 @@ classdef Optickle < handle
     Ndrive = 0;    % number of drives (inputs to optics)
     Nlink = 0;     % number of links
     Nprobe = 0;    % number of probes
-    snSource = []; % serial numbers of the sources
     
     optic = {};    % a cell array of optics
     link = [];     % an array of links
     probe = [];    % an array of probes
+    snSource = []; % serial numbers of the sources
     
     lambda = [];   % carrier wave lengths
     pol = [];      % polarization of each field component
     vFrf = [];     % RF frequency offsets
     k = [];        % wave-number of each field component (lambda and RF)
-    
+  end
+  
+  % user adjustable parameters
+  properties (SetAccess = public)
     minQuant = 1e-3; % minimum loss considered for quantum noise
     debug = 1;       % debugging level (set to 0 for no tickle info)
-    
     sigACunits = 0   % units of response matrix (see above)
   end
   

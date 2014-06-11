@@ -1,22 +1,20 @@
 classdef Optic < handle
-% This is the base class for optics used in Optickle
-%
-% An Optic is a general optical component (mirror, lens, etc.).
-% Each type of optic has a fixed number of inputs and outputs,
-% and names for each.  The details which characterize a given
-% optic are specified in the derived types.
-%
-% ==== Important User Methods
-% getFieldIn - the index of an input field at some port
-% getFieldOut - the index of an output field at some port
-%
-% getInputPortNum - the number of an input port, given its name
-% getOutputPortNum - the number of an output port, given its name
-%
-% getInputName - display name for some input port
-% getOutputName - display name for some output port
-%
-
+  % This is the base class for optics used in Optickle
+  %
+  % An Optic is a general optical component (mirror, lens, etc.).
+  % Each type of optic has a fixed number of inputs and outputs,
+  % and names for each.  The details which characterize a given
+  % optic are specified in the derived types.
+  %
+  % ==== Important User Methods
+  % getFieldIn - the index of an input field at some port
+  % getFieldOut - the index of an output field at some port
+  %
+  % getInputPortNum - the number of an input port, given its name
+  % getOutputPortNum - the number of an output port, given its name
+  %
+  % getInputName - display name for some input port
+  % getOutputName - display name for some output port
   
   properties (SetAccess = {?Optic, ?Optickle})
      sn = 0;            % optic serial number
