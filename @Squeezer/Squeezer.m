@@ -17,9 +17,7 @@ classdef Squeezer < Optic
   %  efficiency)
   % 
   % ==== Functions, those in Optic
-  %
-  % Example: a sink at the REFL port
-  % obj = Sink('REFL');
+ 
 
   properties
     loss = []; % 1-escape efficiency
@@ -40,7 +38,7 @@ classdef Squeezer < Optic
     %
     % Default parameters are:
     % [loss, sqAng, sqdB] = 
-    % [1, 0, 10]
+    % [0, 0, 10]
 
         
     % deal with no arguments
@@ -66,7 +64,7 @@ classdef Squeezer < Optic
         %end
 
         % loss
-        args = {1,0,10};
+        args = {0,0,10};
         args(1:(nargin-1)) = varargin(1:end);
       
         % store stuff in class
