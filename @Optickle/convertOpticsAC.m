@@ -57,7 +57,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   mOptGen = sparse(Narf,Ndrv+Narf);
   mRadFrc = sparse(Ndrv,Ndrv+Narf);
   
-  lResp = zeros(Naf,Nopt);
+  lResp = zeros(Naf,Ndrv);
 
   mQuant = sparse(Nfld, 0);
   
@@ -91,7 +91,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       mRadFrc = mRadFrc + mDrv * [ mRad_n * mInAC, mFrc_n * mDrv.' ] ;
       
       % mechanical response list
-      lResp(:,n) = vResp_n;
+      lResp = lResp + vResp_n * mDrv.';
       
       % accumulate noises (removing ones that are zero)
       mQ1 = mOutAC * sparse(mQuant_n);
