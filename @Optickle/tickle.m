@@ -131,8 +131,8 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   
   %%%%% compute DC outputs
   % sigDC is already real, but use "real" to remove numerical junk
-  sigDC = real(mPrb(:, 1:Nfld) * vDC) / 2;
-  sigQ = real(mPrbQ * vDC) / 2;
+  sigDC = real(mPrb(:, 1:Nfld) * vDC);
+  sigQ = real(mPrbQ * vDC);
   fDC = reshape(vDC, Nlnk, Nrf);		% DC fields for output
 
   % Build DC outputs
@@ -161,7 +161,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   
   % noise stuff
   Nnoise = size(mQuant, 2);
-  pQuant  = opt.h * opt.k * opt.c / (4 * pi);
+  pQuant  = opt.h * opt.k * opt.c / (8 * pi);   % CHECK
   aQuant = sqrt(pQuant) ;
   aQuantTemp = repmat(aQuant.',opt.Nlink,1); % aQuant is
                                              % Nrfx1. mQuant is
@@ -192,7 +192,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
           pQuantMatrix = diag(pQuantTemp(:));
           vDCinShot = mIn_k * pQuantMatrix * vDC;
           
-          shotPrb(k) = (2 - sum(abs(mPrb_k), 1)) * abs(vDCinShot).^2;
+          shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * abs(vDCinShot).^2; %CHECK
       end
   end
   
@@ -255,14 +255,14 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     end
     
     % extract optic to probe transfer functions
-    sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
+    sigAC(:, :, nAF) = 2 * mPrb * tfAC(jAsb, :);   % CHECK
     mMech(:, :, nAF) = tfAC(jDrv, :);
     
     if isNoise
       %%%% With Quantum Noise
       mQinj = [mPhi * mQuant;  mQOz];
       mNoise = (eyeNdof - mDof) \ mQinj;
-      noisePrb = mPrb * mNoise(jAsb, :);
+      noisePrb = 2 * mPrb * mNoise(jAsb, :);   % CHECK
       noiseDrv = mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise
