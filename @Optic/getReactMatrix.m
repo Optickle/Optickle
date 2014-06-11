@@ -1,8 +1,12 @@
 % default getReactMatrix method
 %   returns a zero matrix, Ndrive x (Nrf * Nin) x Naf
 %
-% mRct = getReactMatrix(obj, par)
+% [mRad, mFrc, vRsp] = getReactMatrix(obj, pos, par);
 
-function mRct = getReactMatrix(obj, pos, par)
+function [mRad, mFrc, vRspAF] = getReactMatrix(obj, pos, par)
   
-  mRct = zeros(obj.Ndrive, par.Nrf * obj.Nin, par.Naf);
+  mRad = zeros(obj.Ndrive, 2 * par.Nrf * obj.Nin);
+  mFrc = zeros(obj.Ndrive, obj.Ndrive);
+  vRspAF = zeros(par.Naf, obj.Ndrive);
+
+end

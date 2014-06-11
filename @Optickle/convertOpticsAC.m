@@ -4,14 +4,14 @@
 % Convert Optics to Matrices
 %   mapList is from convertLinks
 
-function [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
+function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC)
 
   % === Argument Handling
   if nargin < 3
     pos = [];
   end
   if nargin < 4
-    f = [];
+    error('No audio frequencies defined');
   end
 
   % === Field Info
@@ -24,6 +24,7 @@ function [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
   Nrf  = length(vFrf);			% number of RF components
   Naf  = length(f);				% number of audio frequencies
   Nfld = Nlnk * Nrf;            % number of RF fields
+  Narf = 2*Nfld;                % number of audio fields
   
   % default positions
   if isempty(pos)
@@ -40,12 +41,11 @@ function [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
   % The map matrices are used to build the system matrices from
   % the Field, Reaction and Drive matrices of individual optics.
   %   -- System Optical Properties --
-  %   mOpt: optical transfer matrix      Nfld x Nfld
-  %   rctList(n).m: reaction matrix      Ndrv x Nfld (list of Naf)
-  %   drvList(n).m: drive matrix         Nfld x Nfld (list of Ndrv)
+  %   mOptGen: optical field scatter/generation matrix   Narf x Ndrv+Narf
+  %   mRadFrc: radiation/force reaction matrix           Ndrv x Ndrv+Narf
+  %   lResp: mechanical response list                    Naf x Nopt
+  %   mQuant: quantum noise matrix                       2Nfld x Nvac?
   %
-  % NOTE: changes here must be made also in sweep, which contains
-  % an optimized version of the following code.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % parameters for construction
@@ -54,48 +54,48 @@ function [mOpt, rctList, drvList, mQuant] = convertOptics(opt, mapList, pos, f)
   par.vFaf = f;
 
   % system matrices
-  mOpt = sparse(Nfld, Nfld);
+  mOptGen = sparse(Narf,Ndrv+Narf);
+  mRadFrc = sparse(Ndrv,Ndrv+Narf);
+  
+  lResp = zeros(Naf,Ndrv);
 
-  rctElem = struct('m', sparse(Ndrv, Nfld));
-  rctList = repmat(rctElem, Naf, 1);
-
-  drvElem = struct('m', sparse(Nfld, Nfld));
-  drvList = repmat(drvElem, Ndrv, 1);
-
-  mQuant = sparse(Nfld, 0);
+  mQuant = sparse(Narf, 0);
   
   % build system matrices
   for n = 1:Nopt
-    obj = opt.optic{n};
-    mIn = mapList(n).mIn;
-    mOut = mapList(n).mOut;
-    mDOF = mapList(n).mDOF;
-    
-    %%%% Optic Properties
-    [mOpt_n, mRct_n, mDrv_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
-    
-    % optical field transfer matrix
-    mOpt = mOpt + mOut * mOpt_n * mIn;
-
-    % reaction and drive matrices (only used in AC computation)
-    if Naf > 0
+      obj = opt.optic{n};
       
-      % loop over frequencies
-      for m = 1:Naf
-        mRct_nm = sparse(mRct_n(:, :, m));
-        rctList(m).m = rctList(m).m + mDOF * mRct_nm * mIn;
-      end
+      %%%
+      % Mapping Matrices
+      %
+      % mIn   (obj.Nin*Nrf) x Nfld
+      % mOut  Nfld x (obj.Nout*Nrf)
+      % mDrv  Ndrv x obj.Ndrv
       
-      % loop over drives
-      for m = 1:obj.Ndrive
-        nDrv = obj.drive(m);
-        mDrv_nm = sparse(mDrv_n(:, :, m));
-        drvList(nDrv).m = mOut * mDrv_nm * mIn;
-      end
+      mIn = mapList(n).mIn;
+      mInAC = blkdiag(mIn,mIn); % make block diagonal
+      mOut = mapList(n).mOut;
+      mOutAC = blkdiag(mOut,mOut); % make block diagonal
+      mDrv = mapList(n).mDrv;
+      
+      %mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
+      par.vDC = mIn * vDC; 
+      
+      %%%% Optic Properties
+      [mOpt_n, mGen_n, mRad_n, mFrc_n, vResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
+      
+      % optical field scatter/generation matrix
+      mOptGen = mOptGen + mOutAC * [ mOpt_n * mInAC, mGen_n * mDrv.' ] ;
+      
+      % optic radiation/force response
+      mRadFrc = mRadFrc + mDrv * [ mRad_n * mInAC, mFrc_n * mDrv.' ] ;
+      
+      % mechanical response list
+      lResp = lResp + vResp_n * mDrv.';
       
       % accumulate noises (removing ones that are zero)
-      mQ1 = mOut * sparse(mQuant_n);
+      mQ1 = mOutAC * sparse(mQuant_n);
       isNonZero = full(any(mQ1, 1));
       mQuant = [mQuant, mQ1(:, isNonZero)];  %#ok<AGROW>
-    end
   end
+  
