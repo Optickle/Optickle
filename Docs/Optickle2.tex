@@ -285,24 +285,27 @@ The optic to field matrix, much like the field to field matrix, must result in b
 \end{equation}
 The matrix $\mGen$ is composed of an optic specified matrix and DC fields, and can be written as
 \begin{equation}
-\mGen = \sum_{n=1}^{\Nopt} {\mOutn{n} \mGenn{n} \mDOFn{n}^{T}}.
+\mGen = \sum_{n=1}^{\Nopt} {\mOutn{n} \mGenn{n} \mDrvn{n}^{T}}.
 \end{equation}
-where $\mDOFn{n}$ is the matrix which maps the internal \dsf\ of the $n^{th}$ optic onto the system wide \dsf. The DC fields are present as source fields which the optics modulate to produce audio SBs,
-\begin{eqnarray}
-\mGenn{n} &=& \matrixBegin{c}
-\mDrvn{n,1} , ~~~
-\mDrvn{n,1} , ~~~
-\cdots , ~~~
-\mDrvn{n,N_{dof_n}}
-\matrixEnd \vDCn{n} \\
-&=& \mDrvn{n} \vDCn{n} \elabel{mGen}
-\end{eqnarray}
-where $\mDrvn{n,m}$ is the modulation produced by driving optic $n$, \dof\ $m$.
-The indices are $n \in 1:\Nopt$, $m \in 1:N_{dof_n}$, and $k_{n,m}$ is the map of system \dsf\ to optics internal \dsf.
-
-The drive matrix $\mDrvn{n,m}$ can be written in terms of $\mOptn{n}$
+where $\mDrvn{n}$ is the matrix which maps the internal \dsf\ of the $n^{th}$ optic onto the system wide \dsf. The DC fields are present as source fields which the optics modulate to produce audio SBs,
 \begin{equation}
-\mDrvn{n,m} = \frac{1}{2} \partderiv{\mOptn{n}}{x_{n,m}}
+\mGenn{n} = \matrixBegin{c}
+\mGenn{n,1} , ~~~
+\mGenn{n,1} , ~~~
+\cdots , ~~~
+\mGenn{n,N_{dof_n}}
+\matrixEnd \elabel{mGen}
+\end{equation}
+where
+\begin{equation}
+\mGenn{n,m} = \mCpln{n,m} \vDCn{n,in}
+\end{equation}
+Here, $\mCpln{n,m}$ is the modulation produced by driving optic $n$, \dof\ $m$.
+The indices are $n \in 1:\Nopt$, $m \in 1:N_{dof_n}$.
+
+The coupling matrix $\mCpln{n,m}$ can be written in terms of $\mOptn{n}$
+\begin{equation}
+\mCpln{n,m} = \frac{1}{2} \partderiv{\mOptn{n}}{x_{n,m}}
 \elabel{mDrv}
 \end{equation}
 where $x_{n,m}$ the $m^{th}$ \dof\ of the $n^{th}$ optic. The usual input and output transforms are in place to map the source fields in and the generated audio-sidebands out.
@@ -354,7 +357,7 @@ This matrix is actually the product of the field-to-force matrix, and the force-
 \eeq
 The response matrix $\mResp$ is typically the mechanical response of the optics to radiation pressure induced force, summed over all optics in the system,
 \begin{equation}
-\mResp = \sum^{\Nopt}_{n=1} \mDOFn{n} \mRespn{n} \mDOFn{n}^T
+\mResp = \sum^{\Nopt}_{n=1} \mDrvn{n} \mRespn{n} \mDrvn{n}^T
 \elabel{mResp}
 \end{equation}
 $\mRad$ converts audio sideband fields to radiation forces on the optics,
@@ -403,7 +406,7 @@ For the AF fields, the situation is somewhat more complicated since
 \mInn{n}  & 0 \\
 0 & \mInn{n}^*
 \matrixEnd
- \vAC \\
+ \vACn{fld} \\
 \vACn{n,out} &=& 
 \matrixBegin{cc}
 \mOptn{n} & 0 \\
@@ -477,7 +480,7 @@ The output is similar,
 \matrixEnd^\dagger
  \vACn{in} \\
 && + \frac{4}{c}
-\real{ \vDCn{in}^\dagger  \mOpt^\dagger \mDirn{out} \mDrv \vDCn{in} }
+\real{ \vDCn{in}^\dagger  \mOpt^\dagger \mDirn{out} \mGen }
 \vec{\tilde{x}} \nonumber
 \eeqa
 
@@ -556,15 +559,15 @@ This matches the naive result:
 
 The radiation force which results from production of AF fields by the optic is given by the second
  term in equation \eref{force_total}.
-This term contains $\mDrv$, as shown in equation \eref{mDrv}, and equation \eref{mirror_ASB} for a mirror.
+This term contains $\mCpl$, as shown in equation \eref{mDrv}, and equation \eref{mirror_ASB} for a mirror.
 For our simple mirror example,
 \beqa{mirror_Mdrv}
-\mDrv &=& 
+\mCpl &=& 
 \matrixBegin{cc}
  i k r & 0\\
  0 & i k r
 \matrixEnd  \\
-\Rightarrow \mOpt^\dagger \mDirn{out} \mDrv &=&  i k r
+\Rightarrow \mOpt^\dagger \mDirn{out} \mCpl &=&  i k r
 \matrixBegin{cc}
  r & t \\
  -t & r
@@ -585,14 +588,14 @@ Finally, we can return to the initial problem of finding $\mRadn{n}$ for a given
 We can see from equation \eref{force_total} that the force driven by incoming audio fields has
  a transfer matrix given by
 \beq{mRad}
-\mRadn{n,m} = \matrixBegin{c}
+\mRadn{n,m} = \frac{2}{c} \matrixBegin{c}
 (\mOpt^\dagger \mDirn{out} \mOpt + \mDirn{in})_{n,m} ~ \mInn{n} \vDC \\
 (\mOpt^T \mDirn{out} \mOpt^* + \mDirn{in})_{n,m} ~ \mInn{n}^* \vDC^*
 \matrixEnd^\dagger
 \eeq
  such that the overall radiation reaction matrix is
 \beq{}
-\mRad = \sum^{\Nopt}_{n = 1} \mDOFn{n}
+\mRad = \sum^{\Nopt}_{n = 1} \mDrvn{n}
 \mRadn{n}
 \matrixBegin{cc}
 \mInn{n} & 0 \\
@@ -623,7 +626,7 @@ Similar to the field-optic matrix, the optic-optic matrix is driven by radiation
  
 From equation \eref{force_total}, the force coefficient for a given drive is
 \beq{mFrc_nm}
-\mFrcn{n,m} = \frac{4}{c} \real{ \vDC^\dagger  \mInn{n}^T \mOpt^\dagger \mDirn{out} \mDrvn{n,m} \mInn{n} \vDC }
+\mFrcn{n,m} = \frac{4}{c} \real{ \vDC^\dagger  \mInn{n}^T \mOpt^\dagger \mDirn{out} \mGenn{n,m} }
 \eeq
  and the force matrix for a given optic is diagonal
 \beq{mFrc_n}
@@ -638,7 +641,7 @@ From equation \eref{force_total}, the force coefficient for a given drive is
 The system wide matrix is made in the usual way, as a sum over all optics with the
  appropriate mapping matrices:
 \beq{mFrc}
-\mFrc = \sum^{\Nopt}_{n = 1} \mDOFn{n} \mFrcn{n} \mDOFn{n}^T
+\mFrc = \sum^{\Nopt}_{n = 1} \mDrvn{n} \mFrcn{n} \mDrvn{n}^T
 \eeq
  
 
@@ -678,7 +681,7 @@ M &=& -D^{-1} C K = N C A^{-1}
 The part of $\mTF$ which takes drives to signals is $L$ in the above block inversion,
  and the corresponding piece of the inverse of $\matI - \mAC$ is
 \beqa{}
- \vSig &=& \mPrb ~ \mOptTF ~ \matm{optic-field} ~ \mMech ~ \vDrv \\
+ \vSig &=& - \mPrb ~ \mOptTF ~ \matm{optic-field} ~ \mMech ~ \vDrv \\
  \mOptTF &=& \( \matI - \matm{field-field} \) ^{-1} \\
  \mMech &=& \( \matI - \matm{optic-optic} - \matm{field-optic} ~ \mOptTF ~ \matm{optic-field} \)^{-1}
 \eeqa
@@ -721,8 +724,8 @@ S_{DC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
 where
 \begin{align*}
 \delta_{n,m} =
-& \fun{\delta}{\vFrf(m) - \vFrf(n) + f_{demod}} e^{ i \phi_{demod}} ~ + \\
-& \fun{\delta}{\vFrf(m) - \vFrf(n) - f_{demod}} e^{-i \phi_{demod}}.
+& \frac{1}{2} \fun{\delta}{\vFrf(m) - \vFrf(n) + f_{demod}} e^{ i \phi_{demod}} ~ + \\
+& \frac{1}{2} \fun{\delta}{\vFrf(m) - \vFrf(n) - f_{demod}} e^{-i \phi_{demod}}.
 \end{align*}
 
 Translating this into the language of matrix manipulation, the DC signal from the $k^{th}$ probe is

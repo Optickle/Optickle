@@ -3,7 +3,7 @@
 %
 % mOpt = getFieldMatrix(obj, par)
 
-function [mOpt, d] = getFieldMatrix(obj, pos, par)
+function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   
   % constants
   Nrf = par.Nrf;
@@ -42,15 +42,16 @@ function [mOpt, d] = getFieldMatrix(obj, pos, par)
 
   % ==== Compute for each RF component
   % dl/dx (non-zero for reflected fields)
-  d = zeros(4, 2);
-  d(1, 1) = -2 * cos(pi * obj.aoi / 180);
-  d(2:4, 2) = 2 * cos(pi * obj.aoi / 180);
+  dldx = zeros(4, 2);
+  caoi = cos(pi * obj.aoi / 180);
+  dldx(1, 1) = -2 * caoi;
+  dldx(2:4, 2) = 2 * caoi;
 
   % do all RF components
   mOpt = sparse(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase due to mirror position
-    rp = exp(1i * par.k(n) * pos * d);
+    rp = exp(1i * par.k(n) * pos * dldx);
     %rp = exp(1i * (2 * pi / par.lambda) * pos * d);
 
     % enter this submatrix into mOpt
@@ -59,4 +60,7 @@ function [mOpt, d] = getFieldMatrix(obj, pos, par)
     mOpt(nn, mm) = m .* rp;
   end
 
+  % direction matrices
+  mDirIn = diag([-caoi,caoi]);
+  mDirOut = diag([-caoi,caoi,caoi,caoi]);
 end
