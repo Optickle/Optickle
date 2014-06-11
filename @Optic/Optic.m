@@ -1,22 +1,20 @@
 classdef Optic < handle
-% This is the base class for optics used in Optickle
-%
-% An Optic is a general optical component (mirror, lens, etc.).
-% Each type of optic has a fixed number of inputs and outputs,
-% and names for each.  The details which characterize a given
-% optic are specified in the derived types.
-%
-% ==== Important User Methods
-% getFieldIn - the index of an input field at some port
-% getFieldOut - the index of an output field at some port
-%
-% getInputPortNum - the number of an input port, given its name
-% getOutputPortNum - the number of an output port, given its name
-%
-% getInputName - display name for some input port
-% getOutputName - display name for some output port
-%
-
+  % This is the base class for optics used in Optickle
+  %
+  % An Optic is a general optical component (mirror, lens, etc.).
+  % Each type of optic has a fixed number of inputs and outputs,
+  % and names for each.  The details which characterize a given
+  % optic are specified in the derived types.
+  %
+  % ==== Important User Methods
+  % getFieldIn - the index of an input field at some port
+  % getFieldOut - the index of an output field at some port
+  %
+  % getInputPortNum - the number of an input port, given its name
+  % getOutputPortNum - the number of an output port, given its name
+  %
+  % getInputName - display name for some input port
+  % getOutputName - display name for some output port
   
   properties (SetAccess = {?Optic, ?Optickle})
      sn = 0;            % optic serial number
@@ -111,15 +109,30 @@ classdef Optic < handle
     end % constructor
     
     function mOptAC = getFieldMatrixAC(obj, pos, par)
-      % make room for upper and lower audio SBs
-      NinRF = par.Nrf * obj.Nin;
-      NoutRF = par.Nrf * obj.Nout;
-      mOptAC = sparse(2 * NoutRF, 2 * NinRF);
-      
-      % fill in block diagonal matrix
+      % return default expansion of the drive matrix
       mOpt = getFieldMatrix(obj, pos, par);
-      mOptAC(1:NoutRF, 1:NinRF) = mOpt;
-      mOptAC(NoutRF + (1:NoutRF), NinRF + (1:NinRF)) = conj(mOpt);
+      mOptAC = expandFieldMatrixAF(mOpt);
+    end
+    
+    function mGenAC = getGenMatrix(obj, pos, par)
+      % return default expansion of the field matrix
+      mCplMany = getDriveMatrix(obj, pos, par);
+      
+      %%% Expand 3D coupling matrix to mGen
+      
+      % number of outputs and drives
+      NoutRF = size(mCplMany, 1);
+      Ndrv = size(mCplMany, 3);
+      
+      % fill in the generation matrix
+      mGen = zeros(NoutRF, Ndrv);
+      vDC = par.vDC;
+      for n = 1:Ndrv
+        mGen(:, n) = mCplMany(:, :, n) * vDC;
+      end
+      
+      % expand to upper and lower audio SBs
+      mGenAC = [mGen; conj(mGen)];
     end
     
   end % methods
@@ -128,6 +141,124 @@ classdef Optic < handle
     % input to output field matrix (Nout*Nrf x Nin*Nrf)
     mOpt = getFieldMatrix(obj, pos, par);
   end
+  
+  methods (Static)
+    function mOptAC = expandFieldMatrix(mOpt, Nrf)
+      % expand a Nout x Nin field matrix
+      % to all RF components and audio SBs
+      
+      % make room for upper and lower audio SBs
+      NinRF = Nrf * size(mOpt, 2);
+      NoutRF = Nrf * size(mOpt, 1);
+      mOptAC = sparse(2 * NoutRF, 2 * NinRF);
+      
+      % expand to all RF components
+      mOptRF = Optic.blkdiagN(mOpt, Nrf);
+      
+      % fill in block diagonal matrix
+      mOptAC(1:NoutRF, 1:NinRF) = mOptRF;
+      mOptAC(NoutRF + (1:NoutRF), NinRF + (1:NinRF)) = conj(mOptRF);
+    end
+    
+    function mOptAC = expandFieldMatrixRF(mOpt, Nrf)
+      % expand a (2 * Nout) x (2 * Nin) field matrix
+      % (i.e., one with upper and lower audio SBs)
+      % to all RF components
+      
+      % make room for upper and lower audio SBs
+      Nin = size(mOpt, 2) / 2;
+      Nout = size(mOpt, 1) / 2;
+      NinRF = Nrf * Nin;
+      NoutRF = Nrf * Nout;
+      NinAC = 2 * NinRF;
+      NoutAC = 2 * NoutRF;
+      mOptAC = sparse(NoutAC, NinAC);
+      
+      %%% fill in block diagonal matrices into each AF quadrant
+      
+      % upper left quadrant
+      mOptAC(1:NoutRF, 1:NinRF) = ...
+        Optic.blkdiagN(mOpt(1:Nout, 1:Nin), Nrf);
+      
+      % upper right quadrant (only for non-linear optics)
+      mOptAC(NoutRF + (1:NoutRF), (1:NinRF)) = ...
+        Optic.blkdiagN(mOpt(Nout + (1:Nout), 1:Nin), Nrf);
+      
+      % lower left quadrant (only for non-linear optics)
+      mOptAC(1:NoutRF, NinRF + (1:NinRF)) = ...
+        Optic.blkdiagN(mOpt(1:Nout, Nin + (1:Nin)), Nrf);
+      
+      % lower right quadrant
+      mOptAC(NoutRF + (1:NoutRF), NinRF + (1:NinRF)) = ...
+        Optic.blkdiagN(mOpt(Nout + (1:Nout), Nin + (1:Nin)), Nrf);
+    end
+    
+    function mOptAC = expandFieldMatrixAF(mOpt)
+      % expand a Nout x Nin field matrix,
+      % or a (Nrf * Nout) x (Nrf * Nin) field matrix
+      % (i.e., one with RF components, but not audio SBs)
+      % to both audio SBs
+      
+      % make room for upper and lower audio SBs
+      NinRF = size(mOpt, 2);
+      NoutRF = size(mOpt, 1);
+      mOptAC = sparse(2 * NoutRF, NinRF);
+      
+      % fill in block diagonal matrix
+      mOptAC(1:NoutRF, 1:NinRF) = mOpt;
+      mOptAC(NoutRF + (1:NoutRF), NinRF + (1:NinRF)) = conj(mOpt);
+    end
+    
+    function mGenAC = buildGenMatrix(varargin)
+      % builds the audio SB generation matrix from
+      % multiple coupling matrices and the input DC fields
+      %
+      % last argument is vDC, others are coupling matrices
+      % coupling matrices should be NoutRF x NinRF
+      % returned mGen is (2 * NoutRF) x Ndrv
+      %
+      % Example:
+      % mGenAC = buildGenMatrix(mCpl1, mCpl2, vDC)
+      
+      % convert arguments
+      if nargin < 2
+        error('Need at least one coupling matrix and vDC')
+      else
+        mCplList = varargin(1:(end - 1));
+        vDC = varargin{end};
+      end
+      
+      % number of outputs and drives
+      NoutRF = size(mCplList{1}, 1);
+      Ndrv = numel(mCplList);
+      
+      % fill in the generation matrix
+      mGen = zeros(NoutRF, Ndrv);
+      for n = 1:Ndrv
+        mGen(:, n) = mCplList{n} * vDC;
+      end
+      
+      % expand to upper and lower audio SBs
+      mGenAC = [mGen; conj(mGen)];
+    end
+    
+    function m = blkdiagN(m0, N)
+      % construct a block diagonal matrix with N copies of
+      %   the input matrix.  See also blkdiag.
+      %
+      % m = blkdiagN(m, N);
+      
+      % prepare an N element cell array
+      tmp = cell(N, 1);
+      
+      % fill all N elements with the input matrix
+      [tmp{:}] = deal(m0);
+      
+      % make a block diagonal matrix with these matrices
+      m = blkdiag(tmp{:});
+    end
+    
+  end  % methods (Static)
   
 end % Optic
 
