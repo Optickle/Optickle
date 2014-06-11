@@ -140,8 +140,8 @@ function varargout = parTickle01(opt, pos, f)
     fAudio = f(nAF);
 
     % propagation phase matrices
-    mPhim = getPhaseMatrix(vLen, vFrf - fAudio, vPhiGouy);
-    mPhip = getPhaseMatrix(vLen, vFrf + fAudio, vPhiGouy);
+    mPhim = getPhaseMatrix(vLen, vFrf - fAudio, -vPhiGouy); % Gouy phase has minus sign
+    mPhip = getPhaseMatrix(vLen, vFrf + fAudio, -vPhiGouy);
 
     % field to optic position transfer
     mFOm = rctList(nAF).m * conj(mDC) / LIGHT_SPEED;
