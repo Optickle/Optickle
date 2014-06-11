@@ -109,9 +109,30 @@ classdef Optic < handle
     end % constructor
     
     function mOptAC = getFieldMatrixAC(obj, pos, par)
-      % return default expansion of the field matrix
+      % return default expansion of the drive matrix
       mOpt = getFieldMatrix(obj, pos, par);
       mOptAC = expandFieldMatrixAF(mOpt);
+    end
+    
+    function mGenAC = getGenMatrix(obj, pos, par)
+      % return default expansion of the field matrix
+      mCplMany = getDriveMatrix(obj, pos, par);
+      
+      %%% Expand 3D coupling matrix to mGen
+      
+      % number of outputs and drives
+      NoutRF = size(mCplMany, 1);
+      Ndrv = size(mCplMany, 3);
+      
+      % fill in the generation matrix
+      mGen = zeros(NoutRF, Ndrv);
+      vDC = par.vDC;
+      for n = 1:Ndrv
+        mGen(:, n) = mCplMany(:, :, n) * vDC;
+      end
+      
+      % expand to upper and lower audio SBs
+      mGenAC = [mGen; conj(mGen)];
     end
     
   end % methods
@@ -188,16 +209,16 @@ classdef Optic < handle
       mOptAC(NoutRF + (1:NoutRF), NinRF + (1:NinRF)) = conj(mOpt);
     end
     
-    function mGen = buildGenMatrix(varargin)
+    function mGenAC = buildGenMatrix(varargin)
       % builds the audio SB generation matrix from
       % multiple coupling matrices and the input DC fields
       %
       % last argument is vDC, others are coupling matrices
-      % drive matrices should be NoutRF x NinRF
+      % coupling matrices should be NoutRF x NinRF
       % returned mGen is (2 * NoutRF) x Ndrv
       %
       % Example:
-      % mGen = buildGenMatrix(mCpl1, mCpl2, vDC)
+      % mGenAC = buildGenMatrix(mCpl1, mCpl2, vDC)
       
       % convert arguments
       if nargin < 2
@@ -216,6 +237,9 @@ classdef Optic < handle
       for n = 1:Ndrv
         mGen(:, n) = mCplList{n} * vDC;
       end
+      
+      % expand to upper and lower audio SBs
+      mGenAC = [mGen; conj(mGen)];
     end
     
     function m = blkdiagN(m0, N)
