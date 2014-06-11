@@ -51,13 +51,6 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     nDrive = [];
   end
   
-  % third argument is actually control struct (see convertSimulink)
-  isCon = isstruct(f);
-  if isCon
-    sCon = f;
-    f = sCon.f;
-  end
-  
   % forth and fith argument given, return tfAC as last return argument
   isOut_tfAC = nargin >= 5;
   
@@ -101,17 +94,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % optic conversion
   mOpt = convertOpticsDC(opt, mapList, pos);
   
-  % noise stuff
-  Nnoise = size(mQuant, 2);
-  pQuant  = opt.h * opt.k * opt.c / (4 * pi);
-  aQuant = sqrt(pQuant) / 2;
-  aQuantTemp = repmat(aQuant',opt.Nlink,1); % aQuant is
-                                             % Nrfx1. mQuant is
-                                             % Nlink*Nrf x number
-                                             % of loss points*2
 
-  aQuantMatrix = diag(aQuantTemp(:));
-  mQuant = aQuantMatrix * mQuant;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== DC Fields and Signals
@@ -130,10 +113,9 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   mPhi = getPhaseMatrix(vLen, vFrf, [], mPhiFrf);		% propagation phase matrix
   vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
 
-  % compile system wide probe matrix and probe shot noise vector
+  % compile system wide probe matrix 
   mPrb = sparse(Nprb, Narf);
   mPrbQ = sparse(Nprb, Nfld);
-  shotPrb = zeros(Nprb, 1);
   for k = 1:Nprb
     mIn_k = prbList(k).mIn;
     mPrb_k = prbList(k).mPrb;
@@ -145,24 +127,6 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     % quad phase signals, for oscillator phase noise
     mPrbQ_k = prbList(k).mPrbQ;
     mPrbQ(k, :) = (mPrbQ_k * conj(vDCin)).' * mIn_k;
-
-    % shot noise
-    if isNoise
-
-        % This section attempts to account for the shot noise due to
-        % fields which are not recorded by a detector. E.g. a 10
-        % MHz detector will not see signal due to 37 MHz sidebands
-        % but it should see their shot noise  
-        
-        % Define a new vDCin which includes the appropriate pQuant
-        % for each dc component
-        pQuantTemp = repmat(pQuant',opt.Nlink,1);
-        pQuantMatrix = diag(pQuantTemp(:));
-        vDCinShot = mIn_k * pQuantMatrix * vDC;
-        
-        shotPrb(k) = (2 - sum(abs(mPrb_k), 1)) * abs(vDCinShot).^2;
-
-    end
   end
   
   %%%%% compute DC outputs
@@ -193,12 +157,43 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % get optic matricies for AC part
-  [mOptGen, mRadFrc, mResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC);
+  [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC);
   
-  % prepare generation matrix (part of optic-field matrix)
-  mGen = sparse(Nfld, Ndrv);
-  for n = 1:Ndrv
-    mGen(:, n) = drvList(n).m * vDC;
+  % noise stuff
+  Nnoise = size(mQuant, 2);
+  pQuant  = opt.h * opt.k * opt.c / (4 * pi);
+  aQuant = sqrt(pQuant) ;
+  aQuantTemp = repmat(aQuant.',opt.Nlink,1); % aQuant is
+                                             % Nrfx1. mQuant is
+                                             % Nlink*Nrf x number
+                                             % of loss points*2
+
+  % get both upper and lower sidebands
+  aQuantMatrix = diag([aQuantTemp(:);aQuantTemp(:)]); 
+  mQuant = aQuantMatrix * mQuant;
+  
+  % compile probe shot noise vector
+  shotPrb = zeros(Nprb, 1);
+  
+  % shot noise
+  if isNoise
+      for k = 1:Nprb
+          mIn_k = prbList(k).mIn;
+          mPrb_k = prbList(k).mPrb;
+          
+          % This section attempts to account for the shot noise due to
+          % fields which are not recorded by a detector. E.g. a 10
+          % MHz detector will not see signal due to 37 MHz sidebands
+          % but it should see their shot noise
+          
+          % Define a new vDCin which includes the appropriate pQuant
+          % for each dc component
+          pQuantTemp = repmat(pQuant',opt.Nlink,1);
+          pQuantMatrix = diag(pQuantTemp(:));
+          vDCinShot = mIn_k * pQuantMatrix * vDC;
+          
+          shotPrb(k) = (2 - sum(abs(mPrb_k), 1)) * abs(vDCinShot).^2;
+      end
   end
   
   % useful indices
@@ -212,38 +207,15 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   end
   
   % main inversion tools
-  mDC = sparse(1:Nfld, 1:Nfld, vDC, Nfld, Nfld);
-
-  mFFz = sparse(Nfld, Nfld);
-  mOOz = sparse(Ndrv, Ndrv);
   mQOz = sparse(Ndrv, Nnoise);
   eyeNdof = speye(Ndof);
 
   % intialize result space
-  if ~isCon
-    % full results: all probes, all drives
-    mExc = eyeNdof(:, jDrv);
-    sigAC = zeros(Nprb, NdrvOut, Naf);
-    mMech = zeros(NdrvOut, NdrvOut, Naf);
-    noiseAC = zeros(Nprb, Naf);
-    noiseMech = zeros(NdrvOut, Naf);
-  else
-    % reduced results for control struct
-    mExc = eyeNdof(:, jDrv) * sCon.mDrvOut;
-
-    sOpt.mInOut = zeros(sCon.Nout, sCon.Nin, Naf);
-    sOpt.mPlant = zeros(sCon.Nin, sCon.Nout, Naf);
-    sOpt.mOpenLoop = zeros(sCon.Nout, sCon.Nout, Naf);
-    sOpt.mCloseLoop = zeros(sCon.Nout, sCon.Nout, Naf);
-    
-    eyeNout = eye(sCon.Nout);
-    mPrbPrb = sCon.mPrbIn * sparse(diag(sigQ)) * sCon.mPrbOut;
-
-    if isNoise
-      noiseOut = zeros(sCon.Nout, Naf);
-      shotPrbAmp = sqrt(shotPrb);
-    end
-  end
+  mExc = eyeNdof(:, jDrv);
+  sigAC = zeros(Nprb, NdrvOut, Naf);
+  mMech = zeros(NdrvOut, NdrvOut, Naf);
+  noiseAC = zeros(Nprb, Naf);
+  noiseMech = zeros(NdrvOut, Naf);
   
   % is tfAC wanted?
   if isOut_tfAC
@@ -266,21 +238,15 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     % propagation phase matrices
     mPhim = getPhaseMatrix(vLen, vFrf - fAudio,[],mPhiFrf);
     mPhip = getPhaseMatrix(vLen, vFrf + fAudio,[],mPhiFrf);
-
-    % field to optic position transfer
-    mFOm = rctList(nAF).m * conj(mDC) / LIGHT_SPEED;
-    mFOp = rctList(nAF).m * mDC / LIGHT_SPEED;
-
-    % field to field transfer
-    mFFm = mPhim * mOpt;
-    mFFp = conj(mPhip * mOpt);
-
-    % optic to field transfer
-    mOFm = mPhim * mGen;
-    mOFp = conj(mPhip * mGen);
+    mPhi = blkdiag(mPhip,conj(mPhim));
+    
+    % mechanical response matrix
+    mResp = diag(lResp(nAF,:));
     
     % ==== Put it together and solve
-    mDof = [mFFm, mFFz, mOFm; mFFz, mFFp, mOFp; mFOm, mFOp, mOOz];
+    mDof = [  mPhi * mOptGen
+             mResp * mRadFrc ];
+    
     tfAC = (eyeNdof - mDof) \ mExc;
 
     % field TF matrix wanted?
@@ -289,47 +255,19 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     end
     
     % extract optic to probe transfer functions
-    if ~isCon
-      % no control struct, return TFs to all probes and drives
-      sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
-      mMech(:, :, nAF) = tfAC(jDrv, :);
-    else
-      % reduce probes and drives to those required by control struct
-      mPlant = sCon.mPrbIn * mPrb * tfAC(jAsb, :) + ...
-        sCon.mDrvIn * tfAC(jDrv, :) + mPrbPrb;
-      
-      % compute closed loop response of outputs
-      mCon = sCon.mCon(:, :, nAF);
-      mOL = mCon * mPlant;
-      mCL = inv(eyeNout - mOL);
-      mInOut = mCL * mCon;
-      
-      % store into the sOpt struct
-      sOpt.mInOut(:, :, nAF) = mInOut;
-      sOpt.mPlant(:, :, nAF) = mPlant;
-      sOpt.mOpenLoop(:, :, nAF) = mOL;
-      sOpt.mCloseLoop(:, :, nAF) = mCL;
-    end
+    sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
+    mMech(:, :, nAF) = tfAC(jDrv, :);
     
     if isNoise
       %%%% With Quantum Noise
-      mQinj = [mPhim * mQuant; conj(mPhip * mQuant); mQOz];
+      mQinj = [mPhi * mQuant;  mQOz];
       mNoise = (eyeNdof - mDof) \ mQinj;
       noisePrb = mPrb * mNoise(jAsb, :);
       noiseDrv = mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise
-      if ~isCon
-        noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
-        noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
-      else
-        % transfer noise to outputs
-        noiseAmp = mInOut * (sCon.mPrbIn * noisePrb + ...
-          sCon.mDrvIn * noiseDrv);
-        noisePrbAmp = mInOut * sCon.mPrbIn * shotPrbAmp;
-        noiseOut(:, nAF) = sqrt(sum(abs(noiseAmp).^2, 2) + ...
-          abs(noisePrbAmp).^2);
-      end
+      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
       
       % HACK: noise probe
       %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
@@ -388,19 +326,13 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   drawnow
 
   % Build the rest of the outputs
-  if ~isCon
-    varargout{3} = sigAC;
-    varargout{4} = mMech;
-    if isNoise
+  varargout{3} = sigAC;
+  varargout{4} = mMech;
+  if isNoise
       varargout{5} = noiseAC;
       varargout{6} = noiseMech;
-    end
-  else
-    varargout{3} = sOpt;
-    if isNoise
-      varargout{4} = noiseOut;
-    end
   end
+  
 
   if isOut_tfAC && nargout > 0
     varargout{nargout} = tfACout;

@@ -5,7 +5,7 @@
 
 function [mRad, mFrc, vRspAF] = getReactMatrix(obj, pos, par)
   
-  mRad = zeros(obj.Ndrive, par.Nrf * obj.Nin);
+  mRad = zeros(obj.Ndrive, 2 * par.Nrf * obj.Nin);
   mFrc = zeros(obj.Ndrive, obj.Ndrive);
   vRspAF = zeros(par.Naf, obj.Ndrive);
 

@@ -4,7 +4,7 @@
 % Convert Optics to Matrices
 %   mapList is from convertLinks
 
-function [mOptGen, mRadFrc, mResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC)
+function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC)
 
   % === Argument Handling
   if nargin < 3
@@ -43,8 +43,8 @@ function [mOptGen, mRadFrc, mResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   %   -- System Optical Properties --
   %   mOptGen: optical field scatter/generation matrix   Narf x Ndrv+Narf
   %   mRadFrc: radiation/force reaction matrix           Ndrv x Ndrv+Narf
-  %   mResp: mechanical response list                    Naf x Nopt
-  %   mQuant: quantum noise matrix                       2?Nfld x Nvac?
+  %   lResp: mechanical response list                    Naf x Nopt
+  %   mQuant: quantum noise matrix                       2Nfld x Nvac?
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -57,9 +57,9 @@ function [mOptGen, mRadFrc, mResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   mOptGen = sparse(Narf,Ndrv+Narf);
   mRadFrc = sparse(Ndrv,Ndrv+Narf);
   
-  mResp = zeros(Naf,Nopt);
+  lResp = zeros(Naf,Ndrv);
 
-  mQuant = sparse(Nfld, 0);
+  mQuant = sparse(Narf, 0);
   
   % build system matrices
   for n = 1:Nopt
@@ -73,16 +73,16 @@ function [mOptGen, mRadFrc, mResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       % mDrv  Ndrv x obj.Ndrv
       
       mIn = mapList(n).mIn;
-      mInAC = blockdiag(mIn,mIn); % make block diagonal
+      mInAC = blkdiag(mIn,mIn); % make block diagonal
       mOut = mapList(n).mOut;
-      mOutAC = blockdiag(mOut,mOut); % make block diagonal
+      mOutAC = blkdiag(mOut,mOut); % make block diagonal
       mDrv = mapList(n).mDrv;
       
       %mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
       par.vDC = mIn * vDC; 
       
       %%%% Optic Properties
-      [mOpt_n, mGen_n, mRad_n, mFrc_n, mResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
+      [mOpt_n, mGen_n, mRad_n, mFrc_n, vResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
       
       % optical field scatter/generation matrix
       mOptGen = mOptGen + mOutAC * [ mOpt_n * mInAC, mGen_n * mDrv.' ] ;
@@ -91,9 +91,7 @@ function [mOptGen, mRadFrc, mResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       mRadFrc = mRadFrc + mDrv * [ mRad_n * mInAC, mFrc_n * mDrv.' ] ;
       
       % mechanical response list
-      mResp(:,n) = mResp_n;
-      
-      % NOT WORKING YET FOR OPTICKLE2?
+      lResp = lResp + vResp_n * mDrv.';
       
       % accumulate noises (removing ones that are zero)
       mQ1 = mOutAC * sparse(mQuant_n);
