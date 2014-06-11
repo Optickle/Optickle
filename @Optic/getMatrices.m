@@ -4,13 +4,14 @@
 % The parameter struct is
 %  par.c = opt.c;
 %  par.lambda = opt.lambda;
-%  par.k = opt.k + 2 * pi * vFrf / opt.c;
+%  par.k = opt.k;
 %  par.Nrf = Nrf;
 %  par.vFrf = vFrf;
 %  par.Naf = Naf;
 %  par.vFaf = f;
+%  par.vDC = mIn{n} * vDC;   % DC fields at each optic's inputs
 %
-% [mOpt, mRct, mDrv, mQuant] = getMatrices(obj, pos, par);
+% [mOptAC, mGen, mRad, mFrc, mRsp, mQuant] = getMatrices(obj, pos, par)
 
 function [mOptAC, mGen, mRad, mFrc, mRsp, mQuant] = getMatrices(obj, pos, par)
 
