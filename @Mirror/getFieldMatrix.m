@@ -3,7 +3,7 @@
 %
 % mOpt = getFieldMatrix(obj, par)
 
-function [mOpt, mDirin, mDirout, dldx] = getFieldMatrix(obj, pos, par)
+function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   
   % constants
   Nrf = par.Nrf;
@@ -61,6 +61,6 @@ function [mOpt, mDirin, mDirout, dldx] = getFieldMatrix(obj, pos, par)
   end
 
   % direction matrices
-  mDirin = diag([-caoi,caoi]);
-  mDirout = diag([-caoi,caoi,caoi,caoi]);
+  mDirIn = diag([-caoi,caoi]);
+  mDirOut = diag([-caoi,caoi,caoi,caoi]);
 end
