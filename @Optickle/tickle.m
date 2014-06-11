@@ -188,12 +188,6 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % get optic matricies for AC part
   [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC);
   
-  % prepare generation matrix (part of optic-field matrix)
-  mGen = sparse(Nfld, Ndrv);
-  for n = 1:Ndrv
-    mGen(:, n) = drvList(n).m * vDC;
-  end
-  
   % useful indices
   jAsb = 1:Narf;
   jDrv = (1:Ndrv) + Narf;
@@ -205,10 +199,6 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   end
   
   % main inversion tools
-  mDC = sparse(1:Nfld, 1:Nfld, vDC, Nfld, Nfld);
-
-  mFFz = sparse(Nfld, Nfld);
-  mOOz = sparse(Ndrv, Ndrv);
   mQOz = sparse(Ndrv, Nnoise);
   eyeNdof = speye(Ndof);
 
@@ -240,21 +230,15 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     % propagation phase matrices
     mPhim = getPhaseMatrix(vLen, vFrf - fAudio,[],mPhiFrf);
     mPhip = getPhaseMatrix(vLen, vFrf + fAudio,[],mPhiFrf);
-
-    % field to optic position transfer
-    mFOm = rctList(nAF).m * conj(mDC) / LIGHT_SPEED;
-    mFOp = rctList(nAF).m * mDC / LIGHT_SPEED;
-
-    % field to field transfer
-    mFFm = mPhim * mOpt;
-    mFFp = conj(mPhip * mOpt);
-
-    % optic to field transfer
-    mOFm = mPhim * mGen;
-    mOFp = conj(mPhip * mGen);
+    mPhi = blockdiag(mPhip,conj(mPhim));
+    
+    % mechanical response matrix
+    mResp = diag(lResp(nAF,:));
     
     % ==== Put it together and solve
-    mDof = [mFFm, mFFz, mOFm; mFFz, mFFp, mOFp; mFOm, mFOp, mOOz];
+    mDof = [  mPhi * mOptGen
+             mResp * mRadFrc / LIGHT_SPEED ];
+    
     tfAC = (eyeNdof - mDof) \ mExc;
 
     % field TF matrix wanted?
