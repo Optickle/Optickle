@@ -12,7 +12,7 @@ function [mOptAC, mGenAC, mRad, mFrc, mRsp, mQuant] = getMatrices(obj, pos, par)
   [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
   
   % expand to both audio SBs
-  mOptAC = expandFieldMatrixAF(mOpt);
+  mOptAC = Optic.expandFieldMatrixAF(mOpt);
 
   % reaction, drive and noise matrices (only used in AC computation)
   [mGenAC, mGen] = getGenMatrix(obj, pos, par, mOpt, dldx);

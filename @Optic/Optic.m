@@ -122,7 +122,7 @@ classdef Optic < handle
       
       % number of outputs and drives
       NoutRF = obj.Nout * par.Nrf;
-      Ndrv = obj.Ndrv;
+      Ndrv = obj.Ndrive;
       
       % fill in the generation matrix
       mGen = zeros(NoutRF, Ndrv);
