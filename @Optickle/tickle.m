@@ -102,10 +102,16 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   mOpt = convertOpticsDC(opt, mapList, pos);
   
   % noise stuff
-  %Nnoise = size(mQuant, 2); % mQuant came from AC part of convertOptics
-  pQuant = opt.h * opt.c / (2 * opt.lambda);
+  Nnoise = size(mQuant, 2);
+  pQuant  = opt.h * opt.k * opt.c / (4 * pi);
   aQuant = sqrt(pQuant) / 2;
-  % mQuant = mQuant * aQuant; % same as above
+  aQuantTemp = repmat(aQuant',opt.Nlink,1); % aQuant is
+                                             % Nrfx1. mQuant is
+                                             % Nlink*Nrf x number
+                                             % of loss points*2
+
+  aQuantMatrix = diag(aQuantTemp(:));
+  mQuant = aQuantMatrix * mQuant;
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== DC Fields and Signals
@@ -142,7 +148,20 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
 
     % shot noise
     if isNoise
-      shotPrb(k) = pQuant * (2 - sum(abs(mPrb_k), 1)) * abs(vDCin).^2;
+
+        % This section attempts to account for the shot noise due to
+        % fields which are not recorded by a detector. E.g. a 10
+        % MHz detector will not see signal due to 37 MHz sidebands
+        % but it should see their shot noise  
+        
+        % Define a new vDCin which includes the appropriate pQuant
+        % for each dc component
+        pQuantTemp = repmat(pQuant',opt.Nlink,1);
+        pQuantMatrix = diag(pQuantTemp(:));
+        vDCinShot = mIn_k * pQuantMatrix * vDC;
+        
+        shotPrb(k) = (2 - sum(abs(mPrb_k), 1)) * abs(vDCinShot).^2;
+
     end
   end
   
