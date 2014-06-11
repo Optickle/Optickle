@@ -13,13 +13,14 @@
 %
 % [mOptAC, mGen, mRad, mFrc, mRsp, mQuant] = getMatrices(obj, pos, par)
 
-function [mOptAC, mGen, mRad, mFrc, mRsp, mQuant] = getMatrices(obj, pos, par)
+function [mOptAC, mGen, mRad, mFrc, vRspAF, mQuant] ...
+  = getMatrices(obj, pos, par)
 
   % optical field transfer matrix
   mOptAC = getFieldMatrixAC(obj, pos, par);
 
   % reaction, drive and noise matrices (only used in AC computation)
   mGen = getGenMatrix(obj, pos, par);
-  [mRad, mFrc, mRsp] = getReactMatrix(obj, pos, par);
+  [mRad, mFrc, vRspAF] = getReactMatrix(obj, pos, par);
   mQuant = getNoiseMatrix(obj, pos, par);
 end
