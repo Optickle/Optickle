@@ -111,7 +111,7 @@ classdef Optic < handle
     function mOptAC = getFieldMatrixAC(obj, pos, par)
       % return default expansion of the drive matrix
       mOpt = getFieldMatrix(obj, pos, par);
-      mOptAC = expandFieldMatrixAF(mOpt);
+      mOptAC = Optic.expandFieldMatrixAF(mOpt);
     end
     
     function [mGenAC, mGen] = getGenMatrix(obj, pos, par, varargin)
