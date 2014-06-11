@@ -186,7 +186,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % get optic matricies for AC part
-  [mOptGen, mRadFrc, mResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC);
+  [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC);
   
   % prepare generation matrix (part of optic-field matrix)
   mGen = sparse(Nfld, Ndrv);
