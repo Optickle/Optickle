@@ -121,7 +121,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
 
   % compute DC fields
   eyeNfld = speye(Nfld);			% a sparse identity matrix
-  mPhi = getPhaseMatrix(vLen, vFrf,[],mPhiFrf);		% propagation phase matrix
+  mPhi = getPhaseMatrix(vLen, vFrf, [], mPhiFrf);		% propagation phase matrix
   vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
 
   % compile system wide probe matrix and probe shot noise vector
