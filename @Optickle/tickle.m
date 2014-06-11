@@ -230,7 +230,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     % propagation phase matrices
     mPhim = getPhaseMatrix(vLen, vFrf - fAudio,[],mPhiFrf);
     mPhip = getPhaseMatrix(vLen, vFrf + fAudio,[],mPhiFrf);
-    mPhi = blockdiag(mPhip,conj(mPhim));
+    mPhi = blkdiag(mPhip,conj(mPhim));
     
     % mechanical response matrix
     mResp = diag(lResp(nAF,:));

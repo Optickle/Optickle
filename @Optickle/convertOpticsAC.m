@@ -73,9 +73,9 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       % mDrv  Ndrv x obj.Ndrv
       
       mIn = mapList(n).mIn;
-      mInAC = blockdiag(mIn,mIn); % make block diagonal
+      mInAC = blkdiag(mIn,mIn); % make block diagonal
       mOut = mapList(n).mOut;
-      mOutAC = blockdiag(mOut,mOut); % make block diagonal
+      mOutAC = blkdiag(mOut,mOut); % make block diagonal
       mDrv = mapList(n).mDrv;
       
       %mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
