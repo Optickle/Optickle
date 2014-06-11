@@ -12,7 +12,7 @@ function exitCond = testDetuneFP()
     numericalEquality = isequaln(referenceStruct,calculationStruct);
 
     if ~numericalEquality
-        warn('Answers are numerically different, this may be OK if error is small')
+        warning('Answers are numerically different, this may be OK if error is small')
         exitCond = exitCond+1;
     end
     toc
