@@ -44,7 +44,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   %   mOptGen: optical field scatter/generation matrix   Narf x Ndrv+Narf
   %   mRadFrc: radiation/force reaction matrix           Ndrv x Ndrv+Narf
   %   lResp: mechanical response list                    Naf x Nopt
-  %   mQuant: quantum noise matrix                       2?Nfld x Nvac?
+  %   mQuant: quantum noise matrix                       2Nfld x Nvac?
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -92,8 +92,6 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       
       % mechanical response list
       lResp(:,n) = Resp_n;
-      
-      % NOT WORKING YET FOR OPTICKLE2?
       
       % accumulate noises (removing ones that are zero)
       mQ1 = mOutAC * sparse(mQuant_n);
