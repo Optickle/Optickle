@@ -108,7 +108,7 @@ classdef Optic < handle
       end
     end % constructor
     
-    function mOptAC = getFieldMatrixAC(obj, pos, par)
+    function [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par)
       % return default expansion of the drive matrix
       mOpt = getFieldMatrix(obj, pos, par);
       mOptAC = Optic.expandFieldMatrixAF(mOpt);
@@ -121,8 +121,8 @@ classdef Optic < handle
       %%% Expand 3D coupling matrix to mGen
       
       % number of outputs and drives
-      NoutRF = size(mCplMany, 1);
-      Ndrv = size(mCplMany, 3);
+      NoutRF = obj.Nout * par.Nrf;
+      Ndrv = obj.Ndrv;
       
       % fill in the generation matrix
       mGen = zeros(NoutRF, Ndrv);
