@@ -3,13 +3,14 @@
 %            vRspAF: Naf vector
 %            mFrc: Ndrive x Ndrive matrix
 %
-% [mRad,mResp,mFrc] = getReactMatrix(obj, pos, par)
+% [mRadAC,mFrc,vRspAF] = getReactMatrix(obj, pos, par)
 
 function [mRadAC,mFrc,vRspAF] = getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOut, mGen)
   
   % check for optional arguments
-  if nargin < 5
+  if nargin < 4
     [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
+    [~, mGen] = getGenMatrix(obj, pos, par, mOpt, dldx);
   end
   
   % constants

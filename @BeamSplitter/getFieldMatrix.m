@@ -3,9 +3,10 @@
 %
 % mOpt = getFieldMatrix(obj, par)
 
-function [mOpt, d] = getFieldMatrix(obj, pos, par)
+function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   
   % constants
+  Nrf = par.Nrf;
   Nin = 4;									% obj.Optic.Nin
   Nout = 8;									% obj.Optic.Nout
   pos = pos + obj.Optic.pos;				% mirror position
@@ -45,8 +46,9 @@ function [mOpt, d] = getFieldMatrix(obj, pos, par)
   % ==== Compute for each RF component
   % dl/dx (non-zero for reflected fields)
   d = zeros(Nout, Nin);
-  d(1, 1) = -2 * cos(pi * obj.aoi / 180);
-  d(2:4, 2) = 2 * cos(pi * obj.aoi / 180);
+  caoi = cos(pi * obj.aoi / 180);
+  d(1, 1) = -2 * caoi;
+  d(2:4, 2) = 2 * caoi;
   d(5:8, 3:4) = d(1:4, 1:2);  % B-side
 
   % do all RF components
@@ -60,3 +62,9 @@ function [mOpt, d] = getFieldMatrix(obj, pos, par)
     mm = (1:Nin) + Nin * (n - 1);
     mOpt(nn, mm) = m .* rp;
   end
+
+  % direction matrices
+  mDirIn = diag([-caoi,caoi,-caoi,caoi]);
+  mDirOut = diag([-caoi,caoi,caoi,caoi,-caoi,caoi,caoi,caoi]);
+  
+end

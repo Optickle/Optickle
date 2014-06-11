@@ -26,7 +26,7 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   atbt =  at * bt;
 
   % transfer matrix
-  m = zeros(4, 2);
+  m = zeros(Nout, Nin);
 
   % from front input node (in1)
   m(1, 1) = hr;
@@ -42,7 +42,7 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
 
   % ==== Compute for each RF component
   % dl/dx (non-zero for reflected fields)
-  dldx = zeros(4, 2);
+  dldx = zeros(Nout, Nin);
   caoi = cos(pi * obj.aoi / 180);
   dldx(1, 1) = -2 * caoi;
   dldx(2:4, 2) = 2 * caoi;
