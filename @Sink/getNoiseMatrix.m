@@ -23,8 +23,5 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   end
   
   % convert to noise amplitudes for all RF components
-  mNA = blkdiagN(sqrt(mNP), par.Nrf);
-  
-  % these noises are unsqueezed, so make amplitude and phase
-  mQuant = [mNA, 1i * mNA];
+  mQuant = blkdiagN(sqrt(mNP), 2 * par.Nrf);
 end
