@@ -1,11 +1,11 @@
 % getReactMatrix method
-%   returns  mRad: Ndrive x (2 * Nrf * Nin) matrix
-%            mResp: Naf vector
+%   returns  mRadAC: Ndrive x (2 * Nrf * Nin) matrix
+%            vRspAF: Naf vector
 %            mFrc: Ndrive x Ndrive matrix
 %
 % [mRad,mResp,mFrc] = getReactMatrix(obj, pos, par)
 
-function [mRadAC,mFrc,mRsp] = getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOut, mGen)
+function [mRadAC,mFrc,vRspAF] = getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOut, mGen)
   
   % check for optional arguments
   if nargin < 5
@@ -20,7 +20,7 @@ function [mRadAC,mFrc,mRsp] = getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOu
   LIGHT_SPEED = Optickle.c;
   
   % mechanical response
-  mRsp = getMechResp(obj, par.vFaf);
+  vRspAF = getMechResp(obj, par.vFaf);
   
   % field matrix and derivatives
   mRad = zeros(1, Nrf * Nin);
