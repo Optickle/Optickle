@@ -28,10 +28,9 @@ function mQuant = getNoiseMatrix(obj, pos, par)
                                  obj.in, par.minQuant);
       
       
-      mNA = blkdiag(mNA,mNP);
+      mNA = blkdiag(mNA, sqrt(mNP));
   end
 
   % these noises are unsqueezed, so make amplitude and phase
-  mQuant = [mNA, 1i * mNA];
-
+  mQuant = blkdiag(mNA, mNA);
 end
