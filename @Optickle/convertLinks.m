@@ -65,8 +65,8 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
   % loop over probes
   for jPrb = 1:Nprb
     prb = opt.probe(jPrb);
-    phi = exp(1i * pi * prb.phase / 180);
-    phi_quad = exp(1i * pi * (prb.phase + 90) / 180);
+    phi = exp(1i * pi * prb.phase / 180) / 2;
+    phi_quad = exp(1i * pi * (prb.phase + 90) / 180) / 2;
 
     % loop over RF components (wave numbers)
     for n = 1:Nrf
@@ -81,7 +81,7 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
           if prb.phase ~= 0
             warning('Non-zero demod phase for DC probe %k ignored.', jPrb)
           end
-          prbList(jPrb).mPrb(m, n) = 2;
+          prbList(jPrb).mPrb(m, n) = 1;
         elseif dk_p < smallWaveNumber
           prbList(jPrb).mPrb(m, n) = phi;
           prbList(jPrb).mPrbQ(m, n) = phi_quad;
@@ -102,7 +102,7 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
   % ==== Optic Link Maps
   % mIn: all fields to input fields               obj.Nin x Nlnk
   % mOut: output fields to all fields             Nlnk x obj.Nout
-  % mDOF: optic interal DOFs to all DOFs          Ndrv x obj.Ndrv
+  % mDrv: optic interal drives to all drives      Ndrv x obj.Ndrv
   %
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   if nargout < 3
@@ -110,7 +110,7 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
   end
   
   % system matrices
-  mapElem = struct('mIn', [], 'mOut', [], 'mDOF', []);
+  mapElem = struct('mIn', [], 'mOut', [], 'mDrv', []);
   mapList = repmat(mapElem, Nopt, 1);
   
   % build system matrices
@@ -135,9 +135,9 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
     end
 
     % drive DOF map
-    mDOF = sparse(Ndrv, obj.Ndrive);
+    mDrv = sparse(Ndrv, obj.Ndrive);
     for m = 1:obj.Ndrive
-      mDOF(obj.drive(m), m) = 1;
+      mDrv(obj.drive(m), m) = 1;
     end
     
     % expand in and out to cover all RF frequencies and store in list
@@ -145,7 +145,7 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
     mapList(n).mOut = blkdiagN(mOut, Nrf);
     
     % store DOF in list
-    mapList(n).mDOF = mDOF;
+    mapList(n).mDrv = mDrv;
   end
 
 end

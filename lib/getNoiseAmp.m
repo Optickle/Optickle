@@ -4,6 +4,7 @@
 % a mirror.  It is not in the Mirror class, because it is
 % also used by BeamSplitter.  There is probably a better solution.
 
+
 function mNP = getNoiseAmp(Thr, Lhr, Rar, Lmd, phi, in, minQuant)
   
   % zero small losses
@@ -28,7 +29,7 @@ function mNP = getNoiseAmp(Thr, Lhr, Rar, Lmd, phi, in, minQuant)
   ar = -sqrt(Rar);				% AR refl
   at =  sqrt(1 - Rar);				% AR trans
   bt =  sqrt(1 - Lmd);				% bulk trans
-
+  
   hrf =  hr * frp;
   hrb = -hr * brp;
   arf =  ar * frp;
@@ -88,12 +89,12 @@ function mNP = getNoiseAmp(Thr, Lhr, Rar, Lmd, phi, in, minQuant)
   
   % add power from open inputs
   if in(1) == 0
-    mNP1 = [hrf; atbt * ht; 0; tbo * arbt * ht];
-    mNP = [mNP, mNP1];
+      mNP1 = [hrf; atbt * ht; 0; tbo * arbt * ht];
+      mNP  = [mNP, mNP1];
   end
   
   if in(2) == 0
-    mNP1 = [htbt * at; tbo * at; arf; tbo * arbt * hrbt * at];
-    mNP = [mNP, mNP1];
+      mNP1 = [htbt * at; tbo * at; arf; tbo * arbt * hrbt * at];
+       mNP = [mNP, mNP1];
   end
 end

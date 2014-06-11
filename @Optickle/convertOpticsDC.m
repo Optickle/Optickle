@@ -10,9 +10,6 @@ function mOpt = convertOpticsDC(opt, mapList, pos)
   if nargin < 3
     pos = [];
   end
-  if nargin < 4
-    f = [];
-  end
 
   % === Field Info
   vFrf = getSourceInfo(opt);
@@ -22,7 +19,6 @@ function mOpt = convertOpticsDC(opt, mapList, pos)
   Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
   Nlnk = opt.Nlink;				% number of links
   Nrf  = length(vFrf);			% number of RF components
-  Naf  = length(f);				% number of audio frequencies
   Nfld = Nlnk * Nrf;            % number of RF fields
   
   % default positions
@@ -48,8 +44,6 @@ function mOpt = convertOpticsDC(opt, mapList, pos)
 
   % parameters for construction
   par = getOptParam(opt);
-  par.Naf = Naf;
-  par.vFaf = f;
 
   % system matrices
   mOpt = sparse(Nfld, Nfld);
@@ -61,7 +55,7 @@ function mOpt = convertOpticsDC(opt, mapList, pos)
     mOut = mapList(n).mOut;
     
     %%%% Optic Properties
-    mOpt_n = getMatrices(obj, pos(obj.drive), par);
+    mOpt_n = getFieldMatrix(obj, pos(obj.drive), par);
     
     % optical field transfer matrix
     mOpt = mOpt + mOut * mOpt_n * mIn;
