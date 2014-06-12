@@ -20,14 +20,14 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   % block-diagonal matrix
 
   % Loop over rf frequencies (which now include other wavelengths)
-  mNA = []; % should pre-allocate and/or avoid loop
-  for iLoop = 1:par.Nrf
+  mNA = []; % should pre-allocate index in for more speed
+  for n = 1:par.Nrf
 
       % get noise powers
-      mNP = getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi(iLoop), ...
-                                 obj.in, par.minQuant);
+      mNP = Mirror.getNoiseAmp(obj.Thr(n), obj.Lhr(n), obj.Rar(n), ...
+        obj.Lmd(n), phi(n), obj.in, par.minQuant);
       
-      
+      % iteratively build a block diagonal matrix
       mNA = blkdiag(mNA, sqrt(mNP));
   end
 

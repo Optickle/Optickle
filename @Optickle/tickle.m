@@ -161,8 +161,8 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   
   % noise stuff
   Nnoise = size(mQuant, 2);
-  pQuant  = opt.h * opt.k * opt.c / (8 * pi);   % CHECK
-  aQuant = sqrt(pQuant) ;
+  pQuant  = opt.h * opt.k * opt.c / (2 * pi);   % CHECK
+  aQuant = sqrt(pQuant);
   aQuantTemp = repmat(aQuant.',opt.Nlink,1); % aQuant is
                                              % Nrfx1. mQuant is
                                              % Nlink*Nrf x number
@@ -177,23 +177,21 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   
   % shot noise
   if isNoise
-      for k = 1:Nprb
-          mIn_k = prbList(k).mIn;
-          mPrb_k = prbList(k).mPrb;
-          
-          % This section attempts to account for the shot noise due to
-          % fields which are not recorded by a detector. E.g. a 10
-          % MHz detector will not see signal due to 37 MHz sidebands
-          % but it should see their shot noise
-          
-          % Define a new vDCin which includes the appropriate pQuant
-          % for each dc component
-          pQuantTemp = repmat(pQuant',opt.Nlink,1);
-          pQuantMatrix = diag(pQuantTemp(:));
-          vDCinShot = mIn_k * pQuantMatrix * vDC;
-          
-          shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * abs(vDCinShot).^2; %CHECK
-      end
+    for k = 1:Nprb
+      mIn_k = prbList(k).mIn;
+      mPrb_k = prbList(k).mPrb;
+      
+      % This section attempts to account for the shot noise due to
+      % fields which are not recorded by a detector. E.g. a 10
+      % MHz detector will not see signal due to 37 MHz sidebands
+      % but it should see their shot noise
+      
+      % Define a new vDCin which includes the appropriate pQuant
+      % for each dc component
+      vDCinShot = mIn_k * vDC;
+      
+      shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * (pQuant .* abs(vDCinShot).^2); %CHECK
+    end
   end
   
   % useful indices
@@ -262,7 +260,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
       %%%% With Quantum Noise
       mQinj = [mPhi * mQuant;  mQOz];
       mNoise = (eyeNdof - mDof) \ mQinj;
-      noisePrb = 2 * mPrb * mNoise(jAsb, :);   % CHECK
+      noisePrb = mPrb * mNoise(jAsb, :);   % CHECK
       noiseDrv = mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise

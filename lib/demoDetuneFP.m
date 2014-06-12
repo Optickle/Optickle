@@ -2,7 +2,7 @@
 %   this function demonstrates the use of tickle with optFP
 %
 
-function demoDetuneFP
+function [sigDC0, sigAC0, mMech0, noiseAC0] = demoDetuneFP
 
   % create the model
   opt = optFP;

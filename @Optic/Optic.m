@@ -153,7 +153,7 @@ classdef Optic < handle
       mOptAC = sparse(2 * NoutRF, 2 * NinRF);
       
       % expand to all RF components
-      mOptRF = Optic.blkdiagN(mOpt, Nrf);
+      mOptRF = blkdiagN(mOpt, Nrf);
       
       % fill in block diagonal matrix
       mOptAC(1:NoutRF, 1:NinRF) = mOptRF;
@@ -178,19 +178,19 @@ classdef Optic < handle
       
       % upper left quadrant
       mOptAC(1:NoutRF, 1:NinRF) = ...
-        Optic.blkdiagN(mOpt(1:Nout, 1:Nin), Nrf);
+        blkdiagN(mOpt(1:Nout, 1:Nin), Nrf);
       
       % upper right quadrant (only for non-linear optics)
       mOptAC(NoutRF + (1:NoutRF), (1:NinRF)) = ...
-        Optic.blkdiagN(mOpt(Nout + (1:Nout), 1:Nin), Nrf);
+        blkdiagN(mOpt(Nout + (1:Nout), 1:Nin), Nrf);
       
       % lower left quadrant (only for non-linear optics)
       mOptAC(1:NoutRF, NinRF + (1:NinRF)) = ...
-        Optic.blkdiagN(mOpt(1:Nout, Nin + (1:Nin)), Nrf);
+        blkdiagN(mOpt(1:Nout, Nin + (1:Nin)), Nrf);
       
       % lower right quadrant
       mOptAC(NoutRF + (1:NoutRF), NinRF + (1:NinRF)) = ...
-        Optic.blkdiagN(mOpt(Nout + (1:Nout), Nin + (1:Nin)), Nrf);
+        blkdiagN(mOpt(Nout + (1:Nout), Nin + (1:Nin)), Nrf);
     end
     
     function mOptAC = expandFieldMatrixAF(mOpt)
@@ -241,23 +241,7 @@ classdef Optic < handle
       % expand to upper and lower audio SBs
       mGenAC = [mGen; conj(mGen)];
     end
-    
-    function m = blkdiagN(m0, N)
-      % construct a block diagonal matrix with N copies of
-      %   the input matrix.  See also blkdiag.
-      %
-      % m = blkdiagN(m, N);
-      
-      % prepare an N element cell array
-      tmp = cell(N, 1);
-      
-      % fill all N elements with the input matrix
-      [tmp{:}] = deal(m0);
-      
-      % make a block diagonal matrix with these matrices
-      m = blkdiag(tmp{:});
-    end
-    
+        
   end  % methods (Static)
   
 end % Optic
