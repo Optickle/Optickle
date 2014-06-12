@@ -8,8 +8,8 @@ function mOpt = getFieldMatrix(obj, pos, par)
   % constants
   Nrf = par.Nrf;
   vFrf = par.vFrf;
-  vKrf = opt.k;
-  vpol = opt.pol;
+  vKrf = par.k;
+  vpol = par.pol;
   fMod = obj.fMod;
   aMod = obj.aMod;
   LIGHT_SPEED = Optickle.c;

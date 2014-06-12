@@ -8,11 +8,11 @@ function mOpt = getFieldMatrix(obj, pos, par)
   % constants
   Nrf = par.Nrf;
   vFrf = par.vFrf;
-  vKrf = opt.k;
-  vpol = opt.pol;
+  vKrf = par.k;
+  vpol = par.pol;
 
   lfw = obj.lfw;   % list of fraction of wave of the waveplate for each wavelength (e.g. 0.25 for QWP, 0.5 for HWP)
-  vfw = Optickle.mapByLambda(lfw,opt.lambda);
+  vfw = Optickle.mapByLambda(lfw,par.lambda);
   theta = obj.theta / 180 * pi;   % rotation angle of the waveplate
   mRot = [cos(theta),sin(theta);-sin(theta),cos(theta)]; 
   

@@ -18,7 +18,7 @@ classdef Waveplate < Optic
   % ==== Functions, those in Optic
   %
   % Example: an HWP for 1064 nm, QWP for 532 nm at 45 degrees
-  % obj = Waveplate('WP1', [0.5, 1064e-9 ; 0.25, 532e-9], 45);
+  % obj = Waveplate('WP1', [0.5 1064e-9 ; 0.25 532e-9], 45);
   
   properties
       lfw = []; % fractions of wave
@@ -26,7 +26,7 @@ classdef Waveplate < Optic
   end
   
   methods
-    function obj = Waveplate(name, varargin)
+    function obj = Waveplate(varargin)
     % obj = Waveplate(name, lfw, theta);
     %
     % Optical parameters:
@@ -42,7 +42,6 @@ classdef Waveplate < Optic
     inNames    = {'in'} ;
     outNames   = {'out'};
     driveNames = {};
-    obj@Optic(name, inNames, outNames, driveNames);
 
     % deal with arguments
     errstr = 'Don''t know what to do with ';	% for argument error messages
@@ -54,6 +53,8 @@ classdef Waveplate < Optic
         % wrong number of input args
         error([errstr '%d input arguments.'], nargin);
     end
+    
+    obj@Optic(name, inNames, outNames, driveNames);
     % set lfw and theta
     obj.lfw = lfw;
     obj.theta = theta;
