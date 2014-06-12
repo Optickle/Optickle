@@ -3,9 +3,12 @@ classdef Optickle < handle
   %
   % opt = Optickle(vFrf, lambda)
   % vFrf - RF frequency components
-  % lambda - carrier wave length,
-  %          or base wavelengths for each RF component (default 1064 nm)
+  % lambda - carrier wave length (default 1064 nm)
+  %          or base wavelengths for each RF component
   % pol - polarization for each RF component (default is S)
+  %       this is a vector of the same length as vFrf
+  %       its values can be 1 for S or 0 for P.
+  %      -->  S == 1, P == 0  <--
   %
   % Class fields are:
   %
@@ -35,7 +38,7 @@ classdef Optickle < handle
   % Optics provide names, coupling coefficients, and basis
   % parameters for their input linkts.
   %
-  % Types of optics are listed below:
+  % Types of optics some common are listed below:
   %   Source - a field source (0 inputs, 1 output)
   %   Sink - a field sink, used for detectors (1 inputs, 0 output)
   %
@@ -202,7 +205,37 @@ classdef Optickle < handle
           vecVal(isMatch) = valByLambda(n, 1);
         end
       end        
-    end  
+    end
+
+    function mPhi = getPhaseMatrix(vLen, vFreq, vPhiLinks, mPhiFrf)
+      % phase matrix for tickle and sweep
+      %
+      % mPhi = getPhaseMatrix(vLen, vFreq, [vPhiLinks], [mPhiFrf])
+      % vPhiLinks is an additional (positive) phase for each link at all frequencies (Nlink x 1)
+      % mPhiFrf is an additional (positive) phase for each RF frequency (Nlink x Nrf)
+      %
+      % mPhi = getPhaseMatrix(vLen, vFreq, vPhiLinks, mPhiFrf)
+      
+      Nlink = numel(vLen);
+      Nrf = numel(vFreq);
+      
+      if nargin < 3 || isempty(vPhiLinks)
+        vPhiLinks = zeros(Nlink,1);
+      end
+      
+      if nargin < 4 || isempty(mPhiFrf)
+        mPhiFrf = zeros(Nlink,Nrf);
+      end
+      
+      v = exp(1i * (vLen(:) * vFreq(:).'...
+        + repmat(vPhiLinks, 1, Nrf)...
+        + mPhiFrf...
+        )... % close phases
+        ); % close exp
+      
+      N = numel(v(:));
+      mPhi = sparse(1:N, 1:N, v(:), N, N);
+    end
   end
   
 end      % classdef

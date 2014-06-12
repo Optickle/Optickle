@@ -1,7 +1,7 @@
 % getFieldMatrix method
 %   returns a mOpt, the field transfer matrix for this optic
 %
-% mOpt = getFieldMatrix(obj, par)
+% [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
 
 function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   
@@ -67,5 +67,4 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
     %rphi = exp(1i * par.k(n) * pos);
     %mOpt(nn, mm) = m * mDirIn * rphi;
   end
-
 end

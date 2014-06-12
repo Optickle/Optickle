@@ -11,9 +11,8 @@
 
 function mQuant = getNoiseMatrix(obj, pos, par)
   
-
+  % compute phases for getNoiseAmp
   pos = pos + obj.pos;		% mirror position, with offset
-
   phi = -2 * par.k * pos * cos(pi * obj.aoi / 180);
   
   % optic parametes as vectors for each field component

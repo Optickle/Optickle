@@ -1,5 +1,5 @@
 % getDriveMatrix method
-%   returns a matrix, (Nrf * obj.Nout) x (Nrf * obj.Nin) x Ndrive
+%   returns the drive coupling matrix, Nrf * (obj.Nout x obj.Nin)
 %
 % mCpl = getDriveMatrix(obj, pos, par)
 

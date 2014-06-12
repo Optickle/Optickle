@@ -130,12 +130,11 @@ classdef Mirror < Optic
           % wrong number of input args
           error([errstr '%d input arguments.'], nargin);
       end
-    end
-    
+    end   
     function [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
       % optic parametes as vectors for each field component
       %
-      % [vThr, vLhr, vRar, vLmd] = getVecProperties(obj)
+      % [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
       
       vThr = Optickle.mapByLambda(obj.Thr, lambda, pol);
       vLhr = Optickle.mapByLambda(obj.Lhr, lambda, pol);
