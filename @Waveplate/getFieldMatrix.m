@@ -28,7 +28,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
         for jj = 1:2
           for kk = 1:2
             if [vpol(n)+1,vpol(m)+1] == [jj,kk]
-              mOpt(n,m) = mJones(jj,kk)
+              mOpt(n,m) = mJones(jj,kk);
             end
           end
         end
