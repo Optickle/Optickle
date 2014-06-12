@@ -110,6 +110,76 @@ classdef Mirror < Optic
           error([errstr '%d input arguments.'], nargin);
       end
     end
+    
+    
+    %%%% Basis Methods %%%%
+
+    function qm = getBasisMatrix(obj)
+      % Compute basis transform matrix
+      %
+      % qm = getBasisMatrix(obj)
+      qm = planeConvex(OpHG, obj.aoi, obj.Chr, obj.Nmd);
+    end
+    function qxy = getFrontBasis(obj)
+      % qxy = getFrontBasis(obj)
+      %
+      % Return the complex basis x-y pair for the front input.
+      % see also @Mirror/setFrontBasis and @OpHG/apply
+      
+      if isempty(obj.dWaist) || ~isfinite(obj.dWaist)
+        % basis not determined
+        qxy = [];
+      elseif obj.Chr == 0
+        % flat mirror
+        if obj.dWaist ~= 0
+          error('%s: distance to waist specified for a flat mirror', ...
+            obj.Optic.name);
+        end
+        
+        % not wrong, but not helpful either
+        qxy = [];
+      elseif obj.aoi ~= 0
+        % mirror not a normal to beam... too hard, and not very useful
+        error('%s: distance to waist specified for angled mirror', ...
+          obj.Optic.name);
+      else
+        % curved mirror with distance specified
+        ROC = 1 / obj.Chr;
+        z = obj.dWaist;
+        z02 = (ROC - z) * z;
+        if z02 <= 0
+          error(['%s: Unable to match beam waist at distance %g ' ...
+            'to mirror with curvature %g.'], obj.Optic.name, z, obj.Chr);
+        end
+        z0 = sqrt(z02);
+        q = z - 1i * z0;
+        qxy = [q q];
+      end
+      
+    end
+    function obj = setFrontBasis(obj, dWaist)
+      % obj = setFrontBasis(obj, dWaist)
+      %
+      % Set the distance from the beam waist to the front
+      % input of this mirror.  For non-flat mirrors,
+      % the Rayleigh Range of the input beam is given by
+      %   z0 = sqrt(dWaist * (1/Chr - dWaist))
+      % The argument of the sqrt must be positive.
+      %
+      % This information need not be set for all mirrors, may not
+      % be set for mirrors with an angle of incidence not equal
+      % to zero (aoi ~= 0), and is generally only set for a few
+      % cavity mirrors.  Setting this for a flat mirror (Chr == 0)
+      % will result in an error for any value other than 0, and is
+      % not used in any case (as the beam is not constrained by
+      % this information).
+      %
+      % for general info about beam specification see beamRW, beamZ0, and cavHG
+      % for applications in Optickle, see @Optickle/setCavityBasis
+      
+      obj.dWaist = dWaist;
+    end
+    
   end
   
 end

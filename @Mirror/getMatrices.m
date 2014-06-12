@@ -6,7 +6,8 @@
 %
 % [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = getMatrices(obj, pos, par)
 
-function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = getMatrices(obj, pos, par)
+function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = ...
+  getMatrices(obj, pos, par)
 
   % optical field transfer matrix
   [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
