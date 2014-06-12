@@ -28,7 +28,7 @@ function mQuant = getNoiseMatrix(obj, pos, par)
 
       % get noise powers
       mNP = Mirror.getNoiseAmp(vThr(n), vLhr(n), vRar(n), ...
-        vLmd(n), phi(n), vin, par.minQuant);
+        vLmd(n), phi(n), obj.in, par.minQuant);
       
       % iteratively build a block diagonal matrix
       mNA = blkdiag(mNA, sqrt(mNP));
