@@ -201,8 +201,6 @@ classdef Mirror < Optic
   end  % methods
   
   methods (Static)
-    function vecVal = 
-    
     function mNP = getNoiseAmp(Thr, Lhr, Rar, Lmd, phi, in, minQuant)
       % mNP = getNoiseAmp(Thr, Lhr, Rar, Lmd, in, out)
       %
@@ -301,7 +299,6 @@ classdef Mirror < Optic
         mNP = [mNP, mNP1];
       end
     end
-
   end  % methods (Static)
   
 end
