@@ -89,6 +89,6 @@ function [fDC, sigDC] = sweep(opt, pos)
     end
 
     % compute DC outputs
-    sigDC(:, n) = real(mPrb * vDC) / 2;
+    sigDC(:, n) = real(mPrb * vDC);
     fDC(:, :, n) = reshape(vDC, Nlnk, Nrf);
   end

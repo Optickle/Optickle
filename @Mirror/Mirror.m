@@ -92,6 +92,9 @@ classdef Mirror < Optic
       %          0.5,  532e-9, 0];
       % Note that the wavelength must be specified, even if all
       % wavelengths used in the simulation are the same.
+      %
+      % Any wavelengths/polarizations with unspecified values
+      % will use the first value specified (e.g., Thr(1, 1)).
       
       % deal with no arguments
       if nargin == 0
@@ -129,6 +132,16 @@ classdef Mirror < Optic
       end
     end
     
+    function [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
+      % optic parametes as vectors for each field component
+      %
+      % [vThr, vLhr, vRar, vLmd] = getVecProperties(obj)
+      
+      vThr = Optickle.mapByLambda(obj.Thr, lambda, pol);
+      vLhr = Optickle.mapByLambda(obj.Lhr, lambda, pol);
+      vRar = Optickle.mapByLambda(obj.Rar, lambda, pol);
+      vLmd = Optickle.mapByLambda(obj.Lmd, lambda, pol);
+    end
     
     %%%% Hermite Gauss Basis %%%%
 

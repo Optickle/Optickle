@@ -11,6 +11,9 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   Nout = 4;				% obj.Nout
   pos = pos + obj.pos;		% mirror position, with offset
   
+  % optic parametes as vectors for each field component
+  [vThr, vLhr, vRar, vLmd] = obj.getVecProperties(par.lambda, par.pol);
+
   % dl/dx (non-zero for reflected fields)
   dldx = zeros(Nout, Nin);
   caoi = cos(pi * obj.aoi / 180);
@@ -28,11 +31,11 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   % ==== Compute for each RF component
   for n = 1:Nrf
     % amplitude reflectivities, transmissivities and phases
-    hr = -sqrt(1 - obj.Thr(n) - obj.Lhr(n));	% HR refl
-    ht =  sqrt(obj.Thr(n));			% HR trans
-    ar = -sqrt(obj.Rar(n));			% AR refl
-    at =  sqrt(1 - obj.Rar(n));		% AR trans
-    bt =  sqrt(1 - obj.Lmd(n));		% bulk trans
+    hr = -sqrt(1 - vThr(n) - vLhr(n));	% HR refl
+    ht =  sqrt(vThr(n));               % HR trans
+    ar = -sqrt(vRar(n));               % AR refl
+    at =  sqrt(1 - vRar(n));           % AR trans
+    bt =  sqrt(1 - vLmd(n));           % bulk trans
     
     % transmission combinations
     hrbt = -hr * bt;
