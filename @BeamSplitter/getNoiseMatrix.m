@@ -9,14 +9,16 @@
 
 function mQuant = getNoiseMatrix(obj, pos, par)
   
+  error('Broken!  Needs work.')
+
   pos = pos + obj.Optic.pos;		% mirror position, with offset
   phi = -2 * (2 * pi / par.lambda) * pos * cos(pi * obj.aoi / 180);
 
   % get noise powers
-  mNPa = getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi, ...
-    obj.Optic.in(1:2), par.minQuant);
-  mNPb = getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi, ...
-    obj.Optic.in(3:4), par.minQuant);
+  mNPa = Mirror.getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi, ...
+    obj.in(1:2), par.minQuant);
+  mNPb = Mirror.getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi, ...
+    obj.in(3:4), par.minQuant);
   mNP = blkdiag(mNPa, mNPb);
   
   % convert to noise amplitudes for all RF components

@@ -24,7 +24,7 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   for n = 1:par.Nrf
 
       % get noise powers
-      mNP = getNoiseAmp(obj.Thr(n), obj.Lhr(n), obj.Rar(n), ...
+      mNP = Mirror.getNoiseAmp(obj.Thr(n), obj.Lhr(n), obj.Rar(n), ...
         obj.Lmd(n), phi(n), obj.in, par.minQuant);
       
       % iteratively build a block diagonal matrix
