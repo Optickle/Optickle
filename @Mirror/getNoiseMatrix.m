@@ -16,6 +16,9 @@ function mQuant = getNoiseMatrix(obj, pos, par)
 
   phi = -2 * par.k * pos * cos(pi * obj.aoi / 180);
   
+  % optic parametes as vectors for each field component
+  [vThr, vLhr, vRar, vLmd] = obj.getVecProperties(par.lambda, par.pol);
+
   % Calculate noise powers for all rf components and put them in a
   % block-diagonal matrix
 
@@ -24,8 +27,8 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   for n = 1:par.Nrf
 
       % get noise powers
-      mNP = Mirror.getNoiseAmp(obj.Thr(n), obj.Lhr(n), obj.Rar(n), ...
-        obj.Lmd(n), phi(n), obj.in, par.minQuant);
+      mNP = Mirror.getNoiseAmp(vThr(n), vLhr(n), vRar(n), ...
+        vLmd(n), phi(n), vin, par.minQuant);
       
       % iteratively build a block diagonal matrix
       mNA = blkdiag(mNA, sqrt(mNP));

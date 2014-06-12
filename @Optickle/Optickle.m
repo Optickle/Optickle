@@ -175,6 +175,34 @@ classdef Optickle < handle
       end
       
     end
+    function vecVal = mapByLambda(valByLambda, lambda, pol)
+      % map values specified as [value, lambda] pairs
+      % to one value for each lambda
+      %
+      % vecVal = mapByLambda(valByLambda, lambda)
+      
+      % start with default value
+      vecVal = ones(size(lambda)) * valByLambda(1);
+      
+      % number of pairs and field components
+      Npair = size(valByLambda, 1);
+      
+      % decide how to map these... with pol or without?
+      if size(valByLambda, 2) == 2
+        % loop over pairs looking for wavelength matches
+        for n = 1:Npair
+          isMatch = valByLambda(n, 2) == lambda;
+          vecVal(isMatch) = valByLambda(n, 1);
+        end
+      elseif size(valByLambda, 2) == 3
+        % loop over pairs looking for wavelength and polarization matches
+        for n = 1:Npair
+          isMatch = valByLambda(n, 2) == lambda & ...
+            valByLambda(n, 3) == pol;
+          vecVal(isMatch) = valByLambda(n, 1);
+        end
+      end        
+    end  
   end
   
 end      % classdef

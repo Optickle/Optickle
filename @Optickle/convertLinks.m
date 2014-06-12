@@ -177,16 +177,17 @@ function linkPhiRf = getRfPhase(opt,link)
       linkPhiRf = phase*ones(size(linkPhiRf));
     case 2
       % phase for every lambda
+      linkPhiRf = Optickle.mapByLambda(phase, lambda);
       
       % loop through lambda
-      for jRf = 1:Nrf
-        % find the phase of this lambda
-        lamInd = find(abs(phase(:,1)-lambda(jRf))<smallNumberMeters,1);
-        
-        lamPhi = phase(lamInd,2);
-        
-        % now put this phase into the correct RF frequency index
-        linkPhiRf(jRf) = lamPhi;
-      end
+%       for jRf = 1:Nrf
+%         % find the phase of this lambda
+%         lamInd = find(abs(phase(:,1)-lambda(jRf))<smallNumberMeters,1);
+%         
+%         lamPhi = phase(lamInd,2);
+%         
+%         % now put this phase into the correct RF frequency index
+%         linkPhiRf(jRf) = lamPhi;
+%       end
   end
 end
