@@ -35,7 +35,7 @@ end
 
 function errorCount = checkForErrors(label, fieldNames, calcStruct, refStruct)
     errorCount = 0;
-    errorThreshold = 1e-14;
+    errorThreshold = 1e-10;
 
     for name = fieldNames
         try
@@ -47,7 +47,7 @@ function errorCount = checkForErrors(label, fieldNames, calcStruct, refStruct)
             error = max(errorMat(:));
             
             if error > errorThreshold
-                warning([label ' error is above threshold'])
+                warning([label ' error is ' num2str(error) ' in variable ' name{:}])
                 errorCount = errorCount + 1;
             end
         catch err
