@@ -17,7 +17,6 @@ function exitCond = testDetuneFP()
         exitCond = exitCond+1;
     end
     
-    
     %%% test DC calculations
     exitCond = exitCond + checkForErrors('DC',{'fDC0','fDC1','fDC2','sigDC0','sigDC1','sigDC2'},...
                    calculationStruct,referenceStruct);
