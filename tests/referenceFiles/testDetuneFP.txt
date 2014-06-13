@@ -1,0 +1,5 @@
+Optickle test reference data
+----------------------------
+Test function: testDetuneFP
+Path to Optickle: /home/nicolas/tmp/Optickle/@Optickle/Optickle.m
+Run on: 13-Jun-2014 12:19:11
