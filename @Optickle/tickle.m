@@ -171,7 +171,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % get both upper and lower sidebands
   aQuantMatrix = diag([aQuantTemp(:);aQuantTemp(:)]); 
   mQuant = aQuantMatrix * mQuant;
-  
+  whos
   % compile probe shot noise vector
   shotPrb = zeros(Nprb, 1);
   
