@@ -5,7 +5,7 @@
 function outstruct = testDetuneFP()
 
     % create the model
-    opt = optFP;
+    opt = testOptFP;
 
     % get some drive indexes
     nEX = getDriveIndex(opt, 'EX');
