@@ -7,7 +7,6 @@ function mOpt = getFieldMatrix(obj, pos, par)
 
   % constants
   Nrf = par.Nrf;
-  vFrf = par.vFrf;
   vKrf = par.k;
   vpol = par.pol;
   fMod = obj.fMod;
@@ -25,7 +24,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
       % only bother with same polarization fields
       if vpol(n) == vpol(m)
         % frequency differences (including wavelength differences)
-        df = abs(vKrf(m) - vKrf(n)) * LIGHTSPEED / (2*pi);
+        df = abs(vKrf(m) - vKrf(n)) * LIGHT_SPEED / (2*pi);
         n_df = round(df / fMod);
         r_df = abs(df - n_df * fMod);
         if r_df < 1e-3 && n_df ~= 0
@@ -35,7 +34,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
           end
         elseif r_df < 1 && n_df ~= 0
           warning(['Modulation frequency near-miss for RFmodulator %s ' ...
-            'with RF components %d and %d.'], obj.Optic.name, n, m)
+            'with RF components %d and %d.'], obj.name, n, m)
         end
       end
     end
