@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.13 (TeX Live 2012/W32TeX) (format=pdflatex 2012.8.18)  12 JUN 2014 12:02
+This is pdfTeX, Version 3.1415926-2.5-1.40.13 (TeX Live 2012/W32TeX) (format=pdflatex 2012.8.18)  13 JUN 2014 15:50
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -837,12 +837,12 @@ by the co-propagating
 LaTeX Warning: Reference `eqn:force' on page 14 undefined on input line 710.
 
 [14] [15]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 800.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 804.
  [16]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 800.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 804.
  (./Optickle2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 800.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 800.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 804.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 804.
 Package rerunfilecheck Info: File `Optickle2.out' has not changed.
 (rerunfilecheck)             Checksum: 37C47E6DDDD31E25C06CD94A31F5548F;852.
 
@@ -852,7 +852,7 @@ LaTeX Warning: There were undefined references.
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 800.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 804.
  ) 
 Here is how much of TeX's memory you used:
  15894 strings out of 493488
@@ -875,7 +875,7 @@ c:/w32tex/share/texmf/fonts/type1/public/amsfonts/cm/cmsy6.pfb><c:/w32tex/share
 pe1/public/amsfonts/symbols/msbm10.pfb><c:/w32tex/share/texmf/fonts/type1/urw/t
 imes/utmb8a.pfb><c:/w32tex/share/texmf/fonts/type1/urw/times/utmr8a.pfb><c:/w32
 tex/share/texmf/fonts/type1/urw/times/utmri8a.pfb>
-Output written on Optickle2.pdf (16 pages, 235012 bytes).
+Output written on Optickle2.pdf (16 pages, 235091 bytes).
 PDF statistics:
  311 PDF objects out of 1000 (max. 8388607)
  273 compressed objects within 3 object streams
