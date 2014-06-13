@@ -11,7 +11,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
   else
     % account for RF propagation phase
     d = sum(obj.df(:, 1));
-    v = exp(1i * d * par.vFrf);
+    v = exp(1i * d * par.k);
     
     % send inputs to outputs
     mOpt = sparse(diag(v));
