@@ -93,7 +93,6 @@ classdef OptickleTest < matlab.unittest.TestCase
             testCase.verifyWarningFree(funHandle);
         end
         function warnOnMatrixFieldsInequalityInStruct(testCase,label, fieldNames)
-            errorCount = 0;
             % precision is the product of these two numbers
             errorThreshold = 1e-6;
             smallNumber = 1e-12;
@@ -124,7 +123,6 @@ classdef OptickleTest < matlab.unittest.TestCase
                     [ind{1:dim}] = ind2sub(size(errorMat),find(errorMat == max(errorMat(:)),1));
                     warning([label ' error is ' num2str(error) ' at index ['...
                         cell2CommaSeparatedString(ind) '] in variable ' name{:}])
-                    errorCount = errorCount + 1;
                 end
             end
         end
