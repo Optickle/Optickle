@@ -25,5 +25,4 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
     mm = (1:Nin) + Nin * (n - 1);
     mCpl(nn, mm) = mOpt(nn, mm) .* drp;
   end
-
 end
