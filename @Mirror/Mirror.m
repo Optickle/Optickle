@@ -255,7 +255,7 @@ classdef Mirror < Optic
       atbt =  at * bt;
       tbo = atbt * hrbt;
       
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Build noise power matrix
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Build noise amplitude matrix
       mNP = zeros(4, 0);
       
       if Lhr ~= 0
@@ -298,18 +298,7 @@ classdef Mirror < Optic
         mNP1 = [0; 0; 1; 0];
         mNP2 = [0; 0; 0; 1];
         mNP = [mNP, mNP1, mNP2];
-      end
-      
-      % add power from open inputs
-      if in(1) == 0
-        mNP1 = [hrf; atbt * ht; 0; tbo * arbt * ht];
-        mNP  = [mNP, mNP1];
-      end
-      
-      if in(2) == 0
-        mNP1 = [htbt * at; tbo * at; arf; tbo * arbt * hrbt * at];
-        mNP = [mNP, mNP1];
-      end
+      end      
     end
   end  % methods (Static)
   
