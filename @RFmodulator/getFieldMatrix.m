@@ -7,7 +7,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
 
   % constants
   Nrf = par.Nrf;
-  vKrf = par.k;
+  vNu = par.nu;
   vpol = par.pol;
   fMod = obj.fMod;
   aMod = obj.aMod;
@@ -24,12 +24,12 @@ function mOpt = getFieldMatrix(obj, pos, par)
       % only bother with same polarization fields
       if vpol(n) == vpol(m)
         % frequency differences (including wavelength differences)
-        df = (vKrf(m) - vKrf(n)) * LIGHT_SPEED / (2*pi);        
+        df = vNu(m) - vNu(n);        
         n_df = round(df / fMod);
         r_df = df - n_df * fMod;
         
         % check for match
-        [isMatch, isClose] = Optickle.isSameFreq(r_df);
+        [isMatch, isClose] = Optickle.isSameFreq(r_df,0);
         
         if isMatch && n_df ~= 0
           mOpt(m, n) = besselj(n_df, imag(aMod)) * 1i^n_df;
