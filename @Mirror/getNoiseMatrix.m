@@ -11,23 +11,25 @@
 
 function mQuant = getNoiseMatrix(obj, pos, par)
   
-
+  % compute phases for getNoiseAmp
   pos = pos + obj.pos;		% mirror position, with offset
-
   phi = -2 * par.k * pos * cos(pi * obj.aoi / 180);
   
+  % optic parametes as vectors for each field component
+  [vThr, vLhr, vRar, vLmd] = obj.getVecProperties(par.lambda, par.pol);
+
   % Calculate noise powers for all rf components and put them in a
   % block-diagonal matrix
 
   % Loop over rf frequencies (which now include other wavelengths)
-  mNA = []; % should pre-allocate and/or avoid loop
-  for iLoop = 1:par.Nrf
+  mNA = []; % should pre-allocate index in for more speed
+  for n = 1:par.Nrf
 
       % get noise powers
-      mNP = getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi(iLoop), ...
-                                 obj.in, par.minQuant);
+      mNP = Mirror.getNoiseAmp(vThr(n), vLhr(n), vRar(n), ...
+        vLmd(n), phi(n), obj.in, par.minQuant);
       
-      
+      % iteratively build a block diagonal matrix
       mNA = blkdiag(mNA, sqrt(mNP));
   end
 

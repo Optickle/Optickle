@@ -31,7 +31,9 @@ function [fDC, sigDC] = sweep(opt, pos)
 
   % link converstion
   [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
-  mPhi = getPhaseMatrix(vLen, vFrf, [], mPhiFrf);	% propagation phase matrix
+  
+  % propagation phase matrix
+  mPhi = Optickle.getPhaseMatrix(vLen, vFrf, [], mPhiFrf);
 
   % parameters for construction
   par = getOptParam(opt);
@@ -89,6 +91,6 @@ function [fDC, sigDC] = sweep(opt, pos)
     end
 
     % compute DC outputs
-    sigDC(:, n) = real(mPrb * vDC) / 2;
+    sigDC(:, n) = real(mPrb * vDC);
     fDC(:, :, n) = reshape(vDC, Nlnk, Nrf);
   end

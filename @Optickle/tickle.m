@@ -108,9 +108,11 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % reshaped and returned in a matrix fDC, which is Nlnk x Nrf.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+  % propagation phase matrix
+  mPhi = Optickle.getPhaseMatrix(vLen, vFrf, [], mPhiFrf);
+
   % compute DC fields
   eyeNfld = speye(Nfld);			% a sparse identity matrix
-  mPhi = getPhaseMatrix(vLen, vFrf, [], mPhiFrf);		% propagation phase matrix
   vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
 
   % compile system wide probe matrix 
@@ -234,8 +236,8 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     fAudio = f(nAF);
 
     % propagation phase matrices
-    mPhim = getPhaseMatrix(vLen, vFrf - fAudio,[],mPhiFrf);
-    mPhip = getPhaseMatrix(vLen, vFrf + fAudio,[],mPhiFrf);
+    mPhim = Optickle.getPhaseMatrix(vLen, vFrf - fAudio, [], mPhiFrf);
+    mPhip = Optickle.getPhaseMatrix(vLen, vFrf + fAudio, [], mPhiFrf);
     mPhi = blkdiag(mPhip,conj(mPhim));
     
     % mechanical response matrix
@@ -335,3 +337,4 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   if isOut_tfAC && nargout > 0
     varargout{nargout} = tfACout;
   end
+end

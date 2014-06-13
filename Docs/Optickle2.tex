@@ -8,12 +8,9 @@
 %\usepackage{units}
 %\usepackage{braket}
 
-%\usepackage[pdftex]{color}
-%\usepackage[pdftex]{graphicx}
-%\usepackage[pdftex,colorlinks=true,linkcolor=black,pdfview=FitH,pdfstartview=FitH]{hyperref}
-\usepackage[dvipdfm]{color}
-\usepackage[dvipdfm]{graphicx}
-\usepackage[dvipdfm,colorlinks=true,linkcolor=black,pdfview=FitH,pdfstartview=FitH]{hyperref}
+\usepackage[pdftex]{color}
+\usepackage[pdftex]{graphicx}
+\usepackage[pdftex,colorlinks=true,linkcolor=black,pdfview=FitH,pdfstartview=FitH]{hyperref}
 
 \usepackage[font=small]{caption}
 \usepackage{sidecap}
@@ -388,7 +385,7 @@ The modulation of each incoming and outgoing power by the co-propagating DC fiel
 Converting this expression to trigonometric form
 \beqa{power-force_trig}
  P_X &=& \real{ \tilde{P}_X } \fcos{\Omega t} + \imag{\tilde{P}_X } \fsin{\Omega t} \\
-\tilde{P}_X &=& 2 \( E_{DC_X}^* E_{+_X} + E_{DC_X} E_{-_X}^* \)
+\tilde{P}_X &=& 2 \( E_{DC_X}^* E_{+_X} + E_{DC_X} E_{-_X}^* \) \elabel{tildePX}
 \eeqa
 
 For the $n^{th}$ optic we can compute $E_{DC}$ at the outputs, given the inputs, with the field
@@ -704,11 +701,12 @@ AC signals, on the other hand, are products between DC and audio frequency field
 
 \subsection{DC Signals}
 To compute the DC signals, we start with an expression for the intensity present at a given FEP,
-\begin{equation}
-I = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
+\begin{eqnarray}
+I &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{i 2 \pi [\nu + \vFrf(n)] t}  \right|^2 \\
+ &=& \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
  E^*_{DC_n} E_{DC_m} e^{i 2 \pi (\vFrf(m) - \vFrf(n)) t}
 \elabel{intensity}
-\end{equation}
+\end{eqnarray}
 where $E_{DC_n}$ is the field amplitude of the $n^{th}$ RF component, with the RF phase rotation factored out (much like equation \eref{force} for field induced forces).
 
 Requiring that the output be at the demodulation frequency $f_{demod}$, such that the integral
@@ -739,13 +737,25 @@ where the probe's matrix expresses the delta function in equation \eref{sigDC} a
 and $\mPrbInn{k}$ is the input map for the probe.
 
 \subsection{AC Signals}
-AC signal computation follows a very similar path.
+AC signal computation follows a very similar path. Intensity present at a given FEP is
+\begin{eqnarray}
+I &=& \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{i 2 \pi [\nu + \vFrf(n)] t} + E_{+_n} e^{i 2 \pi [\nu + \vFrf(n) + f_{\rm audio}] t} \right. \right. \nonumber \\
+  & & \left. \left.+ E_{-_n} e^{i 2 \pi [\nu + \vFrf(n) - f_{\rm audio}] t} \right) \right|^2 \\
+ &=& \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1} Re \left[ E^*_{DC_n} E_{-_m} e^{i 2 \pi (\vFrf(m) - \vFrf(n) - f_{\rm audio} ) t} \right. \nonumber \\
+ & & \left. E_{DC_n} E_{+_m}^{*} e^{i 2 \pi (-\vFrf(m) + \vFrf(n) - f_{\rm audio} ) t} \right] .
+\elabel{intensity}
+\end{eqnarray}
 The audio frequency signal present at a given FEP is
 \begin{equation}
 S_{AC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
-(E^*_{DC_n} E_{-_m} \delta_{n,m} + E_{DC_n} E^*_{+_m} \delta_{m,n} ) .
+Re[ \tilde{S}_{AC} ] \cos{(2 \pi f_{\rm audio} t)} + Im[ \tilde{S}_{AC} ] \sin{(2 \pi f_{\rm audio} t)}
 \elabel{sac}
 \end{equation}
+where
+\begin{equation}
+\tilde{S}_{AC} = 2 (E^*_{DC_n} E_{-_m} \delta_{n,m} + E_{DC_n} E^*_{+_m} \delta_{m,n})
+\end{equation}
+(see, also, equation \eref{tildePX}).
 The overall probe matrix is constructed from the individuals row at a time according to
 \begin{equation}
 \mPrb(k,:) =
