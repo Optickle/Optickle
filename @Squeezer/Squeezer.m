@@ -85,7 +85,7 @@ classdef Squeezer < Optic
     obj@Optic(name, inNames, outNames, driveNames);
 
     % deal with arguments
-    errstr = 'Don''t know what to do with ';	% for argument error messages
+    errstr = 'Don''t know what to do with '; % for argument error messages
     switch( nargin )
       case 0					% default constructor, do nothing
       case {1, 2, 3, 4, 5, 8}
@@ -94,7 +94,7 @@ classdef Squeezer < Optic
         args(1:(nargin-1)) = varargin(1:end);
         if nargin==8 
           if varargin(end)==1
-            [obj.lambda, obj.fRF, obj.pol, obj.sqzAng, obj.x,...
+            [obj.lambda, obj.fRF, obj.pol, obj.sqAng, obj.x,...
               obj.escEff, obj.sqzOption] = deal(args{1:(nargin-1)});
             %Calculate the level of squeezing and antisqueezing from x and
             %escEff
@@ -102,7 +102,7 @@ classdef Squeezer < Optic
             obj.antidB = 20*log10(1+4*obj.x*obj.escEff/(1-obj.x)^2);
           else  
             %The user is inputting the level of squeeizng and antisqueezing
-            [obj.lambda, obj.fRF, obj.pol, obj.sqzAng, obj.sqdB,...
+            [obj.lambda, obj.fRF, obj.pol, obj.sqAng, obj.sqdB,...
               obj.antidB, obj.sqzOption] = deal(args{1:(nargin-1)});
             Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
             Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
@@ -111,8 +111,8 @@ classdef Squeezer < Optic
             obj.escEff = (1-Vs)*(1+obj.x)^2/(4*x);
           end
         else
-          [obj.lambda, obj.fRf, obj.pol, obj.sqzAng, obj.sqdB, ...
-             obj.antidB, obj.x, obj.escEff, obj.sqzOption ] = deal(args{:});
+          [obj.lambda, obj.fRF, obj.pol, obj.sqAng, obj.sqdB, ...
+             obj.antidB, obj.x, obj.escEff, obj.sqzOption] = deal(args{:});
         end
       otherwise
         % wrong number of input args

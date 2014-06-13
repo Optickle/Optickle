@@ -6,11 +6,13 @@
 %
 % In this, the squeezer implementation, there is 1 loss
 % point where noise enters.  This loss = 1-escape_efficiency 
+% Sidebands are added only for the Wavelength, RF frequency, and
+% polarization which is squeezed by the Squeezer.  
 
 function mQuant = getNoiseMatrix(obj, pos, par)
   
   % noise powers
-  loss = obj.loss;
+  loss = 1-obj.escEff;
   if loss > par.minQuant
     mNP = loss;
   else
