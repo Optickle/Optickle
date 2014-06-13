@@ -1,20 +1,19 @@
 % getDriveMatrix method
 %   returns a sparse matrix, Nrf * (obj.Nout x obj.Nin)
 %
-% mDrv = getDriveMatrix(obj, pos, par)
+% mCpl = getDriveMatrix(obj, pos, par)
 
-function mDrv = getDriveMatrix(obj, pos, par)
+function mCpl = getDriveMatrix(obj, pos, par)
   
   % constants
   Nrf = par.Nrf;
-
-  % constants
-  Nrf = par.Nrf;
-  vFrf = par.vFrf;
+  vKrf = par.k;
+  vpol = par.pol;
   fMod = obj.fMod;
   aMod = real(obj.aMod);
   pMod = imag(obj.aMod);
-
+  LIGHT_SPEED = Optickle.c;
+  
   % loop over RF components
   mPhi = zeros(Nrf, Nrf);
   mAmp = zeros(Nrf, Nrf);
@@ -27,24 +26,32 @@ function mDrv = getDriveMatrix(obj, pos, par)
     % loop over RF components again to look for RF frequency matches
     %   most of this is copied from getFieldMatrix
     for m = 1:Nrf
-      df = vFrf(m) - vFrf(n);
-      n_df = round(df / fMod);
-      r_df = abs(df - n_df * fMod);
-      if r_df < 1e-3 && n_df ~= 0
-	% phase and amplitude audio SBs on RF phase modulation
-        mPhi(m, n) = besselj(n_df, pMod) * 1i^n_df * n_df / 2;
-        mAmp(m, n) = dbessel(n_df, pMod) * 1i^n_df / 2;
+      % only bother with same polarization fields
+      if vpol(n) == vpol(m)
+        % frequency differences (including wavelength differences)
+        df = (vKrf(m) - vKrf(n)) * LIGHT_SPEED / (2*pi);        
+        n_df = round(df / fMod);
+        r_df = df - n_df * fMod;
 
-	% phase and amplitude audio SBs on RF amplitude modulation
-	if n_df == 1 || n_df == -1
-	  mPhi(m, n) = mPhi(m, n) + n_df * aMod / 4;
-	  mAmp(m, n) = mAmp(m, n) + aMod / 4;
+        % check for match
+        [isMatch, isClose] = Optickle.isSameFreq(r_df);
+        
+        if isMatch && n_df ~= 0
+  	      % phase and amplitude audio SBs on RF phase modulation
+          mPhi(m, n) = besselj(n_df, pMod) * 1i^n_df * n_df / 2;
+          mAmp(m, n) = dbessel(n_df, pMod) * 1i^n_df / 2;
+	      if n_df == 1 || n_df == -1
+	        mPhi(m, n) = mPhi(m, n) + n_df * aMod / 4;
+	        mAmp(m, n) = mAmp(m, n) + aMod / 4;
+          end
         end
       end
     end
   end
 
   % build drive matrix
-  mDrv = zeros(Nrf, Nrf, 2);
-  mDrv(:, :, 1) = mAmp;
-  mDrv(:, :, 2) = 1i * mPhi;
+  mCpl = zeros(Nrf, Nrf, 2);
+  mCpl(:, :, 1) = mAmp;
+  mCpl(:, :, 2) = 1i * mPhi;
+  
+  mCpl
