@@ -147,6 +147,172 @@ classdef Optickle < handle
       opt.k = 2 * pi * (1 ./ opt.lambda + opt.vFrf / opt.c);
       
     end
+    
+    %%%% Add Optics %%%%
+    
+    function [opt, sn] = addBeamSplitter(opt, name, varargin)
+      % [opt, sn] = addBeamSplitter(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
+      %
+      % ===> Do not waste time with BeamSplitters <===
+      % A BeamSplitter is a 4 input, 8 output object designed to be used
+      % where fields propagating in opposite directions overlap on the same
+      % optic (e.g., in an interferometer).  If you are simply splitting a
+      % beam among detectors you need only one input and 2 outputs, so a
+      % Mirror object is sufficient, will reduce complexity as it does not
+      % have A and B sides, and will save computation time.  Typically, an
+      % interferometer simulation requires only a few BeamSplitter objects
+      % (e.g., 1), and none of them are in the readout!
+      %
+      % aio - angle of incidence (in degrees)
+      % Chr - curvature of HR surface (Chr = 1 / radius of curvature)
+      % Thr - power transmission of HR surface
+      % Lhr - power loss on reflection from HR surface
+      % Rar - power reflection of AR surface
+      % Nmd - refractive index of medium (1.45 for fused silica, SiO2)
+      % Lmd - power loss in medium (one pass)
+      %
+      % see BeamSplitter and Mirror for more information
+      
+      obj = BeamSplitter(name, varargin{:});
+      [opt, sn] = addOptic(opt, obj);
+    end
+    function [opt, sn] = addGouyPhase(opt, name, varargin)
+      % [opt, sn] = addGouyPhase(opt, name, phi)
+      %   Add a Gouy phase adjuster to the model.
+      %
+      % phi - Gouy phase in radians
+      %
+      % see also GouyPhase and setGouyPhase
+      
+      obj = GouyPhase(name, varargin{:});
+      [opt, sn] = addOptic(opt, obj);
+    end
+    function [opt, sn] = addMirror(opt, name, varargin)
+      % [opt, sn] = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
+      %   Add a mirror to the model.
+      %
+      % aio - angle of incidence (in degrees)
+      % Chr - curvature of HR surface (Chr = 1 / radius of curvature)
+      % Thr - power transmission of HR suface
+      % Lhr - power loss on reflection from HR surface
+      % Rar - power reflection of AR surface
+      % Nmd - refractive index of medium (1.45 for fused silica, SiO2)
+      % Lmd - power loss in medium (one pass)
+      %
+      % see Mirror for more information
+      
+      obj = Mirror(name, varargin{:});
+      [opt, sn] = addOptic(opt, obj);
+    end
+    function [opt, sn] = addModulator(opt, name, varargin)
+      % [opt, sn] = addModulator(opt, name, cMod)
+      %   Add a modulator to the model.
+      %
+      % name - name of this optic
+      % cMod - modulation coefficient (1 for amplitude, i for phase)
+      %        this must be either a scalar, which is applied to all RF
+      %        field components, or a vector giving coefficients for each
+      %        RF field component.
+      %
+      % Modulators can be used to modulate a beam.  These are not for
+      % continuous modulation (i.e., for making RF sidebands), but rather
+      % for measuring transfer functions (e.g., for frequency or intensity
+      % noise couplings).
+      %
+      % see Modulator for more information
+      
+      obj = Modulator(name, varargin{:});
+      [opt, sn] = addOptic(opt, obj);
+    end
+    function [opt, sn] = addRFmodulator(opt, name, fMod, aMod)
+      % [opt, sn] = addRFmodulator(opt, name, fMod, aMod)
+      %   Add an RF modulator to the model.
+      %
+      % name - name of this optic
+      % fMod - modulation frequency
+      % aMod - modulation index (imaginary for phase, real for amplitude)
+      %
+      % see RFModulator for more information
+      
+      obj = RFmodulator(name, fMod, aMod);
+      [opt, sn] = addOptic(opt, obj);
+    end
+    function [opt, sn] = addSink(opt, name, varargin)
+      % [opt, sn] = addSink(opt, name, loss)
+      %   Add a sink to the model.
+      %
+      % loss - power loss from input to output (default = 1)
+      %
+      % Sinks can be used as place holders for probes, or as
+      % beam attenuators when loss < 1.  See optFP for examples.
+      
+      obj = Sink(name, varargin{:});
+      [opt, sn] = addOptic(opt, obj);
+    end
+    function [opt, sn] = addSqueezer( opt, name, varargin )
+      % [opt, sn] = addSqueezer(opt, name, loss, sqAng, sqdB)
+      %
+      % Parameters:
+      %
+      % loss - This represents the escape efficiency of the OPO
+      %   (1-loss = escape efficiency)
+      % sqAng - squeezing angle
+      % sqdB - amount of squeezing in dB with perfect escape efficiency
+      %
+      % See squeezer for more options
+      
+      obj = Squeezer(name, varargin{:});
+      [opt, sn] = addOptic(opt, obj);
+    end
+    function [opt, sn] = addTelescope(opt, name, varargin)
+      % [opt, sn] = addTelescope(opt, name, f)
+      % [opt, sn] = addTelescope(opt, name, f, df)
+      %   Add a Telescope to the model.
+      %
+      % name - name of this optic
+      % f - focal length of first lens
+      % df - distances from previous lens and lens focal length
+      %      for lenses after the first
+      %
+      % see Telescope for more information
+      
+      obj = Telescope(name, varargin{:});
+      [opt, sn] = addOptic(opt, obj);
+    end
+    function [opt, sn] = addWaveplate(opt, name, lfw, theta)
+      % [opt, sn] = addWaveplate(opt, name, lfw, theta)
+      %   Add an waveplate to the model.
+      %
+      % name - name of this optic
+      % lfw - fraction of wave
+      % theta - rotation angle
+      %
+      % see Waveplate for more information
+      
+      obj = Waveplate(name, lfw, theta);
+      [opt, sn] = addOptic(opt, obj);
+    end
+    
+    function [opt, sn] = addOptic(opt, obj)
+      % Add a general optic to the model.
+      %
+      % [opt, sn] = addOptic(opt, obj)
+      %
+      % This function is generally not used directly.  Use the add functions
+      % for specific types of optics instead (e.g., addMirror).
+      %
+      % see also addBeamSplitter, addMirror, addModulator, addSink, addSource, etc.
+      
+      % increment optic serial number
+      sn = opt.Noptic + 1;
+      opt.Noptic = sn;
+      
+      % add optic with new serial number and drive indices
+      opt.optic{sn, 1} = setSN(obj, sn, opt.Ndrive);
+      
+      % update drive counter
+      opt.Ndrive = opt.Ndrive + obj.Ndrive;
+    end
   end    % methods
   
   methods (Static)
