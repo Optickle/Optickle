@@ -116,20 +116,31 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
 
   % compile system wide probe matrix 
-  mPrb = sparse(Nprb, Narf);
-  mPrbQ = sparse(Nprb, Nfld);
+  mPrb = zeros(Nprb, Narf);
+  mPrbQ = zeros(Nprb, Nfld);
   for k = 1:Nprb
     mIn_k = prbList(k).mIn;
     mPrb_k = prbList(k).mPrb;
     
-    vDCin = mIn_k * vDC;
-    mPrb(k, 1:Nfld) = (mPrb_k * conj(vDCin)).' * mIn_k;
-    mPrb(k, (1:Nfld) + Nfld) = (mPrb_k.' * vDCin).' * mIn_k;
+    % conjugate transpose of DC fields on this probe
+    vDCinCT = (mIn_k * vDC)';
+    
+    % DC and upper audio SB part of mPrb
+    mPrb(k, 1:Nfld) = vDCinCT * mPrb_k * mIn_k;
+    
+    % lower audio SB part of mPrb
+    mPrb(k, (1:Nfld) + Nfld) = conj(mPrb(k, 1:Nfld));
     
     % quad phase signals, for oscillator phase noise
+    %  since we only compute the Q DC signals, we don't need
+    %  the lower audio SB part
     mPrbQ_k = prbList(k).mPrbQ;
-    mPrbQ(k, :) = (mPrbQ_k * conj(vDCin)).' * mIn_k;
+    mPrbQ(k, :) = vDCinCT * mPrbQ_k * mIn_k;
   end
+  
+  % make them sparse matrices
+  mPrb = sparse(mPrb);
+  mPrbQ = sparse(mPrbQ);
   
   %%%%% compute DC outputs
   % sigDC is already real, but use "real" to remove numerical junk
@@ -192,7 +203,8 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
       % for each dc component
       vDCinShot = mIn_k * vDC;
       
-      shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * (pQuant .* abs(vDCinShot).^2); %CHECK
+      shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * ...
+        (pQuant .* abs(vDCinShot).^2);
     end
   end
   
@@ -255,14 +267,14 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
     end
     
     % extract optic to probe transfer functions
-    sigAC(:, :, nAF) = 2 * mPrb * tfAC(jAsb, :);   % CHECK
+    sigAC(:, :, nAF) = 2 * mPrb * tfAC(jAsb, :);
     mMech(:, :, nAF) = tfAC(jDrv, :);
     
     if isNoise
       %%%% With Quantum Noise
       mQinj = [mPhi * mQuant;  mQOz];
       mNoise = (eyeNdof - mDof) \ mQinj;
-      noisePrb = mPrb * mNoise(jAsb, :);   % CHECK
+      noisePrb = mPrb * mNoise(jAsb, :);
       noiseDrv = mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise

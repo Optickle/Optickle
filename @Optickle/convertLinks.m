@@ -9,7 +9,7 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
   % === Field Info
   vFrf = getSourceInfo(opt);
   vKrf = opt.k;
-  smallWaveNumber = 100e-3*2*pi/Optickle.c; % corresponds to 100mHz
+  kToF = Optickle.c / (2 * pi); % convert wavenumber to frequency
   
   % ==== Sizes of Things
   Nopt = opt.Noptic;			% number of optics
@@ -37,7 +37,7 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   lnks = opt.link;
-  vLen = 2 * pi  * [lnks.len]' / opt.c;  
+  vLen = 2 * pi  * [lnks.len]' / Optickle.c;  
   
   % additional phase matrix for each RF frequency
   
@@ -45,7 +45,6 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
 
   for jLink = 1:Nlnk
     mPhiFrf(jLink,:) = getRfPhase(opt,lnks(jLink));
-    
   end
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,8 +64,8 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
   % loop over probes
   for jPrb = 1:Nprb
     prb = opt.probe(jPrb);
-    phi = exp(1i * pi * prb.phase / 180) / 2;
-    phi_quad = exp(1i * pi * (prb.phase + 90) / 180) / 2;
+    phi = exp(1i * pi * prb.phase / 180);
+    phi_quad = exp(1i * pi * (prb.phase + 90) / 180);
 
     % loop over RF components (wave numbers)
     for n = 1:Nrf
@@ -79,22 +78,29 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
         if opt.pol(n) == opt.pol(m)
           
           % wave number differences
-          dk_p = abs(vKrf(m) - vKrf(n) + 2*pi*prb.freq/Optickle.c);
-          dk_m = abs(vKrf(m) - vKrf(n) - 2*pi*prb.freq/Optickle.c);
-          if dk_p < smallWaveNumber && dk_m < smallWaveNumber
+          df_p = kToF * (vKrf(m) - vKrf(n)) + prb.freq;
+          df_m = kToF * (vKrf(m) - vKrf(n)) - prb.freq;
+          
+          % check for matches
+          [isMatch_p, isClose_p] = Optickle.isSameFreq(df_p);
+          [isMatch_m, isClose_m] = Optickle.isSameFreq(df_m);
+          
+          % fill matrix with matches
+          if isMatch_p && isMatch_m
             if prb.phase ~= 0
               warning('Non-zero demod phase for DC probe %k ignored.', jPrb)
             end
             prbList(jPrb).mPrb(m, n) = 1;
-          elseif dk_p < smallWaveNumber
-            prbList(jPrb).mPrb(m, n) = phi;
-            prbList(jPrb).mPrbQ(m, n) = phi_quad;
-          elseif dk_m < smallWaveNumber
-            prbList(jPrb).mPrb(m, n) = conj(phi);
-            prbList(jPrb).mPrbQ(m, n) = conj(phi_quad);
-          elseif dk_p < smallWaveNumber*1e3 || dk_m < smallWaveNumber*1e3
-            disp(dk_p)
-            disp(dk_m)
+          elseif isMatch_p
+            % upper RF match
+            prbList(jPrb).mPrb(m, n) = phi / 2;
+            prbList(jPrb).mPrbQ(m, n) = phi_quad / 2;
+          elseif isMatch_m
+            % lower RF match
+            prbList(jPrb).mPrb(m, n) = conj(phi) / 2;
+            prbList(jPrb).mPrbQ(m, n) = conj(phi_quad) / 2;
+          elseif isClose_p || isClose_m
+            disp([df_p, df_m])
             warning(['Demodulation frequency near-miss for probe %s ' ...
               'with RF components %d and %d.'], getProbeName(opt,jPrb), n, m)
           end

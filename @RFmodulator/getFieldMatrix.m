@@ -24,15 +24,19 @@ function mOpt = getFieldMatrix(obj, pos, par)
       % only bother with same polarization fields
       if vpol(n) == vpol(m)
         % frequency differences (including wavelength differences)
-        df = abs(vKrf(m) - vKrf(n)) * LIGHT_SPEED / (2*pi);        
+        df = (vKrf(m) - vKrf(n)) * LIGHT_SPEED / (2*pi);        
         n_df = round(df / fMod);
-        r_df = abs(df - n_df * fMod);
-        if r_df < 1e-1 && n_df ~= 0
+        r_df = df - n_df * fMod;
+        
+        % check for match
+        [isMatch, isClose] = Optickle.isSameFreq(r_df);
+        
+        if isMatch && n_df ~= 0
           mOpt(m, n) = besselj(n_df, imag(aMod)) * 1i^n_df;
           if n_df == 1 || n_df == -1
             mOpt(m, n) = mOpt(m, n) + real(aMod) / 2;
           end
-        elseif r_df < 1 && n_df ~= 0
+        elseif isClose && n_df ~= 0
           warning(['Modulation frequency near-miss for RFmodulator %s ' ...
             'with RF components %d and %d.'], obj.name, n, m)
         end

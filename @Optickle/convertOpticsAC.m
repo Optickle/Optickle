@@ -93,8 +93,13 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       % mechanical response list
       lResp = lResp + lResp_n * mDrv.';
       
+      % account for unconnected inputs
+      isCon = obj.in == 0;
+      isConRF = repmat(isCon(:), 2 * Nrf, 1);
+      mQuantCon_n = mOpt_n(:, isConRF);  % vacuum from disocnnected inputs
+      
       % accumulate noises (removing ones that are zero)
-      mQ1 = mOutAC * sparse(mQuant_n);
+      mQ1 = mOutAC * sparse([mQuant_n, mQuantCon_n]);
       isNonZero = full(any(mQ1, 1));
       mQuant = [mQuant, mQ1(:, isNonZero)];  %#ok<AGROW>
   end

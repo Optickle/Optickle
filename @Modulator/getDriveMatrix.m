@@ -15,3 +15,4 @@ function mDrv = getDriveMatrix(obj, pos, par)
   else
     error('Modulator %d has invalid modulation vector.', obj.sn);
   end
+end

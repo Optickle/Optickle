@@ -17,8 +17,8 @@ function [opt, snProbe] = addProbeIn(opt, name, snOpt, nameIn, freq, phase)
   % check/parse field source
   snOpt = getSerialNum(opt, snOpt);
   portTo = getInputPortNum(opt.optic{snOpt}, nameIn);
-
   snLink = opt.optic{snOpt}.in(portTo);
+  
   if snLink == 0
     error('Unavailable Field: %s not linked, so field is zero', ...
           getInputName(opt, snOpt, portFrom));
