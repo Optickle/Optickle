@@ -54,12 +54,12 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   par.vFaf = f;
 
   % system matrices
-  mOptGen = sparse(Narf,Ndrv+Narf);
-  mRadFrc = sparse(Ndrv,Ndrv+Narf);
+  mOptGen = sparse(Narf,Ndrv+Narf);   % [mOpt, mGen]
+  mRadFrc = sparse(Ndrv,Ndrv+Narf);   % [mRad, mFrc]
   
-  lResp = zeros(Naf,Ndrv);
+  lResp = zeros(Naf,Ndrv); % frequency response of each drive
 
-  mQuant = sparse(Narf, 0);
+  mQuant = sparse(Narf, 0);  % quantum noises
   
   % build system matrices
   for n = 1:Nopt
@@ -82,7 +82,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       par.vDC = mIn * vDC; 
       
       %%%% Optic Properties
-      [mOpt_n, mGen_n, mRad_n, mFrc_n, vResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
+      [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
       
       % optical field scatter/generation matrix
       mOptGen = mOptGen + mOutAC * [ mOpt_n * mInAC, mGen_n * mDrv.' ] ;
@@ -91,10 +91,15 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       mRadFrc = mRadFrc + mDrv * [ mRad_n * mInAC, mFrc_n * mDrv.' ] ;
       
       % mechanical response list
-      lResp = lResp + vResp_n * mDrv.';
+      lResp = lResp + lResp_n * mDrv.';
+      
+      % account for unconnected inputs
+      isCon = obj.in == 0;
+      isConRF = repmat(isCon(:), 2 * Nrf, 1);
+      mQuantCon_n = mOpt_n(:, isConRF);  % vacuum from disocnnected inputs
       
       % accumulate noises (removing ones that are zero)
-      mQ1 = mOutAC * sparse(mQuant_n);
+      mQ1 = mOutAC * sparse([mQuant_n, mQuantCon_n]);
       isNonZero = full(any(mQ1, 1));
       mQuant = [mQuant, mQ1(:, isNonZero)];  %#ok<AGROW>
   end

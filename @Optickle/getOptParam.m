@@ -12,7 +12,9 @@ function par = getOptParam(opt)
   par.minQuant = opt.minQuant;
   par.lambda = opt.lambda;
   par.k = opt.k;
+  par.nu = opt.nu;
   par.Nrf = length(opt.vFrf);
   par.vFrf = opt.vFrf;
   par.lambda = opt.lambda;
   par.pol = opt.pol;
+end

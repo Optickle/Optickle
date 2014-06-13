@@ -31,3 +31,4 @@ function opt = addReadoutTelescope(opt, name, f, df, ts, ds, da, db)
   opt = addLink(opt, tele, 'out', smir, 'fr', ds);
   opt = addLink(opt, smir, 'fr', snkA, 'in', da);
   opt = addLink(opt, smir, 'bk', snkB, 'in', db);
+end

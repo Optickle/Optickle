@@ -55,3 +55,4 @@ function rsp = getMechResp(obj, f, nDOF)
   if length(rsp) ~= Naf
     error('Bad mechTF DOF %d of %s', nDOF, obj.name);
   end
+end

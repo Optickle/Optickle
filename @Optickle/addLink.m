@@ -8,7 +8,10 @@
 % snTo - the serial number or name of the sink optic (field destination)
 % nameIn - the number or name of the input port (e.g., 2, 'bk', etc.)
 % len - the length of the link
-% phase - TODO DESCRIPTION
+% phase - the propagation phase (optional)
+%   this can be the same for all wavelengths, or it can be specified
+%   as an Nx2 matrix of [phase, wavelength] pairs as in
+%     phase = [0.1, 1064e-9; 0.9, 532e-9];
 %
 % The serial numbers of the optics (for snFrom and snTo) are
 % returned by addOptic.  The name of the optic can also be used.
