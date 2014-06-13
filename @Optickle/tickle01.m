@@ -44,7 +44,7 @@ function varargout = tickle01(opt, pos, f, nDrive)
   end
 
   % === Field Info
-  [vFrf, vSrc] = getSourceInfo(opt);
+  vFrf = opt.vFrf;
   
   % ==== Sizes of Things
   Ndrv = opt.Ndrive;		% number of drives (internal DOFs)
@@ -68,17 +68,6 @@ function varargout = tickle01(opt, pos, f, nDrive)
   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % ==== Convert to Matrix Form
-  % duplicated from tickle
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  % link and probe conversion
-  [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
-
-  % optic conversion
-  mOpt = convertOpticsDC(opt, mapList, pos);
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== DC Fields and Signals
   % duplicated from tickle
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,7 +75,6 @@ function varargout = tickle01(opt, pos, f, nDrive)
   [vLen, prbList, mapList, mPhiFrf, vDC, mPrb, mPrbQ] = ...
     tickleDC(opt, pos);
 
-    
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Audio Frequency Loop
   % mostly duplicated from tickle
@@ -101,15 +89,20 @@ function varargout = tickle01(opt, pos, f, nDrive)
   vDist = [lnks.len]';
   vPhiGouy = getGouyPhase(vDist, vBasis(:, 2));
 
-  % optic conversion
-  [m01, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f);
+  % expand the probe matrix to both audio SBs
+  mPrb = sparse([mPrb, conj(mPrb)]);
   
-  % prepare generation matrix (part of optic-field matrix)
-  mGen = sparse(Nfld, Ndrv);
-  for n = 1:Ndrv
-    mGen(:, n) = drvList(n).m * vDC;
+  % get optic matricies for AC part
+  [mOptGen, mRadFrc, lResp, mQuant] = ...
+    convertOptics01(opt, mapList, pos, f, vDC);
+  
+  % noise stuff
+  if isNoise
+    [Nnoise, mQuant, shotPrb] = tickleShot(opt, prbList, vDC, mQuant);
+  else
+    Nnoise = 0;
   end
-  
+    
   % useful indices
   jAsb = 1:Narf;
   jDrv = (1:Ndrv) + Narf;
@@ -121,9 +114,6 @@ function varargout = tickle01(opt, pos, f, nDrive)
   end
   
   % main inversion tools
-  mDC = sparse(1:Nfld, 1:Nfld, vDC, Nfld, Nfld);
-
-  mFFz = sparse(Nfld, Nfld);
   mOOz = sparse(NdrvOut, NdrvOut);
   eyeNdof = speye(Ndof);
 
@@ -131,6 +121,8 @@ function varargout = tickle01(opt, pos, f, nDrive)
   mExc = eyeNdof(:, jDrv);
   sigAC = zeros(Nprb, NdrvOut, Naf);
   mMech = zeros(NdrvOut, NdrvOut, Naf);
+  noiseAC = zeros(Nprb, Naf);
+  noiseMech = zeros(NdrvOut, Naf);
   
   % since this can take a while, let's time it
   tic;
@@ -145,29 +137,44 @@ function varargout = tickle01(opt, pos, f, nDrive)
     fAudio = f(nAF);
 
     % propagation phase matrices
-    mPhim = getPhaseMatrix(vLen, vFrf - fAudio, -vPhiGouy); % Gouy phase has minus sign
-    mPhip = getPhaseMatrix(vLen, vFrf + fAudio, -vPhiGouy);
+    %   Gouy phase has minus sign
+    mPhim = getPhaseMatrix(vLen, vFrf - fAudio, -vPhiGouy, mPhiFrf);
+    mPhip = getPhaseMatrix(vLen, vFrf + fAudio, -vPhiGouy, mPhiFrf);
+    mPhi = blkdiag(mPhip,conj(mPhim));
 
-    % field to optic position transfer
-    mFOm = rctList(nAF).m * conj(mDC) / LIGHT_SPEED;
-    mFOp = rctList(nAF).m * mDC / LIGHT_SPEED;
-
-    % field to field transfer
-    mFFm = mPhim * m01;
-    mFFp = conj(mPhip * m01);
-
-    % optic to field transfer
-    mOFm = mPhim * mGen;
-    mOFp = conj(mPhip * mGen);
+    % mechanical response matrix
+    mResp = diag(lResp(nAF,:));
     
     % ==== Put it together and solve
-    mDof = [mFFm, mFFz, mOFm; mFFz, mFFp, mOFp; mFOm, mFOp, mOOz];
+    mDof = [  mPhi * mOptGen
+             mResp * mRadFrc ];
+    
     tfAC = (eyeNdof - mDof) \ mExc;
 
+    % field TF matrix wanted?
+    if isOut_tfAC
+      tfACout(:, :, nAF) = tfAC(jAsbAC, :);
+    end
+    
     % extract optic to probe transfer functions
-    sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
+    sigAC(:, :, nAF) = 2 * mPrb * tfAC(jAsb, :);
     mMech(:, :, nAF) = tfAC(jDrv, :);
-        
+    
+    if isNoise
+      %%%% With Quantum Noise
+      mQinj = [mPhi * mQuant;  mQOz];
+      mNoise = (eyeNdof - mDof) \ mQinj;
+      noisePrb = mPrb * mNoise(jAsb, :);
+      noiseDrv = mNoise(jDrv, :);
+      
+      % incoherent sum of amplitude and phase noise
+      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+      
+      % HACK: noise probe
+      %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
+    end
+    
     % ==== Timing and User Interaction
     % NO MODELING HERE (just let the user know how long this will take)
     tNow = toc;
@@ -220,7 +227,11 @@ function varargout = tickle01(opt, pos, f, nDrive)
   % make sure that the wait bar is closed
   drawnow
 
-  % build outputs
+  % Build the rest of the outputs
   varargout{1} = sigAC;
   varargout{2} = mMech;
-end    
+  if isNoise
+      varargout{3} = noiseAC;
+      varargout{4} = noiseMech;
+  end
+end
