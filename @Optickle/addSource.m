@@ -47,3 +47,4 @@ function [opt, sn] = addSource(opt, name, vArf, varargin)
   obj = Source(name, vArf, varargin{:});
   [opt, sn] = addOptic(opt, obj);
   opt.snSource = [opt.snSource; sn];
+end

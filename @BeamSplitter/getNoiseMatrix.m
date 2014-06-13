@@ -9,19 +9,33 @@
 
 function mQuant = getNoiseMatrix(obj, pos, par)
   
-  error('Broken!  Needs work.')
-
-  pos = pos + obj.Optic.pos;		% mirror position, with offset
-  phi = -2 * (2 * pi / par.lambda) * pos * cos(pi * obj.aoi / 180);
-
-  % get noise powers
-  mNPa = Mirror.getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi, ...
-    obj.in(1:2), par.minQuant);
-  mNPb = Mirror.getNoiseAmp(obj.Thr, obj.Lhr, obj.Rar, obj.Lmd, phi, ...
-    obj.in(3:4), par.minQuant);
-  mNP = blkdiag(mNPa, mNPb);
+  % compute phases for getNoiseAmp
+  pos = pos + obj.pos;		% mirror position, with offset
+  phi = -2 * par.k * pos * cos(pi * obj.aoi / 180);
   
-  % convert to noise amplitudes for all RF components
-  mQuant = blkdiagN(mNP, 2 * par.Nrf);
-  
+  % optic parametes as vectors for each field component
+  [vThr, vLhr, vRar, vLmd] = obj.getVecProperties(par.lambda, par.pol);
+
+  % Calculate noise powers for all rf components and put them in a
+  % block-diagonal matrix
+
+  % Loop over rf frequencies (which now include other wavelengths)
+  mNA = []; % should pre-allocate index in for more speed
+  for n = 1:par.Nrf
+
+      % get noise powers, in 1 and 2
+      mNPa = Mirror.getNoiseAmp(vThr(n), vLhr(n), vRar(n), ...
+        vLmd(n), phi(n), obj.in(1:2), par.minQuant);
+      
+      % get noise powers, in 3 and 4
+      mNPb = Mirror.getNoiseAmp(vThr(n), vLhr(n), vRar(n), ...
+        vLmd(n), phi(n), obj.in(3:4), par.minQuant);
+      
+      % iteratively build a block diagonal matrix
+      mNA = blkdiag(mNA, sqrt(blockdiag(mNPa, mNPb)));
+  end
+
+  % these noises are unsqueezed, so make amplitude and phase
+  mQuant = blkdiag(mNA, mNA);
+
 end

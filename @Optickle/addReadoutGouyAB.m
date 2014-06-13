@@ -40,3 +40,4 @@ nameSinkB = sprintf('%s_SinkB', name);
 opt = addLink(opt, namePhaseA, 'out', ProbeA, 'in', 2);
 opt = addLink(opt, namePhaseB, 'out', ProbeB, 'in', 2);
 
+end

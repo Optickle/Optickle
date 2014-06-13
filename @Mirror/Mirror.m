@@ -130,12 +130,11 @@ classdef Mirror < Optic
           % wrong number of input args
           error([errstr '%d input arguments.'], nargin);
       end
-    end
-    
+    end   
     function [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
       % optic parametes as vectors for each field component
       %
-      % [vThr, vLhr, vRar, vLmd] = getVecProperties(obj)
+      % [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
       
       vThr = Optickle.mapByLambda(obj.Thr, lambda, pol);
       vLhr = Optickle.mapByLambda(obj.Lhr, lambda, pol);
@@ -256,7 +255,7 @@ classdef Mirror < Optic
       atbt =  at * bt;
       tbo = atbt * hrbt;
       
-      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Build noise power matrix
+      %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% Build noise amplitude matrix
       mNP = zeros(4, 0);
       
       if Lhr ~= 0
@@ -299,18 +298,7 @@ classdef Mirror < Optic
         mNP1 = [0; 0; 1; 0];
         mNP2 = [0; 0; 0; 1];
         mNP = [mNP, mNP1, mNP2];
-      end
-      
-      % add power from open inputs
-      if in(1) == 0
-        mNP1 = [hrf; atbt * ht; 0; tbo * arbt * ht];
-        mNP  = [mNP, mNP1];
-      end
-      
-      if in(2) == 0
-        mNP1 = [htbt * at; tbo * at; arf; tbo * arbt * hrbt * at];
-        mNP = [mNP, mNP1];
-      end
+      end      
     end
   end  % methods (Static)
   

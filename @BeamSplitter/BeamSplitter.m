@@ -39,7 +39,7 @@ classdef BeamSplitter < Optic
   end
 
   methods
-      function obj = BeamSplitter(name, varargin)
+    function obj = BeamSplitter(name, varargin)
       % obj = BeamSplitter(name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
       %
       % Optical Paramters, Members, Functions, etc.
@@ -87,6 +87,30 @@ classdef BeamSplitter < Optic
               error([errstr '%d input arguments.'], nargin);
           end
       end
+      
+    function [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
+      % optic parametes as vectors for each field component
+      %
+      % [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
+      
+      vThr = Optickle.mapByLambda(obj.Thr, lambda, pol);
+      vLhr = Optickle.mapByLambda(obj.Lhr, lambda, pol);
+      vRar = Optickle.mapByLambda(obj.Rar, lambda, pol);
+      vLmd = Optickle.mapByLambda(obj.Lmd, lambda, pol);
+    end
+    
+    %%%% Hermite Gauss Basis %%%%
+
+    function qm = getBasisMatrix(obj)
+      % Compute basis transform matrix
+      %
+      % qm = getBasisMatrix(obj)
+      
+      qm = repmat(OpHG(NaN), 8, 4);
+      q0 = planeConvex(OpHG, obj.aoi, obj.Chr, obj.Nmd);
+      qm(1:4, 1:2) = q0;
+      qm(5:8, 3:4) = q0;
+    end
   end
 end
 
