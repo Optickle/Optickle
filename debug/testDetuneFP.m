@@ -26,19 +26,30 @@ end
 
 function errorCount = checkForErrors(label, fieldNames, calcStruct, refStruct)
     errorCount = 0;
-    errorThreshold = 1e-10;
+    % precision is the product of these two numbers
+    errorThreshold = 1e-6;
+    smallNumber = 1e-6;
 
     for name = fieldNames
         try
-            calcMat = calcStruct.(name{:});
-            refMat = refStruct.(name{:});
+            calcMat = abs(calcStruct.(name{:}));
+            refMat = abs(refStruct.(name{:}));
             
-            errorMat = abs(1 - calcMat./refMat);
+            small = max(calcMat(:))*smallNumber;
+            
+            errorMat = (calcMat-refMat)./(calcMat+refMat+small);
             
             error = max(errorMat(:));
             
             if error > errorThreshold
-                warning([label ' error is ' num2str(error) ' in variable ' name{:}])
+                
+                dim = length(size(errorMat));
+                
+                % find the index of the error
+                [ind{1:dim}] = ind2sub(size(errorMat),find(errorMat == max(errorMat(:))));
+                
+                warning([label ' error is ' num2str(error) ' at index '...
+                    cell2CommaSeparatedString(ind) ' in variable ' name{:}])
                 errorCount = errorCount + 1;
             end
         catch err
@@ -46,5 +57,14 @@ function errorCount = checkForErrors(label, fieldNames, calcStruct, refStruct)
             errorCount = errorCount + 1;
         end
     end
+
+end
+
+function stringOut = cell2CommaSeparatedString(cellIn)
+    stringOut = '';
+    for jj = 1:length(cellIn)
+        stringOut = [stringOut num2str(cellIn{jj}) ', '];
+    end
+    stringOut = stringOut(1:end-2);
 
 end
