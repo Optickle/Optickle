@@ -2,7 +2,7 @@ classdef Squeezer < Optic
   % Squeezer is a type of Optic used in Optickle
   %
   % Squeezers are used to     
-  % obj = Squeezer (name, sqAng, sqdB, antidB, centerFreq)
+  % obj = Squeezer (name, lambda, sqAng, sqdB, antidB)
   %
   % A Squeezer has 1 input and 1 output.
   % Input:  1, in, 
@@ -13,7 +13,8 @@ classdef Squeezer < Optic
   % sqAng - squeezing angle
   % sqdB - amount of squeezing in dB at OPO output
   % antidB - amount of antisqueezing in dB at OPO output
-  % centerFreq - The carrier frequency whose audio sidebands are squeezed
+  % lambda - wavelength to be squeezed
+  % fRF - RF sideband of lambda to be used
   % escEff - escape efficiency.  Calculated automatically based on
   %          the requested level of squeezing and antisqueezing.
   %
@@ -38,7 +39,7 @@ classdef Squeezer < Optic
     % sqdB - amount of squeezing in dB with perfect escape efficiency
     %
     % Default parameters are:
-    % [loss, sqAng, sqdB] = 
+    % [sqAng, sqdB, antidB] = 
     % [0, 0, 10]
 
         
@@ -64,7 +65,7 @@ classdef Squeezer < Optic
         %  return
         %end
 
-        % loss
+        
         args = {0,0,10};
         args(1:(nargin-1)) = varargin(1:end);
       
