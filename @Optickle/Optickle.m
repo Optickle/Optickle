@@ -372,6 +372,14 @@ classdef Optickle < handle
         end
       end        
     end
+    function [isMatch, isClose] = isSameFreq(dFreq)
+      % frequency differences for match and close
+      matchFreqDiff = 0.1; 
+      closeFreqDiff = 100; 
+      
+      isMatch = abs(dFreq) < matchFreqDiff;
+      isClose = abs(dFreq) < closeFreqDiff;
+    end
 
     function mPhi = getPhaseMatrix(vLen, vFreq, vPhiLinks, mPhiFrf)
       % phase matrix for tickle and sweep
