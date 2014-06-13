@@ -18,9 +18,6 @@ function mQuant = getNoiseMatrix(obj, pos, par)
     mNP = zeros(1, 0);
     loss = 0;
   end
-  if obj.in == 0
-    mNP = [mNP, 1 - loss];
-  end
   
   % convert to noise amplitudes for all RF components
   mQuant = blkdiagN(sqrt(mNP), 2 * par.Nrf);
