@@ -15,15 +15,20 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   Nin = 2;					% obj.Optic.Nin
   Nout = 4;					% obj.Optic.Nout
 
+  Nrf
+  
   mCpl = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
     drp = 1i * par.k(n) * dldx / 2;
 
-    % enter this submatrix into mDrv
+    % enter this submatrix into mCpl
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
     mCpl(nn, mm) = mOpt(nn, mm) .* drp;
   end
+  
+  size(mOpt)
+  size(mCpl)
   
 end

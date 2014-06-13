@@ -1,9 +1,9 @@
 % getDriveMatrix method
 %   returns a sparse matrix, Nrf * (obj.Nout x obj.Nin)
 %
-% mDrv = getDriveMatrix(obj, pos, par)
+% mCpl = getDriveMatrix(obj, pos, par)
 
-function mDrv = getDriveMatrix(obj, pos, par)
+function mCpl = getDriveMatrix(obj, pos, par)
   
   % constants
   Nrf = par.Nrf;
@@ -45,6 +45,6 @@ function mDrv = getDriveMatrix(obj, pos, par)
   end
 
   % build drive matrix
-  mDrv = zeros(Nrf, Nrf, 2);
-  mDrv(:, :, 1) = mAmp;
-  mDrv(:, :, 2) = 1i * mPhi;
+  mCpl = zeros(Nrf, Nrf, 2);
+  mCpl(:, :, 1) = mAmp;
+  mCpl(:, :, 2) = 1i * mPhi;
