@@ -20,6 +20,12 @@ function mQuant = getNoiseMatrix(obj, pos, par)
     loss = 0;
   end
   
-  % convert to noise amplitudes for all RF components
-  mQuant = blkdiagN(sqrt(mNP), 2*par.Nrf);
+  %Find the RF component which is squeezed
+  [freqMatch, freqClose] = isSameFreq(obj.fRF*ones(size(par.nu)), par.nu);
+  samePol = obj.pol*ones(size(par.pol))==par.pol;
+  RFMat =  freqMatch & samePol;
+  
+  % convert to noise amplitudes for correct RF components
+  % all other components have zero added noise amplitude
+  mQuant = blkdiag(sqrt(mNP)*RFMat, sqrt(mNP)*RFMat);
 end
