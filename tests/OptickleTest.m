@@ -94,8 +94,8 @@ classdef OptickleTest < matlab.unittest.TestCase
         end
         function warnOnMatrixFieldsInequalityInStruct(testCase,label, fieldNames)
             % precision is the product of these two numbers
-            errorThreshold = 1e-6;
-            smallNumber = 1e-12;
+            errorThreshold = 1e-3;
+            smallNumber = 1e-6;
             
             % helper function
             function stringOut = cell2CommaSeparatedString(cellIn)
