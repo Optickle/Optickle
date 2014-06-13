@@ -90,7 +90,7 @@ classdef Squeezer < Optic
       case 0					% default constructor, do nothing
       case {1, 2, 3, 4, 5, 8}
        
-        args = {par.lambda[0], 0, 0, 1, 10, 10, 0.5195, 1, 0};
+        args = {par.lambda(1), 0, 0, 1, 10, 10, 0.5195, 1, 0};
         args(1:(nargin-1)) = varargin(1:end);
         if nargin==8 
           if varargin(end)==1

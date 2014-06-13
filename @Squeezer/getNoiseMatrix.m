@@ -25,7 +25,14 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   samePol = obj.pol*ones(size(par.pol))==par.pol;
   RFMat =  freqMatch & samePol;
   
+  %Warning message of zero or n>1 RF components are squeezed
+  if nnz(RFMat)==0
+      warning('No RF components are being squeezed! ');
+  elseif nnz(RFMat)>1
+     warning('More than one RF component is being squeezed!'); 
+  end
+  
   % convert to noise amplitudes for correct RF components
   % all other components have zero added noise amplitude
   mQuant = blkdiag(sqrt(mNP)*RFMat, sqrt(mNP)*RFMat);
-end
+  
