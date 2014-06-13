@@ -64,8 +64,8 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
   % loop over probes
   for jPrb = 1:Nprb
     prb = opt.probe(jPrb);
-    phi = exp(1i * pi * prb.phase / 180) / 2;
-    phi_quad = exp(1i * pi * (prb.phase + 90) / 180) / 2;
+    phi = exp(1i * pi * prb.phase / 180);
+    phi_quad = exp(1i * pi * (prb.phase + 90) / 180);
 
     % loop over RF components (wave numbers)
     for n = 1:Nrf
@@ -93,12 +93,12 @@ function [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt)
             prbList(jPrb).mPrb(m, n) = 1;
           elseif isMatch_p
             % upper RF match
-            prbList(jPrb).mPrb(m, n) = phi;
-            prbList(jPrb).mPrbQ(m, n) = phi_quad;
+            prbList(jPrb).mPrb(m, n) = phi / 2;
+            prbList(jPrb).mPrbQ(m, n) = phi_quad / 2;
           elseif isMatch_m
             % lower RF match
-            prbList(jPrb).mPrb(m, n) = conj(phi);
-            prbList(jPrb).mPrbQ(m, n) = conj(phi_quad);
+            prbList(jPrb).mPrb(m, n) = conj(phi) / 2;
+            prbList(jPrb).mPrbQ(m, n) = conj(phi_quad) / 2;
           elseif isClose_p || isClose_m
             disp([df_p, df_m])
             warning(['Demodulation frequency near-miss for probe %s ' ...
