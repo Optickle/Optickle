@@ -3,8 +3,9 @@ close all
 clear all
 clear classes
 
-restoredefaultpath
-addpath(genpath('~/Documents/mit/Optickle'))
+%restoredefaultpath
+path(pathdef)
+addpath(genpath('~/tmp/Optickle2'))
 outstruct = jmDemoDetuneFP;
 save('temp.mat', 'outstruct')
 
@@ -12,13 +13,11 @@ close all
 clear all
 clear classes
 
-restoredefaultpath
-addpath(genpath('~/Documents/mit/Optickle1'))
+%restoredefaultpath
+path(pathdef)
+addpath(genpath('~/tmp/Optickle'))
 outstructOld = jmDemoDetuneFP;
 
 load('temp.mat')
 testDetuneFP(outstruct, outstructOld)
 
-%close all
-clear all
-clear classes
