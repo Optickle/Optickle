@@ -55,8 +55,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   isOut_tfAC = nargin >= 5;
   
   % === Field Info
-  [vFrf, vSrc] = getSourceInfo(opt);
-  LIGHT_SPEED = Optickle.c;
+  vFrf = opt.vFrf;
   
   % ==== Sizes of Things
   Ndrv = opt.Ndrive;	% number of drives (internal DOFs)
@@ -84,19 +83,6 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % Convert to Matrix Form
-  %   opt, the Optickle model, is not used after this section
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  % link and probe conversion
-  [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
-
-  % optic conversion
-  mOpt = convertOpticsDC(opt, mapList, pos);
-  
-
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== DC Fields and Signals
   % Here, the DC fields for each RF component are evaluated
   % at each field evaluation point (FEP, at each link end).
@@ -108,46 +94,16 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % reshaped and returned in a matrix fDC, which is Nlnk x Nrf.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-  % propagation phase matrix
-  mPhi = Optickle.getPhaseMatrix(vLen, vFrf, [], mPhiFrf);
+  [vLen, prbList, mapList, mPhiFrf, vDC, mPrb, mPrbQ] = ...
+    tickleDC(opt, pos);
 
-  % compute DC fields
-  eyeNfld = speye(Nfld);			% a sparse identity matrix
-  vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
-
-  % compile system wide probe matrix 
-  mPrb = zeros(Nprb, Narf);
-  mPrbQ = zeros(Nprb, Nfld);
-  for k = 1:Nprb
-    mIn_k = prbList(k).mIn;
-    mPrb_k = prbList(k).mPrb;
-    
-    % conjugate transpose of DC fields on this probe
-    vDCinCT = (mIn_k * vDC)';
-    
-    % DC and upper audio SB part of mPrb
-    mPrb(k, 1:Nfld) = vDCinCT * mPrb_k * mIn_k;
-    
-    % lower audio SB part of mPrb
-    mPrb(k, (1:Nfld) + Nfld) = conj(mPrb(k, 1:Nfld));
-    
-    % quad phase signals, for oscillator phase noise
-    %  since we only compute the Q DC signals, we don't need
-    %  the lower audio SB part
-    mPrbQ_k = prbList(k).mPrbQ;
-    mPrbQ(k, :) = vDCinCT * mPrbQ_k * mIn_k;
-  end
-  
-  % make them sparse matrices
-  mPrb = sparse(mPrb);
-  mPrbQ = sparse(mPrbQ);
-  
   %%%%% compute DC outputs
   % sigDC is already real, but use "real" to remove numerical junk
-  sigDC = real(mPrb(:, 1:Nfld) * vDC);
-  sigQ = real(mPrbQ * vDC);
+  sigDC = real(mPrb * vDC);
   fDC = reshape(vDC, Nlnk, Nrf);		% DC fields for output
 
+  %sigQ = real(mPrbQ * vDC);  % will need this for osc phase noise!
+  
   % Build DC outputs
   varargout{1} = fDC;
   varargout{2} = sigDC;
@@ -169,8 +125,12 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % drive m to probe n, at all frequencies.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+  % expand the probe matrix to both audio SBs
+  mPrb = sparse([mPrb, conj(mPrb)]);
+  
   % get optic matricies for AC part
-  [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC);
+  [mOptGen, mRadFrc, lResp, mQuant] = ...
+    convertOpticsAC(opt, mapList, pos, f, vDC);
   
   % noise stuff
   Nnoise = size(mQuant, 2);
@@ -184,7 +144,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   % get both upper and lower sidebands
   aQuantMatrix = diag([aQuantTemp(:);aQuantTemp(:)]); 
   mQuant = aQuantMatrix * mQuant;
-  
+  whos
   % compile probe shot noise vector
   shotPrb = zeros(Nprb, 1);
   

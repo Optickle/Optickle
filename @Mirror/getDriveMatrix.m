@@ -19,11 +19,11 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   for n = 1:Nrf
     % reflection phase drive coefficient
     drp = 1i * par.k(n) * dldx / 2;
-
-    % enter this submatrix into mDrv
+    
+    % enter this submatrix into mCpl
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
     mCpl(nn, mm) = mOpt(nn, mm) .* drp;
   end
-  
+
 end

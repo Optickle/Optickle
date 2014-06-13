@@ -45,7 +45,6 @@ function varargout = tickle01(opt, pos, f, nDrive)
 
   % === Field Info
   [vFrf, vSrc] = getSourceInfo(opt);
-  LIGHT_SPEED = opt.c;
   
   % ==== Sizes of Things
   Ndrv = opt.Ndrive;		% number of drives (internal DOFs)
@@ -74,8 +73,26 @@ function varargout = tickle01(opt, pos, f, nDrive)
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
   % link and probe conversion
-  [vLen, prbList, mapList] = convertLinks(opt);
+  [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
+
+  % optic conversion
+  mOpt = convertOpticsDC(opt, mapList, pos);
   
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % ==== DC Fields and Signals
+  % duplicated from tickle
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+  [vLen, prbList, mapList, mPhiFrf, vDC, mPrb, mPrbQ] = ...
+    tickleDC(opt, pos);
+
+    
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % ==== Audio Frequency Loop
+  % mostly duplicated from tickle
+  %  phase includes Gouy phase
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
   % get basis vector
   vBasis = getAllFieldBases(opt);
   
@@ -85,36 +102,8 @@ function varargout = tickle01(opt, pos, f, nDrive)
   vPhiGouy = getGouyPhase(vDist, vBasis(:, 2));
 
   % optic conversion
-  mOpt = convertOptics(opt, mapList, pos, []);
   [m01, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f);
   
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % ==== DC Fields and Signals
-  % duplicated from tickle
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  % compute DC fields
-  eyeNfld = speye(Nfld);			% a sparse identity matrix
-  mPhi = getPhaseMatrix(vLen, vFrf);		% propagation phase matrix
-  vDC = (eyeNfld - (mPhi * mOpt)) \ (mPhi * vSrc);
-
-  % compile system wide probe matrix and probe shot noise vector
-  mPrb = sparse(Nprb, Narf);
-  for k = 1:Nprb
-    mIn_k = prbList(k).mIn;
-    mPrb_k = prbList(k).mPrb;
-    
-    vDCin = mIn_k * vDC;
-    mPrb(k, 1:Nfld) = (mPrb_k * conj(vDCin)).' * mIn_k;
-    mPrb(k, (1:Nfld) + Nfld) = (mPrb_k.' * vDCin).' * mIn_k;
-  end
-    
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % ==== Audio Frequency Loop
-  % mostly duplicated from tickle
-  %  phase includes Gouy phase
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
   % prepare generation matrix (part of optic-field matrix)
   mGen = sparse(Nfld, Ndrv);
   for n = 1:Ndrv
