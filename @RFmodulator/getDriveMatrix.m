@@ -52,5 +52,3 @@ function mCpl = getDriveMatrix(obj, pos, par)
   mCpl = zeros(Nrf, Nrf, 2);
   mCpl(:, :, 1) = mAmp;
   mCpl(:, :, 2) = 1i * mPhi;
-  
-  mCpl
