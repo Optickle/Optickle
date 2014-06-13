@@ -86,6 +86,7 @@ classdef Optickle < handle
     pol = [];      % polarization of each field component
     vFrf = [];     % RF frequency offsets
     k = [];        % wave-number of each field component (lambda and RF)
+    nu = [];       % nu = c  / lambda + fRF = c * k / (2 * pi)
   end
   
   % user adjustable parameters
@@ -144,8 +145,8 @@ classdef Optickle < handle
       opt.probe = newProbe;
       
       % wave number [1/m]
-      opt.k = 2 * pi * (1 ./ opt.lambda + opt.vFrf / opt.c);
-      
+      opt.k = 2 * pi * (1 ./ opt.lambda + opt.vFrf / Optickle.c);
+      opt.nu = Optickle.c ./ opt.lambda + opt.vFrf;      
     end
     
     %%%% Add Optics %%%%
@@ -372,13 +373,13 @@ classdef Optickle < handle
         end
       end        
     end
-    function [isMatch, isClose] = isSameFreq(dFreq)
+    function [isMatch, isClose] = isSameFreq(f1, f2)
       % frequency differences for match and close
       matchFreqDiff = 0.1; 
       closeFreqDiff = 100; 
       
-      isMatch = abs(dFreq) < matchFreqDiff;
-      isClose = abs(dFreq) < closeFreqDiff;
+      isMatch = abs(f1 - f2) < matchFreqDiff;
+      isClose = abs(f1 - f2) < closeFreqDiff;
     end
 
     function mPhi = getPhaseMatrix(vLen, vFreq, vPhiLinks, mPhiFrf)
