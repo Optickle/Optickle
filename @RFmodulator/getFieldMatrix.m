@@ -24,7 +24,7 @@ function mOpt = getFieldMatrix(obj, pos, par)
       % only bother with same polarization fields
       if vpol(n) == vpol(m)
         % frequency differences (including wavelength differences)
-        df = abs(vKrf(m) - vKrf(n)) * LIGHT_SPEED / (2*pi);        
+        df = (vKrf(m) - vKrf(n)) * LIGHT_SPEED / (2*pi);        
         n_df = round(df / fMod);
         r_df = abs(df - n_df * fMod);
         if r_df < 1e-1 && n_df ~= 0
