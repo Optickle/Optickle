@@ -11,7 +11,6 @@ function mOpt = getFieldMatrix(obj, pos, par)
   vpol = par.pol;
   fMod = obj.fMod;
   aMod = obj.aMod;
-  LIGHT_SPEED = Optickle.c;
   
   % loop over RF components
   mOpt = zeros(Nrf, Nrf);
