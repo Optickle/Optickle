@@ -2,10 +2,9 @@
 %
 % [Nnoise, mQuant, shotPrb] = tickleShot(opt, prbList, vDC, mQuant)
 
-function [Nnoise, mQuant, shotPrb] = tickleShot(opt, prbList, vDC, mQuant)
+function [mQuant, shotPrb] = tickleNoise(opt, prbList, vDC, mQuant)
 
   % set the quantum scale
-  Nnoise = size(mQuant, 2);
   pQuant  = Optickle.h * opt.nu;
   aQuant = sqrt(pQuant);
   aQuantTemp = repmat(aQuant.',opt.Nlink,1); % aQuant is
