@@ -1,5 +1,5 @@
 % testDetuneFP
-% this function tests the output of tickle with optFP
+% this function tests the output of tickle for detuned FP cavity
 %
 
 function outstruct = testDetuneFP()
