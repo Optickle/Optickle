@@ -1,7 +1,7 @@
 classdef DetuneFPTest < OptickleTest
     % Define the constructor method
     methods
-        function testCase = DetuneFPTest(testCase) %#ok<INUSD>
+        function testCase = DetuneFPTest() 
             addpath('./testFunctions/')
             testCase.testFunctionHandle = @testDetuneFP;
         end
