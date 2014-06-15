@@ -62,3 +62,14 @@ function [sigDC0, sigAC0, mMech0, noiseAC0] = demoDetuneFP
   title('Quantum Noise Limit for Detuned Cavity', 'fontsize', 18);
   legend('On resonance', '0.1 nm', '1 nm');
   grid on
+  
+  % make a response plot
+  h0 = getTF(sigAC0, nTRANSa_DC, nEX);
+  h1 = getTF(sigAC1, nTRANSa_DC, nEX);
+  h2 = getTF(sigAC2, nTRANSa_DC, nEX);
+  
+  figure(3)
+  zplotlog(f, [h0, h1, h2])
+  title('TR Response for Detuned Cavity', 'fontsize', 18);
+  legend('On resonance', '0.1 nm', '1 nm', 'Location','SouthEast');
+  

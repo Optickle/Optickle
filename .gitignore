@@ -1,2 +1,6 @@
 *.m~
 *.asv
+*.aux
+*.log
+*.out
+*.synctex.gz

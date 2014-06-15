@@ -248,6 +248,58 @@ The $\matm{optic-optic}$ matrix is diagonal, with non-zero terms
  by static fields on an optic. 
 The following sections will describe the construction of each of these matrices in detail.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{General AC Considerations}
+\sslabel{freq_domain}
+
+In order to describe the audio frequency (a.k.a., ``AC'') calculations done in Opticke,
+ we will use both the time and frequency domain.
+In this section we setup a framework for making the transition from one domain to
+ the other consistent throughout.
+
+For a sinusoidal motion for $x(t)$
+\beqa{mirror_x}
+x(t) &=& \real{ \tilde{x} } \fcos{\Omega t} + \imag{\tilde{x} } \fsin{\Omega t} \\
+  &=& \half \real{ \tilde{x} } \(e^{i \Omega t} + e^{-i \Omega t} \) - \tfrac{i}{2} \imag{\tilde{x} } \(e^{i \Omega t} - e^{-i \Omega t} \) \\
+  &=& \half \( \tilde{x}^* ~ e^{i \Omega t} + \tilde{x} ~ e^{-i \Omega t} \) \\
+  &=& \real{ \tilde{x} ~ e^{-i \Omega t} }
+\eeqa
+ such that the complex value $\tilde{x}$ describes the amplitude and phase of $x(t)$.
+
+Note an interesting feature of this definition: a delay increases the phase of $\tilde{x}$.
+Consider an $x_2(t)$ defined as a delayed copy of $x_1(t)$: $x_2(t) = x_1(t - \Delta t)$
+ such that what happens at time $t$ in $x_2$ happened at time $t - \Delta t$ in $x_1$.
+In the frequency domain, the delayed signal $\tilde{x}_2$ is
+\beqa{}
+\real{ \tilde{x}_2 ~ e^{-i \Omega t} } &=& \real{ \tilde{x}_1 ~ e^{-i \Omega (t - \Delta t)} } \\
+\Rightarrow \tilde{x}_2 &=& \tilde{x}_1 e^{i \Omega \Delta t}
+\eeqa
+
+Similarly, for a power level which is varying at angular frequency $\Omega$
+ due to a carrier field $E_{DC}$ with positive and negative audio sidebands $E_{\pm}$,
+ \beq{}
+ P(t) = P_{DC} + P_{\Omega} + P_{2 \Omega} = \abs{ E_{DC}  + E_{+} e^{-i \Omega t} + E_{-} e^{i \Omega t} }^2
+ \eeq
+ the variation at $\Omega$ is
+\beqa{power-force_trig}
+P_{\Omega}  &=& E_{DC}^* E_{+} e^{-i \Omega t} + E_{DC} E_{+}^* e^{i \Omega t}  +
+    E_{DC}^* E_{-} e^{i \Omega t} + E_{DC} E_{-}^* e^{-i \Omega t}  \nonumber \\
+  &=& (E_{DC}^* E_{+} + E_{DC} E_{-}^* )^* e^{i \Omega t} + (E_{DC}^* E_{+} + E_{DC} E_{-}^* ) e^{-i \Omega t} \nonumber \\
+  &=& 2 \real{ (E_{DC}^* E_{+} + E_{DC} E_{-}^* ) e^{-i \Omega t} } \nonumber \\
+   &=& \real{ \tilde{P}_{\Omega}} \fcos{\Omega t} + \imag{\tilde{P}_{\Omega} } \fsin{\Omega t} \\
+&& \Rightarrow \tilde{P}_{\Omega} = 2 \( E_{DC}^* E_{+} + E_{DC} E_{-}^* \) \elabel{tildePX}
+\eeqa
+
+An amplitude modulator, for instance, which produces relative intensity modulation as
+\beqa{}
+P(t)  &=& P_{DC} (1 + A \fcos{\Omega t}) \\
+  &=& \abs{E_{DC}}^2 + A E_{DC}^* E_{DC} \fcos{\Omega t} \\
+\Rightarrow \tilde{P}_{\Omega} &=& A E_{DC}^* E_{DC}  \\
+ &=& \half A \( E_{DC}^* E_{DC} + E_{DC} E_{DC}^* \)  \nonumber \\
+ &=& 2 \( E_{DC}^* E_{+} + E_{DC} E_{-}^* \) \nonumber \\
+\for && E_+ = E_- = \frac{A}{4} E_{DC} 
+\eeqa
+ where in the last step we have identified the audio sideband (SB) amplitudes produced by this modulation.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Field to Field Transfer Matrix}
@@ -262,7 +314,7 @@ Restating,
 \end{equation}
 where in this case the link phase is
 \begin{equation}
-\mPhin{\pm}(k,k) = e^{i ~ (\vFrf(m) \pm f_{AF}) ~ \vLen(n)}
+\mPhin{\pm}(k,k) = e^{i ~ 2 \pi (\nu_m \pm f_{AF}) ~ L_n / c}
 \end{equation}
 which is the same as equation \eref{mPhi}, with the addition of the audio frequency component.
 The conjugation of the lower sideband component is necessary for the optic-field and field-optic
@@ -287,10 +339,7 @@ The matrix $\mGen$ is composed of an optic specified matrix and DC fields, and c
 where $\mDrvn{n}$ is the matrix which maps the internal \dsf\ of the $n^{th}$ optic onto the system wide \dsf. The DC fields are present as source fields which the optics modulate to produce audio SBs,
 \begin{equation}
 \mGenn{n} = \matrixBegin{c}
-\mGenn{n,1} , ~~~
-\mGenn{n,1} , ~~~
-\cdots , ~~~
-\mGenn{n,N_{dof_n}}
+\mGenn{n,1} , ~~~ \mGenn{n,2} , ~~~ \cdots , ~~~ \mGenn{n,N_{dof_n}}
 \matrixEnd \elabel{mGen}
 \end{equation}
 where
@@ -314,13 +363,6 @@ Given an input field $E_{in}$, the field reflected from the front of the mirror 
 E_{out} = -r e^{-2 i k x} ~ E_{in}
 \eeq
  since forward motion of the mirror by $x$ causes a shortening the propagation path of the beam by $2 x$.
-We will use a sinusoidal motion for $x$
-\beqa{mirror_x}
-x &=& \real{ \tilde{x} } \fcos{\Omega t} + \imag{\tilde{x} } \fsin{\Omega t} \\
-  &=& \half \real{ \tilde{x} } \(e^{i \Omega t} + e^{-i \Omega t} \) - \tfrac{i}{2} \imag{\tilde{x} } \(e^{i \Omega t} - e^{-i \Omega t} \) \\
-  &=& \half \( \tilde{x}^* ~ e^{i \Omega t} + \tilde{x} ~ e^{-i \Omega t} \)
-\eeqa
- for some complex $\tilde{x}$.
 
 For small $x$, such that $k x \ll 1$, we can approximate the exponential to first order as
 \beqa{mirror_refl}
@@ -382,12 +424,12 @@ The modulation of each incoming and outgoing power by the co-propagating DC fiel
  where $X \in \set{\rm back_{in, out} , {front_{in,out}} }$,
   $E_{\pm_X}$ are the upper and lower sideband amplitudes,
  and $\Omega = 2 \pi f_{\rm audio}$ is the audio angular frequency.
-Converting this expression to trigonometric form
+Converting this expression to the frequency domain gives
 \beqa{power-force_trig}
- P_X &=& \real{ \tilde{P}_X } \fcos{\Omega t} + \imag{\tilde{P}_X } \fsin{\Omega t} \\
 \tilde{P}_X &=& 2 \( E_{DC_X}^* E_{+_X} + E_{DC_X} E_{-_X}^* \) \elabel{tildePX}
 \eeqa
-
+ as discussed in section \sref{freq_domain}.
+ 
 For the $n^{th}$ optic we can compute $E_{DC}$ at the outputs, given the inputs, with the field
  to field matrix $\mOptn{n}$ as
 \begin{equation}
@@ -699,32 +741,37 @@ As with fields, there are two computations to perform: DC and AC.
 DC signals are the signals present given only the DC fields present, and are thus related to the current working point of the Optickle system.
 AC signals, on the other hand, are products between DC and audio frequency fields: they tell us about the response of the system around the current working point as seen in equation \eref{vSig}.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{DC Signals}
 To compute the DC signals, we start with an expression for the intensity present at a given FEP,
 \begin{eqnarray}
-I &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{-i 2 \pi [\nu + \vFrf(n)] t}  \right|^2 \\
+I &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{-i \omega_n t}  \right|^2 \\
  &=& \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
- E^*_{DC_n} E_{DC_m} e^{-i 2 \pi (\vFrf(m) - \vFrf(n)) t}
+ E^*_{DC_m} E_{DC_n} e^{i (\omega_m - \omega_n) t}
 \elabel{intensity}
 \end{eqnarray}
-where $E_{DC_n}$ is the field amplitude of the $n^{th}$ RF component, with the RF phase rotation factored out (much like equation \eref{force} for field induced forces).
+where $E_{DC_n}$ is the field amplitude of the $n^{th}$ RF component, at frequency $\omega_n = 2 \pi \nu_n$.
 
-Requiring that the output be at the demodulation frequency $f_{demod}$, such that the integral
-\begin{equation}
-S_{DC} = \int^{\infty}_{-\infty} I \fcos{2 \pi f_{demod} t + \phi_{demod}} dt
-\end{equation}
+Requiring that the output be at the demodulation frequency $\omega_{dmd} = 2 \pi f_{dmd}$, such that the integral
+\beqa{}
+S_{DC} &=& \lim_{T \rightarrow \infty} \frac{2}{T} \int^{T}_{-T} I \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
+ &=& \frac{1}{2} \sum^{\Nrf}_{m, n}
+ E^*_{DC_m} E_{DC_n} \cdots \\
+&& \lim_{T \rightarrow \infty} \int^{T}_{-T} \!\!\! e^{i (\omega_m - \omega_n) t} 
+   \(e^{i (\omega_{dmd} t + \phi_{dmd}) } + e^{-i (\omega_{dmd} t + \phi_{dmd})} \) dt \nonumber
+\eeqa
 is non-zero removes most of the terms in the sum by introducing a delta function
 \begin{equation}
 S_{DC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
- E^*_{DC_n} E_{DC_m} \delta_{n,m}
+ E^*_{DC_m} E_{DC_n} \delta_{mn}
 \elabel{sigDC}
 \end{equation}
 where
-\begin{align*}
-\delta_{n,m} =
-& \frac{1}{2} \fun{\delta}{\vFrf(m) - \vFrf(n) + f_{demod}} e^{ i \phi_{demod}} ~ + \\
-& \frac{1}{2} \fun{\delta}{\vFrf(m) - \vFrf(n) - f_{demod}} e^{-i \phi_{demod}}.
-\end{align*}
+\begin{align}
+\delta_{mn} =
+& \tfrac{1}{2} \fun{\delta}{\nu_m - \nu_n + f_{dmd}} e^{ i \phi_{dmd}} ~ +  \nonumber \\
+& \tfrac{1}{2} \fun{\delta}{\nu_m - \nu_n - f_{dmd}} e^{-i \phi_{dmd}}.
+\end{align}
 
 Translating this into the language of matrix manipulation, the DC signal from the $k^{th}$ probe is
 \begin{equation}
@@ -732,30 +779,39 @@ Translating this into the language of matrix manipulation, the DC signal from th
 \end{equation}
 where the probe's matrix expresses the delta function in equation \eref{sigDC} as the matrix
 \begin{equation}
-\mPrbn{k}(m,n) = \delta_{n,m} ,
+\mPrbn{k}(m, n) = \delta_{mn} ,
 \end{equation}
 and $\mPrbInn{k}$ is the input map for the probe.
 
+%%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{AC Signals}
-AC signal computation follows a very similar path. Intensity present at a given FEP is
-\begin{eqnarray}
-I &=& \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{-i 2 \pi [\nu + \vFrf(n)] t} + E_{+_n} e^{-i 2 \pi [\nu + \vFrf(n) + f_{\rm audio}] t} \right. \right. \nonumber \\
-  & & \left. \left.+ E_{-_n} e^{-i 2 \pi [\nu + \vFrf(n) - f_{\rm audio}] t} \right) \right|^2 \\
- &=& \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1} 2 Re \left[ E_{DC_n}^{*} E_{+_m} e^{-i 2 \pi (\vFrf(m) - \vFrf(n) + f_{\rm audio} ) t} \right. \nonumber \\
- & & \left. E_{DC_n} E_{-_m}^{*} e^{-i 2 \pi (- \vFrf(m) + \vFrf(n) + f_{\rm audio} ) t} \right] .
+The audio frequency signal, or ``AC signal'',
+ computation follows a very similar path to that of the DC signals in the previous section.
+Intensity present at a given FEP is
+\beq{I_AC}
+I = \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{-i \omega_n t} + E_{+_n} e^{-i (\omega_n + \Omega) t} 
+   + E_{-_n} e^{-i (\omega_n - \Omega) t}  \right) \right|^2
+\eeq
+ where $\Omega = 2 \pi f_{\rm audio}$ is the audio sideband frequency being considered.
+If we remove terms from the sum which are the product of the perturbative amplitudes
+ $E_+$ and $E_-$, and those which are the product of 2 DC fields and thus have
+ not audio frequency component, we are left with
+\begin{align}
+I_{AC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1} 2 Re & \left[
+  E_{DC_m}^{*} E_{+_n} e^{i (\omega_m - \omega_n - \Omega) t} ~~ + \right. \nonumber \\
+ & \left. ~~~ E_{DC_m} E_{-_n}^{*} e^{-i (\omega_m - \omega_n + \Omega) t} \right] .
 \elabel{intensity}
-\end{eqnarray}
-The audio frequency signal present at a given FEP is
-\begin{equation}
-S_{AC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
-Re[ \tilde{S}_{AC} ] \cos{(2 \pi f_{\rm audio} t)} + Im[ \tilde{S}_{AC} ] \sin{(2 \pi f_{\rm audio} t)}
-\elabel{sac}
-\end{equation}
-where
-\begin{equation}
-\tilde{S}_{AC} = 2 (E^*_{DC_n} E_{+_m} \delta_{n,m} + E_{DC_n} E^*_{-_m} \delta_{m,n})
-\end{equation}
-(see, also, equation \eref{tildePX}).
+\end{align}
+The audio frequency signal at a FEP, for $\Omega \ll 1/T \ll \omega_{dmd}$, is
+\beqa{sac}
+S_{AC} &=& \frac{2}{T} \int^{T}_{-T} I_{AC} \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
+&=& 2 \sum^{\Nrf}_{m, n} Re \left[
+  E_{DC_m}^{*} E_{+_n} ~ \delta_{mn} ~ e^{-i \Omega t} 
+   + E_{DC_m} E_{-_n}^{*} ~ \delta_{mn}^* ~ e^{-i \Omega t} \right] \nonumber \\
+\Rightarrow &&\tilde{S}_{AC} = 2 \sum^{\Nrf}_{m,n} (E_{DC_m}^* E_{+_n} \delta_{mn} + E_{DC_m} E_{-_n}^* \delta_{mn}^*)
+\eeqa
+(see section \sref{freq_domain}).
+
 The overall probe matrix is constructed from the individuals row at a time according to
 \begin{equation}
 \mPrb(k,:) =
