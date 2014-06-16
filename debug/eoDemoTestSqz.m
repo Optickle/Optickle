@@ -1,6 +1,6 @@
 function eoDemoTestSqz
   % create model
-  opt = eoOptTestSqz
+  opt = eoOptTestSqz;
   
   % get our probe index
   nSqz = getProbeNum(opt, 'Sqz_DC');
@@ -28,6 +28,6 @@ function eoDemoTestSqz
   qShot = noiseAC0;
   
   % plot the result
-  plot(SqzAngle, 20*log10(qNoise/qShot));
+  plot(SqzAngle, 20*log10(qNoise/qShot))
 
 end
