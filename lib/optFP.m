@@ -35,7 +35,7 @@ function opt = optFP
   opt = addMirror(opt, 'IX', 0, 0, 0.03);
   opt = addMirror(opt, 'EX', 0, 0.7 / lCav, 0.001);
 
-  opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 2);
+  opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 0);
   opt = addLink(opt, 'IX', 'fr', 'EX', 'fr', lCav);
   opt = addLink(opt, 'EX', 'fr', 'IX', 'fr', lCav);
   

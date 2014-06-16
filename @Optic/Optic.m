@@ -657,7 +657,7 @@ classdef Optic < handle
       % make room for upper and lower audio SBs
       NinRF = size(mOpt, 2);
       NoutRF = size(mOpt, 1);
-      mOptAC = sparse(2 * NoutRF, NinRF);
+      mOptAC = sparse(2 * NoutRF, 2 * NinRF);
       
       % fill in block diagonal matrix
       mOptAC(1:NoutRF, 1:NinRF) = mOpt;

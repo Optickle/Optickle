@@ -32,7 +32,7 @@ function mQuant = getNoiseMatrix(obj, pos, par)
         vLmd(n), phi(n), obj.in(3:4), par.minQuant);
       
       % iteratively build a block diagonal matrix
-      mNA = blkdiag(mNA, sqrt(blockdiag(mNPa, mNPb)));
+      mNA = blkdiag(mNA, sqrt(blkdiag(mNPa, mNPb)));
   end
 
   % these noises are unsqueezed, so make amplitude and phase
