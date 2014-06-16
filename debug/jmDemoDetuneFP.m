@@ -44,7 +44,7 @@ function outstruct = jmDemoDetuneFP
   h0 = getTF(sigAC0, nREFL_I, nEX);
   h1 = getTF(sigAC1, nREFL_I, nEX);
   h2 = getTF(sigAC2, nREFL_I, nEX);
-  
+ 
   figure
   zplotlog(f, [h0, h1, h2])
   title('PDH Response for Detuned Cavity', 'fontsize', 18);
