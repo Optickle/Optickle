@@ -38,7 +38,7 @@
 % $Id: tickle.m,v 1.14 2011/07/26 23:09:57 tfricke Exp $
 
 
-function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
+function varargout = tickle(opt, pos, f, nDrive)
 
   % === Argument Handling
   if nargin < 2
@@ -50,10 +50,7 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   if nargin < 4
     nDrive = [];
   end
-  
-  % forth and fith argument given, return tfAC as last return argument
-  isOut_tfAC = nargin >= 5;
-  
+    
   % === Field Info
   vFrf = opt.vFrf;
   
@@ -132,181 +129,25 @@ function varargout = tickle(opt, pos, f, nDrive, nField_tfAC)
   [mOptGen, mRadFrc, lResp, mQuant] = ...
     convertOpticsAC(opt, mapList, pos, f, vDC);
   
-  % noise stuff
-  Nnoise = size(mQuant, 2);
-  pQuant  = opt.h * opt.k * opt.c / (2 * pi);   % CHECK
-  aQuant = sqrt(pQuant);
-  aQuantTemp = repmat(aQuant.',opt.Nlink,1); % aQuant is
-                                             % Nrfx1. mQuant is
-                                             % Nlink*Nrf x number
-                                             % of loss points*2
-
-  % get both upper and lower sidebands
-  aQuantMatrix = diag([aQuantTemp(:);aQuantTemp(:)]); 
-  mQuant = aQuantMatrix * mQuant;
-  whos
-  % compile probe shot noise vector
-  shotPrb = zeros(Nprb, 1);
-  
-  % shot noise
-  if isNoise
-    for k = 1:Nprb
-      mIn_k = prbList(k).mIn;
-      mPrb_k = prbList(k).mPrb;
-      
-      % This section attempts to account for the shot noise due to
-      % fields which are not recorded by a detector. E.g. a 10
-      % MHz detector will not see signal due to 37 MHz sidebands
-      % but it should see their shot noise
-      
-      % Define a new vDCin which includes the appropriate pQuant
-      % for each dc component
-      vDCinShot = mIn_k * vDC;
-      
-      shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * ...
-        (pQuant .* abs(vDCinShot).^2);
-    end
-  end
-  
-  % useful indices
-  jAsb = 1:Narf;
-  jDrv = (1:Ndrv) + Narf;
-  if ~isempty(nDrive)
-    jDrv = jDrv(nDrive);
-    NdrvOut = numel(nDrive);
+  % audio frequency and noise calculation
+  if ~isNoise
+    shotPrb = zeros(Nprb, 1);
+    mQuant = zeros(Narf, 0);
+    
+    [sigAC, mMech] = tickleAC(opt, f, nDrive, vLen, ...
+      [], mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   else
-    NdrvOut = Ndrv;
+    [mQuant, shotPrb] = tickleNoise(opt, prbList, vDC, mQuant);
+    
+    [sigAC, mMech, noiseAC, noiseMech] = tickleAC(opt, f, nDrive, vLen, ...
+      [], mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   end
-  
-  % main inversion tools
-  mQOz = sparse(Ndrv, Nnoise);
-  eyeNdof = speye(Ndof);
-
-  % intialize result space
-  mExc = eyeNdof(:, jDrv);
-  sigAC = zeros(Nprb, NdrvOut, Naf);
-  mMech = zeros(NdrvOut, NdrvOut, Naf);
-  noiseAC = zeros(Nprb, Naf);
-  noiseMech = zeros(NdrvOut, Naf);
-  
-  % is tfAC wanted?
-  if isOut_tfAC
-    tfACout = zeros(2 * numel(nField_tfAC), NdrvOut, Naf);
-    jAsbAC = [jAsb(nField_tfAC), jAsb(Nfld + nField_tfAC)];
-  end
-    
-  % since this can take a while, let's time it
-  tic;
-  hWaitBar = [];
-  tLast = 0;
-  
-  % prevent scale warnings
-  sWarn = warning('off', 'MATLAB:nearlySingularMatrix');
-
-  % audio frequency loop
-  for nAF = 1:Naf
-    fAudio = f(nAF);
-
-    % propagation phase matrices
-    mPhim = Optickle.getPhaseMatrix(vLen, vFrf - fAudio, [], mPhiFrf);
-    mPhip = Optickle.getPhaseMatrix(vLen, vFrf + fAudio, [], mPhiFrf);
-    mPhi = blkdiag(mPhip,conj(mPhim));
-    
-    % mechanical response matrix
-    mResp = diag(lResp(nAF,:));
-    
-    % ==== Put it together and solve
-    mDof = [  mPhi * mOptGen
-             mResp * mRadFrc ];
-    
-    tfAC = (eyeNdof - mDof) \ mExc;
-
-    % field TF matrix wanted?
-    if isOut_tfAC
-      tfACout(:, :, nAF) = tfAC(jAsbAC, :);
-    end
-    
-    % extract optic to probe transfer functions
-    sigAC(:, :, nAF) = 2 * mPrb * tfAC(jAsb, :);
-    mMech(:, :, nAF) = tfAC(jDrv, :);
-    
-    if isNoise
-      %%%% With Quantum Noise
-      mQinj = [mPhi * mQuant;  mQOz];
-      mNoise = (eyeNdof - mDof) \ mQinj;
-      noisePrb = mPrb * mNoise(jAsb, :);
-      noiseDrv = mNoise(jDrv, :);
-      
-      % incoherent sum of amplitude and phase noise
-      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
-      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
-      
-      % HACK: noise probe
-      %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
-    end
-    
-    % ==== Timing and User Interaction
-    % NO MODELING HERE (just let the user know how long this will take)
-    tNow = toc;
-    frac = nAF / Naf;
-    tRem = tNow * (1 / frac - 1);
-    if tNow > 2 && tRem > 2 && tNow - tLast > 0.5 && opt.debug > 0
-      % wait bar string
-      str = sprintf('%.1f s used, %.1f s left', tNow, tRem);
-
-      % check and update waitbar
-      if isempty(hWaitBar)
-        % create wait bar
-        try
-          strWB = [str ' (close this window to stop)'];
-          hWaitBar = waitbar(frac, strWB, 'Name', 'Optickle: Computing...');
-          tLast = tNow;
-        catch
-          % can't make wait bar... use text
-          if tNow - tLast > 5
-            disp(str)
-            tLast = tNow;
-          end
-        end
-      else
-        try
-          strWB = [str ' (close this window to stop)'];
-          findobj(hWaitBar);			% error if wait bar closed
-          waitbar(frac, hWaitBar, strWB);	% update wait string
-          tLast = tNow;
-        catch
-          error('Wait bar closed by user.  Exiting.')
-        end
-      end
-    end
-  end
-    
-  % reset scale warning state
-  warning(sWarn.state, sWarn.identifier);
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % ==== Clean Up
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  % close wait bar
-  if ~isempty(hWaitBar)
-    waitbar(1.0, hWaitBar, 'Done computing fields.  Returning...')
-    close(hWaitBar)
-  end
-
-  % make sure that the wait bar is closed
-  drawnow
 
   % Build the rest of the outputs
   varargout{3} = sigAC;
   varargout{4} = mMech;
   if isNoise
-      varargout{5} = noiseAC;
-      varargout{6} = noiseMech;
-  end
-  
-
-  if isOut_tfAC && nargout > 0
-    varargout{nargout} = tfACout;
+    varargout{5} = noiseAC;
+    varargout{6} = noiseMech;
   end
 end

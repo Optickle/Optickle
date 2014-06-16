@@ -44,7 +44,7 @@ function varargout = tickle01(opt, pos, f, nDrive)
   end
 
   % === Field Info
-  [vFrf, vSrc] = getSourceInfo(opt);
+  vFrf = opt.vFrf;
   
   % ==== Sizes of Things
   Ndrv = opt.Ndrive;		% number of drives (internal DOFs)
@@ -68,17 +68,6 @@ function varargout = tickle01(opt, pos, f, nDrive)
   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % ==== Convert to Matrix Form
-  % duplicated from tickle
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  % link and probe conversion
-  [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
-
-  % optic conversion
-  mOpt = convertOpticsDC(opt, mapList, pos);
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== DC Fields and Signals
   % duplicated from tickle
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -86,7 +75,6 @@ function varargout = tickle01(opt, pos, f, nDrive)
   [vLen, prbList, mapList, mPhiFrf, vDC, mPrb, mPrbQ] = ...
     tickleDC(opt, pos);
 
-    
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % ==== Audio Frequency Loop
   % mostly duplicated from tickle
@@ -101,126 +89,32 @@ function varargout = tickle01(opt, pos, f, nDrive)
   vDist = [lnks.len]';
   vPhiGouy = getGouyPhase(vDist, vBasis(:, 2));
 
-  % optic conversion
-  [m01, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f);
+  % expand the probe matrix to both audio SBs
+  mPrb = sparse([mPrb, conj(mPrb)]);
   
-  % prepare generation matrix (part of optic-field matrix)
-  mGen = sparse(Nfld, Ndrv);
-  for n = 1:Ndrv
-    mGen(:, n) = drvList(n).m * vDC;
-  end
+  % get optic matricies for AC part
+  [mOptGen, mRadFrc, lResp, mQuant] = ...
+    convertOptics01(opt, mapList, pos, f, vDC);
   
-  % useful indices
-  jAsb = 1:Narf;
-  jDrv = (1:Ndrv) + Narf;
-  if ~isempty(nDrive)
-    jDrv = jDrv(nDrive);
-    NdrvOut = numel(nDrive);
+  % audio frequency and noise calculation
+  if ~isNoise
+    shotPrb = zeros(Nprb, 1);
+    mQuant = zeros(Narf, 0);
+    
+    [sigAC, mMech] = tickleAC(opt, f, nDrive, vLen, ...
+      vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   else
-    NdrvOut = Ndrv;
-  end
-  
-  % main inversion tools
-  mDC = sparse(1:Nfld, 1:Nfld, vDC, Nfld, Nfld);
-
-  mFFz = sparse(Nfld, Nfld);
-  mOOz = sparse(NdrvOut, NdrvOut);
-  eyeNdof = speye(Ndof);
-
-  % intialize result space
-  mExc = eyeNdof(:, jDrv);
-  sigAC = zeros(Nprb, NdrvOut, Naf);
-  mMech = zeros(NdrvOut, NdrvOut, Naf);
-  
-  % since this can take a while, let's time it
-  tic;
-  hWaitBar = [];
-  tLast = 0;
-  
-  % prevent scale warnings
-  sWarn = warning('off', 'MATLAB:nearlySingularMatrix');
-
-  % audio frequency loop
-  for nAF = 1:Naf
-    fAudio = f(nAF);
-
-    % propagation phase matrices
-    mPhim = getPhaseMatrix(vLen, vFrf - fAudio, -vPhiGouy); % Gouy phase has minus sign
-    mPhip = getPhaseMatrix(vLen, vFrf + fAudio, -vPhiGouy);
-
-    % field to optic position transfer
-    mFOm = rctList(nAF).m * conj(mDC) / LIGHT_SPEED;
-    mFOp = rctList(nAF).m * mDC / LIGHT_SPEED;
-
-    % field to field transfer
-    mFFm = mPhim * m01;
-    mFFp = conj(mPhip * m01);
-
-    % optic to field transfer
-    mOFm = mPhim * mGen;
-    mOFp = conj(mPhip * mGen);
+    [mQuant, shotPrb] = tickleNoise(opt, prbList, vDC, mQuant);
     
-    % ==== Put it together and solve
-    mDof = [mFFm, mFFz, mOFm; mFFz, mFFp, mOFp; mFOm, mFOp, mOOz];
-    tfAC = (eyeNdof - mDof) \ mExc;
-
-    % extract optic to probe transfer functions
-    sigAC(:, :, nAF) = mPrb * tfAC(jAsb, :);
-    mMech(:, :, nAF) = tfAC(jDrv, :);
-        
-    % ==== Timing and User Interaction
-    % NO MODELING HERE (just let the user know how long this will take)
-    tNow = toc;
-    frac = nAF / Naf;
-    tRem = tNow * (1 / frac - 1);
-    if tNow > 2 && tRem > 2 && tNow - tLast > 0.5 && opt.debug > 0
-      % wait bar string
-      str = sprintf('%.1f s used, %.1f s left', tNow, tRem);
-
-      % check and update waitbar
-      if isempty(hWaitBar)
-        % create wait bar
-        try
-          strWB = [str ' (close this window to stop)'];
-          hWaitBar = waitbar(frac, strWB, 'Name', 'Optickle: Computing...');
-          tLast = tNow;
-        catch
-          % can't make wait bar... use text
-          if tNow - tLast > 5
-            disp(str)
-            tLast = tNow;
-          end
-        end
-      else
-        try
-          strWB = [str ' (close this window to stop)'];
-          findobj(hWaitBar);			% error if wait bar closed
-          waitbar(frac, hWaitBar, strWB);	% update wait string
-          tLast = tNow;
-        catch
-          error('Wait bar closed by user.  Exiting.')
-        end
-      end
-    end
-  end
-    
-  % reset scale warning state
-  warning(sWarn.state, sWarn.identifier);
-  
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % ==== Clean Up
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  % close wait bar
-  if ~isempty(hWaitBar)
-    waitbar(1.0, hWaitBar, 'Done computing fields.  Returning...')
-    close(hWaitBar)
+    [sigAC, mMech, noiseAC, noiseMech] = tickleAC(opt, f, nDrive, vLen, ...
+      vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   end
 
-  % make sure that the wait bar is closed
-  drawnow
-
-  % build outputs
+  % Build the outputs
   varargout{1} = sigAC;
   varargout{2} = mMech;
-end    
+  if isNoise
+      varargout{3} = noiseAC;
+      varargout{4} = noiseMech;
+  end
+end

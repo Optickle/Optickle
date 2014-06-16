@@ -9,7 +9,7 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   Nrf = par.Nrf;
   Nin = 4;									% obj.Optic.Nin
   Nout = 8;									% obj.Optic.Nout
-  pos = pos + obj.Optic.pos;				% mirror position
+  pos = pos + obj.pos;				% mirror position
   
   % optic parametes as vectors for each field component
   [vThr, vLhr, vRar, vLmd] = obj.getVecProperties(par.lambda, par.pol);
@@ -23,7 +23,7 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
 
   % direction matrices
   mDirIn = diag([-caoi,caoi,-caoi,caoi]);
-  mDirOut = diag([-caoi,caoi,caoi,caoi-caoi,caoi,caoi,caoi]);
+  mDirOut = diag([-caoi,caoi,caoi,caoi,-caoi,caoi,caoi,caoi]);
   
   % prepare the scattering matrices
   m = zeros(Nout, Nin);                 % single field, no phases
