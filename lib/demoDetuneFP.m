@@ -30,17 +30,17 @@ function [sigDC0, sigAC0, mMech0, noiseAC0] = demoDetuneFP
   fprintf('\nProbes (sigDC matrix):\n');
   showsigDC(opt, sigDC0);
   
-  fDC
+  %fDC
   % compute the same a little off resonance
   pos = zeros(opt.Ndrive, 1);
   pos(nEX) = 0.1e-9;
   [fDC, sigDC1, sigAC1, mMech1, noiseAC1] = tickle(opt, pos, f);
-  fDC
+  %fDC
   
   % and a lot off resonance
   pos(nEX) = 1e-9;
   [fDC, sigDC2, sigAC2, mMech2, noiseAC2] = tickle(opt, pos, f);
-  fDC
+  %fDC
   
   % make a response plot
   h0 = getTF(sigAC0, nREFL_I, nEX);
@@ -56,6 +56,10 @@ function [sigDC0, sigAC0, mMech0, noiseAC0] = demoDetuneFP
   n0 = noiseAC0(nREFL_I, :)';
   n1 = noiseAC1(nREFL_I, :)';
   n2 = noiseAC2(nREFL_I, :)';
+  
+  %[h0(1), h1(1), h2(1)]  % HACK
+  %[n0(1), n1(1), n2(1)]  % HACK
+  %abs([n0(1) ./ h0(1), n1(1) ./ h1(1), n2(1) ./ h2(1)])
   
   figure(2)
   loglog(f, abs([n0 ./ h0, n1 ./ h1, n2 ./ h2]))

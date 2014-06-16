@@ -55,10 +55,10 @@ function opt = optFP
 
   dampRes = [0.01 + 1i, 0.01 - 1i];
   
-  opt = setMechTF(opt, 'IX', zpk([], -w * dampRes, 1 / mI));
+  %opt = setMechTF(opt, 'IX', zpk([], -w * dampRes, 1 / mI));
   opt = setMechTF(opt, 'EX', zpk([], -w * dampRes, 1 / mE));
 
-  opt = setMechTF(opt, 'IX', zpk([], -w_pit * dampRes, 1 / iI), 2);
+  %opt = setMechTF(opt, 'IX', zpk([], -w_pit * dampRes, 1 / iI), 2);
   opt = setMechTF(opt, 'EX', zpk([], -w_pit * dampRes, 1 / iE), 2);
   
   % tell Optickle to use this cavity basis

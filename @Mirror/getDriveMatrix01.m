@@ -1,20 +1,20 @@
 % getDriveMatrix method for TEM01 mode (pitch)
-%   returns a matrix, (Nrf * obj.Nout) x (Nrf * obj.Nin) x Ndrive
+%   returns the drive coupling matrix, (Nrf * obj.Nout) x (Nrf * obj.Nin) x Ndrive
 %   in this case, Nrf * (4 x 2)
 %
 % arguments not in @Optic/getDriveMatrix01
 %   (these are optional and are needed only for optimization)
 %   mOpt = optical matrix from getFieldMatrix
-%   d = dl/dx (non-zero for reflected fields), from getFieldMatrix
-%     = -2 from the front of a mirror at normal incidence (aoi = 0)
+%   dldx = (non-zero for reflected fields), from getFieldMatrix
+%        = -2 from the front of a mirror at normal incidence (aoi = 0)
 %
-% mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
+% mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
 
-function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
+function mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
   
   % check for optional arguments
   if nargin < 6
-    [mOpt, d] = getFieldMatrix(obj, pos, par);
+    [mOpt, ~, ~, dldx] = getFieldMatrix(obj, pos, par);
   end
   
   % constants
@@ -40,15 +40,15 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
   mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
   
   % drive matrix
-  mDrv = zeros(Nrf * Nout, Nrf * Nin);
+  mCpl = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
-    drp = 1i * sqrt(par.k(n) / 2) * (mInj * d / 2);
+    drp = 1i * sqrt(par.k(n) / 2) * (mInj * sign(dldx) / 2);
 
-    % enter this submatrix into mDrv
+    % enter this submatrix into mCpl
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
-    mDrv(nn, mm) = mOpt(nn, mm) .* drp;
+    mCpl(nn, mm) = mOpt(nn, mm) .* drp;
     
   end
   
