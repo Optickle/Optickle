@@ -55,7 +55,7 @@ classdef OptickleTest < matlab.unittest.TestCase
             global globalRefStruct
             if strcmp(testCase.config.referenceType,'Path')
                 testCase.referenceStruct = globalRefStruct;
-                clear GLOBALRefStruct
+                clear globalRefStruct
             end
         end
         function computeCalculatedStruct(testCase)
@@ -90,12 +90,12 @@ classdef OptickleTest < matlab.unittest.TestCase
             funHandle = @() testCase.warnOnMatrixFieldsInequalityInStruct(...
                 label, fieldNames);
             
-            testCase.verifyWarningFree(funHandle);
+            testCase.verifyWarningFree(funHandle,@testCase.saveDataToDisk);
         end
         function warnOnMatrixFieldsInequalityInStruct(testCase,label, fieldNames)
             % precision is the product of these two numbers
-            errorThreshold = 1e-3;
-            smallNumber = 1e-6;
+            errorThreshold = 1e-6;
+            smallNumber = 5e-5;
             
             % helper function
             function stringOut = cell2CommaSeparatedString(cellIn)
@@ -125,6 +125,13 @@ classdef OptickleTest < matlab.unittest.TestCase
                         cell2CommaSeparatedString(ind) '] in variable ' name{:}])
                 end
             end
+        end
+        function saveDataToDisk(testCase)
+            temporaryFile = tempname;
+            calcStruct = testCase.calculatedStruct; %#ok<NASGU>
+            refStruct = testCase.referenceStruct; %#ok<NASGU>
+            save(temporaryFile, 'calcStruct', 'refStruct');
+            fprintf('<a href="matlab:load(''%s'')">Load data into workspace</a>\n', temporaryFile);
         end
     end % methods
 end
