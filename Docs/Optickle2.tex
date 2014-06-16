@@ -30,7 +30,7 @@
 % Header
 
 \title{Optickle 2}
-\author{M.~Evans}
+\author{M.~Evans, Y.~Michmora, J.~Miller, E.~Oelker, N.~Smith-Lefebvre}
 %\address{$^1$MIT Kavli Institute (MKI), Massachusetts Institute of Technology %(MIT), Cambridge, USA;}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -259,35 +259,38 @@ In this section we setup a framework for making the transition from one domain t
 
 For a sinusoidal motion for $x(t)$
 \beqa{mirror_x}
-x(t) &=& \real{ \tilde{x} } \fcos{\Omega t} + \imag{\tilde{x} } \fsin{\Omega t} \\
-  &=& \half \real{ \tilde{x} } \(e^{i \Omega t} + e^{-i \Omega t} \) - \tfrac{i}{2} \imag{\tilde{x} } \(e^{i \Omega t} - e^{-i \Omega t} \) \\
-  &=& \half \( \tilde{x}^* ~ e^{i \Omega t} + \tilde{x} ~ e^{-i \Omega t} \) \\
-  &=& \real{ \tilde{x} ~ e^{-i \Omega t} }
+x(t) &=& \real{ \tilde{x} } \fcos{\Omega t} - \imag{\tilde{x} } \fsin{\Omega t} \\
+  &=& \half \real{ \tilde{x} } \(e^{i \Omega t} + e^{-i \Omega t} \) + \tfrac{i}{2} \imag{\tilde{x} } \(e^{i \Omega t} - e^{-i \Omega t} \) \\
+  &=& \half \( \tilde{x} ~ e^{i \Omega t} + \tilde{x}^* ~ e^{-i \Omega t} \) \\
+  &=& \real{ \tilde{x} ~ e^{i \Omega t} }
 \eeqa
  such that the complex value $\tilde{x}$ describes the amplitude and phase of $x(t)$.
+This is, of course, the usual discrete Fourier transform of a real function
+ in which we have highlighted one frequency component $\Omega$. 
+Interestingly, the minus sign before $\fsin{\Omega t}$ in the first line is necessary to recover
+ this standard definition.
 
-Note an interesting feature of this definition: a delay increases the phase of $\tilde{x}$.
-Consider an $x_2(t)$ defined as a delayed copy of $x_1(t)$: $x_2(t) = x_1(t - \Delta t)$
- such that what happens at time $t$ in $x_2$ happened at time $t - \Delta t$ in $x_1$.
-In the frequency domain, the delayed signal $\tilde{x}_2$ is
-\beqa{}
-\real{ \tilde{x}_2 ~ e^{-i \Omega t} } &=& \real{ \tilde{x}_1 ~ e^{-i \Omega (t - \Delta t)} } \\
-\Rightarrow \tilde{x}_2 &=& \tilde{x}_1 e^{i \Omega \Delta t}
-\eeqa
+%Note an interesting feature of this definition: a delay increases the phase of $\tilde{x}$.
+%Consider an $x_2(t)$ defined as a delayed copy of $x_1(t)$: $x_2(t) = x_1(t - \Delta t)$
+% such that what happens at time $t$ in $x_2$ happened at time $t - \Delta t$ in $x_1$.
+%In the frequency domain, the delayed signal $\tilde{x}_2$ is
+%\beqa{}
+%\real{ \tilde{x}_2 ~ e^{-i \Omega t} } &=& \real{ \tilde{x}_1 ~ e^{-i \Omega (t - \Delta t)} } \\
+%\Rightarrow \tilde{x}_2 &=& \tilde{x}_1 e^{i \Omega \Delta t}
+%\eeqa
 
 Similarly, for a power level which is varying at angular frequency $\Omega$
  due to a carrier field $E_{DC}$ with positive and negative audio sidebands $E_{\pm}$,
  \beq{}
- P(t) = P_{DC} + P_{\Omega} + P_{2 \Omega} = \abs{ E_{DC}  + E_{+} e^{-i \Omega t} + E_{-} e^{i \Omega t} }^2
+ P(t) = P_{DC} + P_{\Omega} + P_{2 \Omega} = \abs{ E_{DC}  + E_{-} e^{+i \Omega t} + E_{+} e^{-i \Omega t} }^2
  \eeq
  the variation at $\Omega$ is
 \beqa{power-force_trig}
-P_{\Omega}  &=& E_{DC}^* E_{+} e^{-i \Omega t} + E_{DC} E_{+}^* e^{i \Omega t}  +
-    E_{DC}^* E_{-} e^{i \Omega t} + E_{DC} E_{-}^* e^{-i \Omega t}  \nonumber \\
-  &=& (E_{DC}^* E_{+} + E_{DC} E_{-}^* )^* e^{i \Omega t} + (E_{DC}^* E_{+} + E_{DC} E_{-}^* ) e^{-i \Omega t} \nonumber \\
-  &=& 2 \real{ (E_{DC}^* E_{+} + E_{DC} E_{-}^* ) e^{-i \Omega t} } \nonumber \\
-   &=& \real{ \tilde{P}_{\Omega}} \fcos{\Omega t} + \imag{\tilde{P}_{\Omega} } \fsin{\Omega t} \\
-&& \Rightarrow \tilde{P}_{\Omega} = 2 \( E_{DC}^* E_{+} + E_{DC} E_{-}^* \) \elabel{tildePX}
+P_{\Omega}  &=& E_{DC}^* E_{-} e^{+i \Omega t} + E_{DC} E_{-}^* e^{-i \Omega t}  +
+    E_{DC}^* E_{+} e^{-i \Omega t} + E_{DC} E_{+}^* e^{+i \Omega t}  \nonumber \\
+  &=& (E_{DC}^* E_{-} + E_{DC} E_{+}^* )^* e^{+i \Omega t} + (E_{DC} E_{-}^* + E_{DC}^* E_{+} ) e^{-i \Omega t} \nonumber \\
+  &=& 2 \real{ (E_{DC}^* E_{-} + E_{DC} E_{+}^* ) e^{+i \Omega t} } \nonumber \\
+&& \Rightarrow \tilde{P}_{\Omega} = 2 \( E_{DC}^* E_{-} + E_{DC} E_{+}^* \) \elabel{tildePX}
 \eeqa
 
 An amplitude modulator, for instance, which produces relative intensity modulation as
@@ -296,10 +299,55 @@ P(t)  &=& P_{DC} (1 + A \fcos{\Omega t}) \\
   &=& \abs{E_{DC}}^2 + A E_{DC}^* E_{DC} \fcos{\Omega t} \\
 \Rightarrow \tilde{P}_{\Omega} &=& A E_{DC}^* E_{DC}  \\
  &=& \half A \( E_{DC}^* E_{DC} + E_{DC} E_{DC}^* \)  \nonumber \\
- &=& 2 \( E_{DC}^* E_{+} + E_{DC} E_{-}^* \) \nonumber \\
+ &=& 2 \( E_{DC}^* E_{-} + E_{DC} E_{+}^* \) \nonumber \\
 \for && E_+ = E_- = \frac{A}{4} E_{DC} 
 \eeqa
  where in the last step we have identified the audio sideband (SB) amplitudes produced by this modulation.
+To express this in matrix form, and allow $A$ to be a complex amplitude rather than just a real number,
+ we an write
+\beq{AMmod_ASB}
+\matrixBegin{c}
+E_- \\
+E_+^*
+\matrixEnd
+ =
+\matrixBegin{c}
+ E_{DC} \\
+ E_{DC}^*
+\matrixEnd
+\frac{\tilde{A}}{4}
+\eeq
+ and the power at $\Omega$ is given by
+\beq{AMmod_matrix_example}
+\tilde{P}_{\Omega} =
+2 \matrixBegin{cc}
+ E_{DC}^*, & E_{DC}
+\matrixEnd
+\matrixBegin{c}
+E_- \\
+E_+^*
+\matrixEnd
+ = 
+2 \matrixBegin{c}
+ E_{DC} \\
+ E_{DC}^*
+\matrixEnd^\dagger
+\matrixBegin{c}
+E_- \\
+E_+^*
+\matrixEnd
+\eeq
+ where in the last step we have introduced the complex-transpose or adjoint operator $\dagger$.
+ 
+Note that the conjugation of the upper sideband component is necessary to allow the
+ conversion from sideband amplitudes to power.
+(This is required in the field-optic part of $\mAC$ in equation \eref{mAC},
+ and is made more explicit in section \sref{field-optic}.)
+Also note that the choice of which sideband to conjugate is not arbitrary:
+ conjugating the lower sideband rather than the upper, as in the two-photon formalism,
+ would result in an overall conjugation of the results and thus a time reversal with respect
+ to the Fourier coefficient as defined in equation \eref{mirror_x}.
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Field to Field Transfer Matrix}
@@ -308,18 +356,19 @@ Restating,
 \begin{equation}
 \matm{field-field} =
 \matrixBegin{cc}
- \mPhin{+} \mOpt & 0 \\
- 0 & \mPhin{-}^* \mOpt^* \\
+ \mPhin{-} & 0 \\
+ 0 & \mPhin{+}^*\\
+\matrixEnd
+\matrixBegin{cc}
+ \mOpt & 0 \\
+ 0 & \mOpt^* \\
 \matrixEnd
 \end{equation}
 where in this case the link phase is
 \begin{equation}
-\mPhin{\pm}(k,k) = e^{i ~ 2 \pi (\nu_m \pm f_{AF}) ~ L_n / c}
+\mPhin{\pm}(k,k) = e^{i ~ 2 \pi (\nu_m \pm f_{AF}) ~ l_n / c}
 \end{equation}
 which is the same as equation \eref{mPhi}, with the addition of the audio frequency component.
-The conjugation of the lower sideband component is necessary for the optic-field and field-optic
- calculations which follow, and allows for a direct mapping from the audio sideband fields in Optickle
- to the two-photon formalism.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Optic to Field Transfer Matrix}
@@ -327,8 +376,8 @@ The optic to field matrix, much like the field to field matrix, must result in b
 \begin{equation}
 \matm{optic-field} =
 \matrixBegin{c}
- \mPhin{+} \mGen \\
- \mPhin{-}^* \mGen^* \\
+ \mPhin{-} \mGen \\
+ \mPhin{+}^* \mGen^* \\
 \matrixEnd
 \elabel{mOF}
 \end{equation}
@@ -367,15 +416,15 @@ E_{out} = -r e^{-2 i k x} ~ E_{in}
 For small $x$, such that $k x \ll 1$, we can approximate the exponential to first order as
 \beqa{mirror_refl}
 E_{out} &=& -r (1 - 2 i k x)  E_{in} \\
- &=& -r E_{in} + i k r  ~ E_{in} \( \tilde{x}^* ~ e^{i \Omega t} + \tilde{x} ~ e^{-i \Omega t} \) \\
- &=& -r E_{in} + E_+ e^{-i \Omega t} + E_- e^{i \Omega t} \\
+ &=& -r E_{in} + i k r  ~ E_{in} \( \tilde{x}^* ~ e^{-i \Omega t} + \tilde{x} ~ e^{+i \Omega t} \) \\
+ &=& -r E_{in} + E_+ e^{+i \Omega t} + E_- e^{-i \Omega t} \\
 \where && E_+ = i k r ~E_{in} ~\tilde{x} ~~ \and ~~ E_- = i k r ~E_{in} ~\tilde{x}^* 
 \eeqa
 Thus, the production of audio sidebands in reflection from the mirror is given by
 \beq{mirror_ASB}
 \matrixBegin{c}
-E_+ \\
-E_-^*
+E_- \\
+E_+^*
 \matrixEnd
  =
 \matrixBegin{c}
@@ -390,6 +439,8 @@ E_-^*
 
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{Field to Optic Transfer Matrix}
+\sslabel{field-optic}
+
 This matrix is actually the product of the field-to-force matrix, and the force-to-degree of freedom matrix, where ``degree of freedom'' most often means ``position''.
 \beq{field-optic}
 \matm{field-optic} = \mResp \mRad
@@ -419,7 +470,7 @@ And also in the case of a perfect reflector: $F_r = 2 ( P_{back_{in}} - P_{front
 
 The modulation of each incoming and outgoing power by the co-propagating DC field and its audio SBs is given by
 \beq{power-force}
- P_X = \abs{ E_{DC_X}  + E_{+_X} e^{-i \Omega t} + E_{-_X} e^{i \Omega t} }^2
+ P_X = \abs{ E_{DC_X}  + E_{+_X} e^{+i \Omega t} + E_{-_X} e^{-i \Omega t} }^2
 \eeq
  where $X \in \set{\rm back_{in, out} , {front_{in,out}} }$,
   $E_{\pm_X}$ are the upper and lower sideband amplitudes,
@@ -745,7 +796,7 @@ AC signals, on the other hand, are products between DC and audio frequency field
 \subsection{DC Signals}
 To compute the DC signals, we start with an expression for the intensity present at a given FEP,
 \begin{eqnarray}
-I &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{-i \omega_n t}  \right|^2 \\
+I &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{+i \Omega_n t}  \right|^2 \\
  &=& \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
  E^*_{DC_m} E_{DC_n} e^{i (\omega_m - \omega_n) t}
 \elabel{intensity}
@@ -789,7 +840,7 @@ The audio frequency signal, or ``AC signal'',
  computation follows a very similar path to that of the DC signals in the previous section.
 Intensity present at a given FEP is
 \beq{I_AC}
-I = \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{-i \omega_n t} + E_{+_n} e^{-i (\omega_n + \Omega) t} 
+I = \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{+i \Omega_n t} + E_{+_n} e^{-i (\omega_n + \Omega) t} 
    + E_{-_n} e^{-i (\omega_n - \Omega) t}  \right) \right|^2
 \eeq
  where $\Omega = 2 \pi f_{\rm audio}$ is the audio sideband frequency being considered.
@@ -806,8 +857,8 @@ The audio frequency signal at a FEP, for $\Omega \ll 1/T \ll \omega_{dmd}$, is
 \beqa{sac}
 S_{AC} &=& \frac{2}{T} \int^{T}_{-T} I_{AC} \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
 &=& 2 \sum^{\Nrf}_{m, n} Re \left[
-  E_{DC_m}^{*} E_{+_n} ~ \delta_{mn} ~ e^{-i \Omega t} 
-   + E_{DC_m} E_{-_n}^{*} ~ \delta_{mn}^* ~ e^{-i \Omega t} \right] \nonumber \\
+  E_{DC_m}^{*} E_{+_n} ~ \delta_{mn} ~ e^{+i \Omega t} 
+   + E_{DC_m} E_{-_n}^{*} ~ \delta_{mn}^* ~ e^{+i \Omega t} \right] \nonumber \\
 \Rightarrow &&\tilde{S}_{AC} = 2 \sum^{\Nrf}_{m,n} (E_{DC_m}^* E_{+_n} \delta_{mn} + E_{DC_m} E_{-_n}^* \delta_{mn}^*)
 \eeqa
 (see section \sref{freq_domain}).

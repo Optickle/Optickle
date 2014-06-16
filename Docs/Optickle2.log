@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  14 JUN 2014 22:38
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013) (format=pdflatex 2013.5.30)  16 JUN 2014 09:51
 entering extended mode
  \write18 enabled.
  file:line:error style messages enabled.
@@ -651,9 +651,6 @@ uage-mappings.tex)))) (./abbrev.tex) (./Optickle2.aux
 LaTeX Warning: Label `eqn:' multiply defined.
 
 
-LaTeX Warning: Label `eqn:' multiply defined.
-
-
 LaTeX Warning: Label `eqn:mirror_refl' multiply defined.
 
 
@@ -834,34 +831,34 @@ ple sys-tem $[] \OT1/cmr/m/n/10.95 =
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14.4> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 252.
  [6] [7] [8] [9]
-Overfull \hbox (15.85075pt too wide) in paragraph at lines 420--421
+Overfull \hbox (15.85075pt too wide) in paragraph at lines 471--472
 []\OT1/ptm/m/n/10.95 The mod-u-la-tion of each in-com-ing and out-go-ing power 
 by the co-propagating
  []
 
 [10] [11] [12] [13] [14] [15] [16] [17]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 860.
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 911.
  [18]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 860.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 911.
  (./Optickle2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 860.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 860.
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 911.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 911.
 Package rerunfilecheck Info: File `Optickle2.out' has not changed.
 (rerunfilecheck)             Checksum: 88C9C74A49259854BB66CF85044BE56F;927.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 860.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 911.
  ) 
 Here is how much of TeX's memory you used:
- 15926 strings out of 493315
- 311811 string characters out of 6137904
- 340041 words of memory out of 5000000
- 19047 multiletter control sequences out of 15000+600000
+ 15930 strings out of 493315
+ 311882 string characters out of 6137904
+ 339262 words of memory out of 5000000
+ 19050 multiletter control sequences out of 15000+600000
  42885 words of font info for 116 fonts, out of 8000000 for 9000
  957 hyphenation exceptions out of 8191
- 40i,14n,41p,322b,744s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 40i,14n,41p,322b,752s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2013/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
 exlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb></usr/local/te
 xlive/2013/texmf-dist/fonts/type1/public/amsfonts/cm/cmex10.pfb></usr/local/tex
@@ -878,10 +875,10 @@ st/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/local/texlive/2013/texm
 f-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/2013/texmf-dist/fon
 ts/type1/urw/times/utmr8a.pfb></usr/local/texlive/2013/texmf-dist/fonts/type1/u
 rw/times/utmri8a.pfb>
-Output written on Optickle2.pdf (18 pages, 240153 bytes).
+Output written on Optickle2.pdf (18 pages, 240892 bytes).
 PDF statistics:
- 330 PDF objects out of 1000 (max. 8388607)
- 290 compressed objects within 3 object streams
- 101 named destinations out of 1000 (max. 500000)
+ 334 PDF objects out of 1000 (max. 8388607)
+ 294 compressed objects within 3 object streams
+ 102 named destinations out of 1000 (max. 500000)
  126 words of extra memory for PDF output out of 10000 (max. 10000000)
 
