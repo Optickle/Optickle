@@ -145,7 +145,7 @@ classdef Optic < handle
       % [mOptAC, mGen, mRad, mFrc, mRsp, mQuant] = getMatrices01(obj, pos, par)
       
       % optical field transfer matrix
-      mOptAC = getFieldMatrix01(obj, pos, par);
+      mOptAC = getFieldMatrix(obj, pos, par);
       
       % reaction, drive and noise matrices (only used in AC computation)
       mGen = getGenMatrix01(obj, pos, par);
