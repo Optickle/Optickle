@@ -18,7 +18,7 @@ sn = getSerialNum(op, name);
 optic = op.optic{sn};
 
 % Modify it
-optic = set(optic, param, value);
+optic.(param) = value;
 
 % Put it back in place
 op.optic{sn} = optic;

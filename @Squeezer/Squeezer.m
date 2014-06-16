@@ -72,7 +72,7 @@ classdef Squeezer < Optic
     %
     % Default parameters are:
     %[lambda, fRF , pol, sqAng, sqdB, antidB, x, escEff, sqzOption] =
-    % [par.lambda[0], 0, 0, 1, 10, 10, 0.5195, 1, 0]        
+    % [1064e-9, 0, 0, 1, 10, 10, 0.5195, 1, 0]        
     % deal with no arguments
     if nargin == 0
         name = '';
@@ -89,11 +89,11 @@ classdef Squeezer < Optic
     switch( nargin )
       case 0					% default constructor, do nothing
       case {1, 2, 3, 4, 5, 8}
-       
-        args = {par.lambda(1), 0, 0, 1, 10, 10, 0.5195, 1, 0};
+        varargin
+        args = {1064e-9, 0, 0, 1, 10, 10, 0.5195, 1, 0};
         args(1:(nargin-1)) = varargin(1:end);
         if nargin==8 
-          if varargin(end)==1
+          if cell2mat(varargin(end))==1
             [obj.lambda, obj.fRF, obj.pol, obj.sqAng, obj.x,...
               obj.escEff, obj.sqzOption] = deal(args{1:(nargin-1)});
             %Calculate the level of squeezing and antisqueezing from x and
@@ -108,7 +108,7 @@ classdef Squeezer < Optic
             Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
             %Calculate x and escEff from Vs and Va
             obj.x = (Va-Vs-2*sqrt(-1+Vs+Va-Vs*Va))/(Vs+Va-2);
-            obj.escEff = (1-Vs)*(1+obj.x)^2/(4*x);
+            obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
           end
         else
           [obj.lambda, obj.fRF, obj.pol, obj.sqAng, obj.sqdB, ...
