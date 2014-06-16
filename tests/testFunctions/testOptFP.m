@@ -25,7 +25,7 @@ function opt = testOptFP
 
   % add an RF modulator
   %   opt = addRFmodulator(opt, name, fMod, aMod)
-  gamma = 0.2;
+  gamma = 0.2*1e-5;
   opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
   opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
 
@@ -33,7 +33,7 @@ function opt = testOptFP
   %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
   lCav = 4000;
   opt = addMirror(opt, 'IX', 0, 0, 0.03);
-  opt = addMirror(opt, 'EX', 0, 0.7 / lCav, 0.001);
+  opt = addMirror(opt, 'EX', 0, 0.7 / lCav, .01);
 
   opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 2);
   opt = addLink(opt, 'IX', 'fr', 'EX', 'fr', lCav);
@@ -42,7 +42,7 @@ function opt = testOptFP
   % set some mechanical transfer functions
   w = 2 * pi * 0.7;      % pendulum resonance frequency
   mI = inf*40;               % mass of input mirror
-  mE = inf*40;               % mass of end mirror
+  mE = .40;               % mass of end mirror
 
   w_pit = 2 * pi * 0.5;   % pitch mode resonance frequency
 
@@ -74,7 +74,8 @@ function opt = testOptFP
   
   % add TRANS optics (adds telescope, splitter and sinks)
   % opt = addReadoutTelescope(opt, name, f, df, ts, ds, da, db)
-  opt = addReadoutTelescope(opt, 'TRANS', 2, [2.2 0.19], ...
+  testTeleLength = 0;
+  opt = addReadoutTelescope(opt, 'TRANS', 2, [testTeleLength * 2.2 0.19], ...
     0.5, 0.1, 0.1, 4.1);
   opt = addLink(opt, 'EX', 'bk', 'TRANS_TELE', 'in', 0.3);
   
@@ -83,10 +84,12 @@ function opt = testOptFP
   opt = addProbeIn(opt, 'TRANSb_DC', 'TRANSb', 'in', 0, 0);	% DC
 
   % add a source at the end, just for fun
-  opt = addSource(opt, 'FlashLight', (1e-3)^2 * (vMod == 1));
+  opt = addSource(opt, 'FlashLight', 0*(1e-3)^2 * (vMod == 1));
   opt = addGouyPhase(opt, 'FakeTele', pi / 4);
-  opt = addLink(opt, 'FlashLight', 'out', 'FakeTele', 'in', 0.1);
-  opt = addLink(opt, 'FakeTele', 'out', 'EX', 'bk', 0.1);
+  %opt = addLink(opt, 'FlashLight', 'out', 'FakeTele', 'in', 0.1);
+  %opt = addLink(opt, 'FakeTele', 'out', 'EX', 'bk', 0.1);
+  opt = addSink(opt,'MattSink');
+  opt = addLink(opt,'MattSink','out','EX','bk',0);
   opt = setGouyPhase(opt, 'FakeTele', pi / 8);
   
   % add unphysical intra-cavity probes
