@@ -2,6 +2,7 @@
 % Preamble
 \documentclass[12pt]{article}
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Packages
 \usepackage{amsmath, amssymb}
@@ -18,6 +19,7 @@
 
 \hypersetup{citecolor=black}
 
+
 %\pdfcompresslevel 9
 
 
@@ -25,6 +27,14 @@
 % Input Commands
 \input{mevansTex}
 \input{abbrev}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% User-defined Commands
+
+%define three element vector for angular section
+\newcommand{\threeVec}[3]{\big( {#1}, {#2}, {#3} \big)}
+%define vector symbol for angular section
+\newcommand{\myVec}[1]{\vec{#1}}
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Header
@@ -852,9 +862,139 @@ The output noise spectra are given by the incoherent sum of all of the injected 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Angular Transfer Functions}
 
-Optickle can compute transfer functions for the TEM01 mode produced, for example, by pitch of a mirror.
-This is done in almost complete analogy with the TEM00 computations described in the previous sections.
-The exceptions are the Gouy phase, and the dependence of audio sideband injection amplitude on the Hermite-Gaussian beam parameters.
+Optickle can compute transfer functions for the TEM01 mode produced,
+for example, by pitch of a mirror.  This is done in almost complete
+analogy with the TEM00 computations described in the previous
+sections.  The exceptions are the Gouy phase, and the dependence of
+audio sideband injection amplitude on the Hermite-Gaussian beam
+parameters.
+
+As the names suggest tickle01 should be used to investigate pitch and
+tickle10 for yaw.
+
+\subsection{Coupling to 01/10 modes as a function of angle of
+  incidence}
+
+%%%%%%%%%%
+\MEfig{h}{0.8}{mirrorAxes}{Definitions of axes and positive pitch/yaw
+  angles at a mirror.}
+%%%%%%%%%%
+There was some confusion in the original version of Optickle as to
+whether the coupling to misalignment modes was treated correctly for
+non-normal incidence (it was). This section serves to explicity give
+the calculations behind this process.
+
+We define the axes at a mirror as shown in
+Figure~\ref{fig:mirrorAxes}. The origin is located at the centre of
+the HR surface of the mirror. Rotations are defined such that a
+positive pitch (yaw) results from a right-handed rotation about the
+$x$ ($y$) axis. The zero point of both rotations is taken to be the
+positive $z$ axis. The symbol $\theta$ is used for rotations of the
+mirror.
+
+In three dimensions, the reflection of a vector (optical axis) from a
+plane (mirror) is described by
+\begin{equation}
+  \label{eq:vectorReflection}
+  \myVec{\mathrm{out}} = \myVec{\mathrm{in}}-2\left[(\myVec{\mathrm{in}}\cdot \hat{n}_\mathrm{mirr})\hat{n}_\mathrm{mirr}\right],
+\end{equation}
+where $\myVec{\mathrm{in}}$ and $\myVec{\mathrm{out}}$ are the vectors
+of the incident and reflected beams, $\hat{n}_\mathrm{mirr}$ is the mirror
+surface normal (which coincides with $\hat{z}$ for unperturbed
+mirrors) and $\cdot$ denotes the standard dot product.
+
+This expression is simply derived by writing the incoming vector in
+terms of components parallel and perpendicular to the mirror
+\begin{align}
+  \myVec{\mathrm{in}}&=\myVec{\mathrm{in}}_\parallel+\myVec{\mathrm{in}}_\perp\\
+  &= [\myVec{\mathrm{in}}-\myVec{\mathrm{in}}_\perp]+\myVec{\mathrm{in}}_\perp\\
+  &= \left[\myVec{\mathrm{in}}-(\myVec{\mathrm{in}}\cdot \hat{n}_\mathrm{mirr})\hat{n}_\mathrm{mirr}\right]+(\myVec{\mathrm{in}}\cdot \hat{n}_\mathrm{mirr})\hat{n}_\mathrm{mirr}.
+\end{align}
+Noting that reflection simply reverses the component of the incoming
+vector which is perpendicualr to the mirror's surface,
+\begin{align}
+  \myVec{\mathrm{out}}&= \left[\myVec{\mathrm{in}}-(\myVec{\mathrm{in}}\cdot \hat{n}_\mathrm{mirr})\hat{n}_\mathrm{mirr}\right]-(\myVec{\mathrm{in}}\cdot \hat{n}_\mathrm{mirr})\hat{n}_\mathrm{mirr},
+\end{align}
+we arrive at our answer.
+
+Input beams and angles of incidence are constrained to be in the x-z
+plane. For an angle of incidence $\phi_\mathrm{aoi}$ the input beam vector is
+\begin{equation}
+  \label{eq:inVec}
+  \myVec{\mathrm{in}}=\threeVec{-\sin(\phi_\mathrm{aoi})}{0}{-\cos(\phi_\mathrm{aoi})}.
+\end{equation}
+Angles of incidence are measured in the same way as mirror yaws. Pitch and yaw angles of the beam are represented by the symbol $\phi$.
+
+\subsubsection{Yaw}
+If the mirror is rotated in yaw by angle $\theta_y$ its surface normal
+is given by
+\begin{equation}
+  \hat{n}_\mathrm{mirr} = \big(\sin(\theta_y),0,\cos(\theta_y)\big)
+\end{equation}
+and the output beam is given from (\ref{eq:vectorReflection}) and
+(\ref{eq:inVec}) by
+\begin{equation}
+  \myVec{\mathrm{out}} = \threeVec{\sin(2\theta_y-\phi_\mathrm{aoi})}{0}{\cos(2\theta_y-\phi_\mathrm{aoi})}
+\end{equation}
+
+The yaw angle of an output beam $\phi_y$ as a function of angle of
+incidence is then obtained from the dot product of the output beam and
+the plane $\hat{n}_{yaw}=\threeVec{1}{0}{0}$
+\begin{align}
+  \phi_y &= \frac{\pi}{2} - \arccos\left(\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{yaw}|}{|\myVec{\mathrm{out}}||\hat{n}_{yaw}|}\right)\\
+  &=\frac{\pi}{2} - \arccos\left( \sin(2\theta_y-\phi_\mathrm{aoi}) \right)\\
+  &=\frac{\pi}{2} - \arccos\left( \cos\left[\frac{\pi}{2}-(2\theta_y-\phi_\mathrm{aoi})\right] \right)\\
+&=2\theta_y-\phi_\mathrm{aoi}.
+\end{align}
+
+The pitch angle $\phi_p$ of an output beam as a function of angle of
+incidence is then obtained from the dot product of the output beam and
+the plane $\hat{n}_{pit}=\threeVec{0}{-1}{0}$
+\begin{align}
+  \phi_p &= \frac{\pi}{2} - \arccos\left(\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{pit}}{|\myVec{\mathrm{out}}||\hat{n}_{pit}|}\right)\\
+  &=0
+\end{align}
+
+These results are precisely what one would naively expect. Pitching
+the mirror, however, is a bit more interesting.
+
+\subsubsection{Pitch}
+If the mirror is rotated in pitch by angle $\theta_p$ then its surface
+normal is given by
+\begin{equation}
+  \hat{n}_\mathrm{mirr} = \big(\sin(\theta_y),0,\cos(\theta_y)\big)
+\end{equation}
+and the output beam is given from (\ref{eq:vectorReflection}) and
+(\ref{eq:inVec}) by
+\begin{equation}
+  \myVec{\mathrm{out}} = \threeVec{-\sin(\phi_\mathrm{aoi})}{-2\cos(\phi_\mathrm{aoi})\cos(\theta_p)\sin(\theta_p)}{-\cos{\phi_\mathrm{aoi}}+2\cos(\phi_\mathrm{aoi})\cos^2(\theta_p)}.
+\end{equation}
+
+The yaw of an output beam as a function of angle of incidence is then
+obtained from the dot product of the output beam and the plane
+$\hat{n}_{yaw}=\threeVec{1}{0}{0}$ as
+\begin{align}
+  yaw &= \frac{\pi}{2} - \arccos\left(\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{yaw}}{|\myVec{\mathrm{out}}||\hat{n}_{yaw}|}\right)\\
+  &=\frac{\pi}{2} - \arccos\left( -\sin(\phi_\mathrm{aoi}) \right)\\
+  &=\frac{\pi}{2} - \arccos\left( \cos\left[\frac{\pi}{2}+\phi_\mathrm{aoi})\right] \right)\\
+&=-\phi_\mathrm{aoi}.
+\end{align}
+
+The pitch of an output beam as a function of angle of incidence is
+then obtained from the dot product of the output beam and the plane
+$\hat{n}_{pit}=\threeVec{0}{-1}{0}$
+\begin{align}
+  pitch &= \frac{\pi}{2} - \arccos\left(\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{pit}}{|\myVec{\mathrm{out}}||\hat{n}_{pit}|}\right)\\
+  &=\frac{\pi}{2} - \arccos\left(2\cos(\phi_\mathrm{aoi})\cos(\theta_p)\sin(\theta_p)\right)\\
+&=\frac{\pi}{2} - \arccos\left(\cos(\phi_\mathrm{aoi})\sin(2\theta_p)\right)\\
+&\simeq \frac{\pi}{2} - \arccos\left(\cos(\phi_\mathrm{aoi})2\theta_p\right)\\
+&\simeq \frac{\pi}{2} - \left[\frac{\pi}{2}-\cos(\phi_\mathrm{aoi})2\theta_p\right]\\
+&=\cos(\phi_\mathrm{aoi})2\theta_p,
+\end{align}
+
+where in the final lines we have approximated the $\sin$ and $\arccos$
+functions to first order as their argument is assumed small (since
+$\theta_p$ is assumed small).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
