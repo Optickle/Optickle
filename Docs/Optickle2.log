@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.5.3)  16 JUN 2014 14:05
+This is pdfTeX, Version 3.1415926-2.5-1.40.14 (TeX Live 2013/Debian) (format=pdflatex 2014.5.3)  16 JUN 2014 16:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -852,26 +852,21 @@ ptickle as to whether
 [18 <./mirrorAxes.pdf, page is rotated 180 degrees>]
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 928.
- [19]
-Overfull \hbox (43.8045pt too wide) detected at line 971
-[][] \OT1/cmr/m/n/10.95 = [][]\OML/cmm/m/it/10.95 ; []; [][]:
- []
-
-[20]
-Package atveryend Info: Empty hook `BeforeClearDocument' on input line 1000.
+ [19] [20]
+Package atveryend Info: Empty hook `BeforeClearDocument' on input line 999.
  [21]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 1000.
- (./Optickle2.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 1000.
-Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 1000.
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 999.
 
+(./Optickle2.aux)
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 999.
+Package atveryend Info: Executing hook `AtEndAfterFileList' on input line 999.
 Package rerunfilecheck Info: File `Optickle2.out' has not changed.
-(rerunfilecheck)             Checksum: 4C434B0C2B80F95001BC9F6CF5BD9647;1164.
+(rerunfilecheck)             Checksum: A973A52EA92381443B9F53A0AADEF9A0;1178.
 
 
 LaTeX Warning: There were multiply-defined labels.
 
-Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 1000.
+Package atveryend Info: Empty hook `AtVeryVeryEnd' on input line 999.
  ) 
 Here is how much of TeX's memory you used:
  15996 strings out of 493307
@@ -896,7 +891,7 @@ xlive/texmf-dist/fonts/type1/public/amsfonts/symbols/msbm10.pfb></usr/share/tex
 live/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/texmf-dist
 /fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/fonts/type1/ur
 w/times/utmri8a.pfb>
-Output written on Optickle2.pdf (21 pages, 305588 bytes).
+Output written on Optickle2.pdf (21 pages, 304117 bytes).
 PDF statistics:
  398 PDF objects out of 1000 (max. 8388607)
  352 compressed objects within 4 object streams

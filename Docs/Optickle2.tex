@@ -925,76 +925,77 @@ plane. For an angle of incidence $\phi_\mathrm{aoi}$ the input beam vector is
 \end{equation}
 Angles of incidence are measured in the same way as mirror yaws. Pitch and yaw angles of the beam are represented by the symbol $\phi$.
 
-\subsubsection{Yaw}
+\subsubsection{Mirror yaw}
 If the mirror is rotated in yaw by angle $\theta_y$ its surface normal
 is given by
 \begin{equation}
   \hat{n}_\mathrm{mirr} = \big(\sin(\theta_y),0,\cos(\theta_y)\big)
 \end{equation}
-and the output beam is given from (\ref{eq:vectorReflection}) and
-(\ref{eq:inVec}) by
+and the output beam is given, from (\ref{eq:vectorReflection}) and
+(\ref{eq:inVec}), by
 \begin{equation}
-  \myVec{\mathrm{out}} = \threeVec{\sin(2\theta_y-\phi_\mathrm{aoi})}{0}{\cos(2\theta_y-\phi_\mathrm{aoi})}
+  \myVec{\mathrm{out}} = \threeVec{\sin(2\theta_y-\phi_\mathrm{aoi})}{0}{\cos(2\theta_y-\phi_\mathrm{aoi})}.
 \end{equation}
 
 The yaw angle of an output beam $\phi_y$ as a function of angle of
 incidence is then obtained from the dot product of the output beam and
-the plane $\hat{n}_{yaw}=\threeVec{1}{0}{0}$
+the plane $\hat{n}_{yaw}=\threeVec{1}{0}{0}$,
 \begin{align}
-  \phi_y &= \frac{\pi}{2} - \arccos\left(\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{yaw}|}{|\myVec{\mathrm{out}}||\hat{n}_{yaw}|}\right)\\
-  &=\frac{\pi}{2} - \arccos\left( \sin(2\theta_y-\phi_\mathrm{aoi}) \right)\\
-  &=\frac{\pi}{2} - \arccos\left( \cos\left[\frac{\pi}{2}-(2\theta_y-\phi_\mathrm{aoi})\right] \right)\\
+  \phi_y &= \frac{\pi}{2} - \arccos\left[\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{yaw}}{|\myVec{\mathrm{out}}||\hat{n}_{yaw}|}\right]\\
+  &=\frac{\pi}{2} - \arccos\left[ \sin(2\theta_y-\phi_\mathrm{aoi}) \right]\\
+  &=\frac{\pi}{2} - \arccos\left[ \cos\left(\frac{\pi}{2}-(2\theta_y-\phi_\mathrm{aoi})\right) \right]\\
 &=2\theta_y-\phi_\mathrm{aoi}.
 \end{align}
 
-The pitch angle $\phi_p$ of an output beam as a function of angle of
-incidence is then obtained from the dot product of the output beam and
-the plane $\hat{n}_{pit}=\threeVec{0}{-1}{0}$
+Similarly, the pitch angle $\phi_p$ is obtained from the dot product
+of the output beam and the plane $\hat{n}_{pit}=\threeVec{0}{-1}{0}$,
 \begin{align}
-  \phi_p &= \frac{\pi}{2} - \arccos\left(\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{pit}}{|\myVec{\mathrm{out}}||\hat{n}_{pit}|}\right)\\
-  &=0
+  \phi_p &= \frac{\pi}{2} - \arccos\left[\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{pit}}{|\myVec{\mathrm{out}}||\hat{n}_{pit}|}\right]\\
+  &=0.
 \end{align}
 
-These results are precisely what one would naively expect. Pitching
-the mirror, however, is a bit more interesting.
+These results are precisely what one would naively expect.
 
-\subsubsection{Pitch}
+\subsubsection{Mirror pitch}
 If the mirror is rotated in pitch by angle $\theta_p$ then its surface
 normal is given by
 \begin{equation}
-  \hat{n}_\mathrm{mirr} = \big(\sin(\theta_y),0,\cos(\theta_y)\big)
+  \hat{n}_\mathrm{mirr} = \threeVec{\sin(\theta_y)}{0}{\cos(\theta_y)}
 \end{equation}
-and the output beam is given from (\ref{eq:vectorReflection}) and
-(\ref{eq:inVec}) by
-\begin{equation}
-  \myVec{\mathrm{out}} = \threeVec{-\sin(\phi_\mathrm{aoi})}{-2\cos(\phi_\mathrm{aoi})\cos(\theta_p)\sin(\theta_p)}{-\cos{\phi_\mathrm{aoi}}+2\cos(\phi_\mathrm{aoi})\cos^2(\theta_p)}.
-\end{equation}
+and the output beam is given, again from (\ref{eq:vectorReflection})
+and (\ref{eq:inVec}), by
+\begin{align}
+  \myVec{\mathrm{out}} = \big(-\sin(\phi_\mathrm{aoi}),-2\cos(&\phi_\mathrm{aoi})\cos(\theta_p)\sin(\theta_p),\nonumber\\
+&-\cos{\phi_\mathrm{aoi}}+2\cos(\phi_\mathrm{aoi})\cos^2(\theta_p)\big).
+\end{align}
 
-The yaw of an output beam as a function of angle of incidence is then
-obtained from the dot product of the output beam and the plane
+The yaw angle of an output beam as a function of angle of incidence is
+then obtained from the dot product of the output beam and the plane
 $\hat{n}_{yaw}=\threeVec{1}{0}{0}$ as
 \begin{align}
-  yaw &= \frac{\pi}{2} - \arccos\left(\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{yaw}}{|\myVec{\mathrm{out}}||\hat{n}_{yaw}|}\right)\\
-  &=\frac{\pi}{2} - \arccos\left( -\sin(\phi_\mathrm{aoi}) \right)\\
-  &=\frac{\pi}{2} - \arccos\left( \cos\left[\frac{\pi}{2}+\phi_\mathrm{aoi})\right] \right)\\
+  \phi_y &= \frac{\pi}{2} - \arccos\left[\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{yaw}}{|\myVec{\mathrm{out}}||\hat{n}_{yaw}|}\right]\\
+  &=\frac{\pi}{2} - \arccos\left[ -\sin(\phi_\mathrm{aoi}) \right]\\
+  &=\frac{\pi}{2} - \arccos\left[ \cos\left(\frac{\pi}{2}+\phi_\mathrm{aoi})\right) \right]\\
 &=-\phi_\mathrm{aoi}.
 \end{align}
 
-The pitch of an output beam as a function of angle of incidence is
-then obtained from the dot product of the output beam and the plane
+The pitch angle of an output beam as a function of angle of incidence
+is similarly obtained from the dot product of the output beam and the plane
 $\hat{n}_{pit}=\threeVec{0}{-1}{0}$
 \begin{align}
-  pitch &= \frac{\pi}{2} - \arccos\left(\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{pit}}{|\myVec{\mathrm{out}}||\hat{n}_{pit}|}\right)\\
-  &=\frac{\pi}{2} - \arccos\left(2\cos(\phi_\mathrm{aoi})\cos(\theta_p)\sin(\theta_p)\right)\\
-&=\frac{\pi}{2} - \arccos\left(\cos(\phi_\mathrm{aoi})\sin(2\theta_p)\right)\\
-&\simeq \frac{\pi}{2} - \arccos\left(\cos(\phi_\mathrm{aoi})2\theta_p\right)\\
+  \phi_p &= \frac{\pi}{2} - \arccos\left[\frac{\myVec{\mathrm{out}}\cdot\hat{n}_{pit}}{|\myVec{\mathrm{out}}||\hat{n}_{pit}|}\right]\\
+  &=\frac{\pi}{2} - \arccos\left[2\cos(\phi_\mathrm{aoi})\cos(\theta_p)\sin(\theta_p)\right]\\
+&=\frac{\pi}{2} - \arccos\left[\cos(\phi_\mathrm{aoi})\sin(2\theta_p)\right]\\
+&\simeq \frac{\pi}{2} - \arccos\left[\cos(\phi_\mathrm{aoi})2\theta_p\right]\\
 &\simeq \frac{\pi}{2} - \left[\frac{\pi}{2}-\cos(\phi_\mathrm{aoi})2\theta_p\right]\\
 &=\cos(\phi_\mathrm{aoi})2\theta_p,
 \end{align}
-
-where in the final lines we have approximated the $\sin$ and $\arccos$
+where, in the final lines, we have approximated the $\sin$ and $\arccos$
 functions to first order as their argument is assumed small (since
 $\theta_p$ is assumed small).
 
+\subsection{What does tickle10/01 do with components which are not mirrors/beamsplitters?}
+
+Fill me in.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \end{document}
