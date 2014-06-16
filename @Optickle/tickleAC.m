@@ -58,7 +58,7 @@ function varargout = tickleAC(opt, f, nDrive, ...
     % propagation phase matrices
     mPhim = Optickle.getPhaseMatrix(vLen, vFrf - fAudio, -vPhiGouy, mPhiFrf);
     mPhip = Optickle.getPhaseMatrix(vLen, vFrf + fAudio, -vPhiGouy, mPhiFrf);
-    mPhi = blkdiag(mPhip,conj(mPhim));
+    mPhi = blkdiag(mPhim,conj(mPhip));
     
     % mechanical response matrix
     mResp = diag(lResp(nAF,:));

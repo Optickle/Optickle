@@ -40,5 +40,6 @@ function mOpt = getFieldMatrix(obj, pos, par)
             'with RF components %d and %d.'], obj.name, n, m)
         end
       end
-    end
+    end    
   end
+end

@@ -35,7 +35,7 @@ function opt = optFP
   opt = addMirror(opt, 'IX', 0, 0, 0.03);
   opt = addMirror(opt, 'EX', 0, 0.7 / lCav, 0.001);
 
-  opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 2);
+  opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 0);
   opt = addLink(opt, 'IX', 'fr', 'EX', 'fr', lCav);
   opt = addLink(opt, 'EX', 'fr', 'IX', 'fr', lCav);
   
@@ -55,10 +55,10 @@ function opt = optFP
 
   dampRes = [0.01 + 1i, 0.01 - 1i];
   
-  opt = setMechTF(opt, 'IX', zpk([], -w * dampRes, 1 / mI));
+  %opt = setMechTF(opt, 'IX', zpk([], -w * dampRes, 1 / mI));
   opt = setMechTF(opt, 'EX', zpk([], -w * dampRes, 1 / mE));
 
-  opt = setMechTF(opt, 'IX', zpk([], -w_pit * dampRes, 1 / iI), 2);
+  %opt = setMechTF(opt, 'IX', zpk([], -w_pit * dampRes, 1 / iI), 2);
   opt = setMechTF(opt, 'EX', zpk([], -w_pit * dampRes, 1 / iE), 2);
   
   % tell Optickle to use this cavity basis
