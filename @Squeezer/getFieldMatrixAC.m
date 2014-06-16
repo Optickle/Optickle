@@ -23,13 +23,15 @@ function mOptAC = getFieldMatrixAC(obj, pos, par)
   end
   
   % apply squeezing operator
-  r = obj.antidB*(log(10)/20); %calculate squeezing factor
+  x = obj.x;
+  %calculate squeezing factor for OPO w/o loss
+  r = 0.5*log(1+4*x/(1-x)^2); 
   
   % 2x2 squeezing matrix for signal/idler pair
   % with loss = 1-escape efficiency
-  mAC = sqrt(obj.escEff)*[cosh(r), -exp(i*2*obj.sqAng)*sinh(r);...
-      -exp(-i*2*obj.sqAng)*sinh(r), cosh(r)];
-    
+   mAC = sqrt(obj.escEff)*[cosh(r), -exp(i*2*obj.sqAng)*sinh(r);...
+       -exp(-i*2*obj.sqAng)*sinh(r), cosh(r)];
+  
   %Apply this transformation to the correct RF components
   mOptAC = eye(2*par.Nrf);
   for k=RFNonZero

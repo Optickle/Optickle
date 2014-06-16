@@ -107,7 +107,7 @@ classdef Squeezer < Optic
             Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
             Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
             %Calculate x and escEff from Vs and Va
-            obj.x = (Va-Vs-2*sqrt(-1+Vs+Va-Vs*Va))/(Vs+Va-2);
+            obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
             obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
           end
         else
@@ -118,8 +118,8 @@ classdef Squeezer < Optic
              obj.antidB, obj.sqzOption] = deal(args{:});
           Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
           Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
-          %Calculate x and escEff from Vs and Va
-          obj.x = (Va-Vs-2*sqrt(-1+Vs+Va-Vs*Va))/(Vs+Va-2);
+          %Calculate x and escEff from Vs and Va     
+          obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
           obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
         end
         % Calculate squeezed frequency from lambda and fRF
