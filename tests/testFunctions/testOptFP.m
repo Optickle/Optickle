@@ -1,6 +1,6 @@
 % Create an Optickle Fabry-Perot
 
-function opt = optFP
+function opt = testOptFP
 
   % RF component vector
   Pin = 100;
