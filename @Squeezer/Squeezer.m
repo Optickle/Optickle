@@ -21,12 +21,11 @@ classdef Squeezer < Optic
   %
   % ==== Members
   % Optic - base class members  
-  % lambda - wavelength to be squeezed (uses first wavelength in lambda
-  %   lambda vector by default)
+  % lambda - wavelength to be squeezed (uses 1064nm by default)
   % fRF - RF sideband of chosen lambda to be used (Uses 0 by default)
-  % pol - polarization of chosen RF sideband to be squeezed (Uses s by
+  % pol - polarization of chosen RF sideband to be squeezed (Uses S by
   %   default
-  % sqAng - squeezing angle (Uses 0 by default)
+  % sqAng - squeezing angle (Uses 0 by default---amplitude squeezing)
   % sqdB - amount of squeezing in dB at OPO output (10 dB by default)
   % antidB - amount of antisqueezing in dB at OPO output (10 dB by default)
   % escEff - escape efficiency (1 by default).

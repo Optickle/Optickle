@@ -1,6 +1,6 @@
 % getFieldMatrixAC method
 % returns a mOptAC, the field transfer matrix for audio sidebands for 
-% the Squeezer.  A unique function is required her because the squeezer AC
+% the Squeezer.  A unique function is required here because the squeezer AC
 % response has off diagonal matrix elements (due to up conversion and down
 % conversion of noise sidebands)
 %
@@ -25,6 +25,9 @@ function mOptAC = getFieldMatrixAC(obj, pos, par)
   % apply squeezing operator
   x = obj.x;
   %calculate squeezing factor for OPO w/o loss
+  %Optickle uses the "beamsplitter model" for losses
+  %The effect of losses is included later in mAC and in getNoiseMatrix.m
+  %Th
   r = 0.5*log(1+4*x/(1-x)^2); 
   
   % 2x2 squeezing matrix for signal/idler pair
@@ -40,7 +43,3 @@ function mOptAC = getFieldMatrixAC(obj, pos, par)
       mOptAC(k+par.Nrf,k) = mAC(2,1);
       mOptAC(k+par.Nrf,k+par.Nrf) = mAC(2,2);
   end
-  
-  
-  
- 
