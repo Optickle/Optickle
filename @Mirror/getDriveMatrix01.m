@@ -10,11 +10,11 @@
 %
 % mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
 
-function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
+function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
   
   % check for optional arguments
   if nargin < 6
-    [mOpt, d] = getFieldMatrix(obj, pos, par);
+    [mOpt, ~, ~, dldx] = getFieldMatrix(obj, pos, par);
   end
   
   % constants
@@ -43,7 +43,7 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
   mDrv = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
-    drp = 1i * sqrt(par.k(n) / 2) * (mInj * d / 2);
+    drp = 1i * sqrt(par.k(n) / 2) * (mInj * dldx / 2);
 
     % enter this submatrix into mDrv
     nn = (1:Nout) + Nout * (n - 1);

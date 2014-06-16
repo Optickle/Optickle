@@ -18,11 +18,11 @@
 % with the AC sideband amplitude.  This IGNORES the overlap integral
 % between the TEM00 and TEM01 modes on a given detector geometry.
 % For a half plane detector, the correction factor is sqrt(pi/2).
-%   === Thanks to Yuta Michimora!!! ===
+%   === Thanks to Yuta Michimura!!! ===
 %
 % To convert DC signals to beam-spot motion, scale by w/(2 * Pdc),
 % where w is the beam size at the probe.
-%   === Thanks to Yuta Michimora!!! ===
+%   === Thanks to Yuta Michimura!!! ===
 %
 % Example:
 % f = logspace(0, 3, 300);
