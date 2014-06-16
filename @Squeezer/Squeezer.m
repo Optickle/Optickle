@@ -35,7 +35,7 @@ classdef Squeezer < Optic
   % sqzOption - select inputs for specifying squeezer.
   %
   % Default values [lambda, fRF , pol, sqAng, sqdB, antidB, x, escEff] =
-  % [par.lambda[0], 0, 0, 1, 10, 10, 0.5195, 1]
+  % [1064e-9, 0, 1, 0, 10, 10, 0.5195, 1]
   % ==== Functions, those in Optic
  
 
@@ -49,6 +49,7 @@ classdef Squeezer < Optic
     x = []; %Normalized nonlinear interaction strength
     escEff= []; %Escape Efficiency
     sqzOption = []; %Bit sets whether squeezing in dB or in x is specified
+    nu = []; %frequency of squeezed component
   end
   
   methods
@@ -72,7 +73,7 @@ classdef Squeezer < Optic
     %
     % Default parameters are:
     %[lambda, fRF , pol, sqAng, sqdB, antidB, x, escEff, sqzOption] =
-    % [1064e-9, 0, 0, 1, 10, 10, 0.5195, 1, 0]        
+    % [1064e-9, 0, 1, 0, 10, 10, 0.5195, 1, 0]        
     % deal with no arguments
     if nargin == 0
         name = '';
@@ -89,9 +90,9 @@ classdef Squeezer < Optic
     switch( nargin )
       case 0					% default constructor, do nothing
       case {1, 2, 3, 4, 5, 8}
-        varargin
-        args = {1064e-9, 0, 0, 1, 10, 10, 0.5195, 1, 0};
+        args = {1064e-9, 0, 1, 0, 10, 10, 0.5195, 1, 0};
         args(1:(nargin-1)) = varargin(1:end);
+        obj.nu = Optickle.c/obj.lambda + obj.fRF; 
         if nargin==8 
           if cell2mat(varargin(end))==1
             [obj.lambda, obj.fRF, obj.pol, obj.sqAng, obj.x,...

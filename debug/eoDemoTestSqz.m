@@ -13,7 +13,7 @@ function eoDemoTestSqz
   for i=1:(length(SqzAngle));
     opt = setOpticParam(opt, 'Sqz1', 'sqAng', SqzAngle(i));
     [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
-    qnoise = cat(2,qnoise,noiseAC0);
+    qNoise = cat(2,qNoise,noiseAC0);
   end
   
   % compute the unsqueezed shot noise level
@@ -28,6 +28,6 @@ function eoDemoTestSqz
   qShot = noiseAC0;
   
   % plot the result
-  plot(SqzAngle, 20*log10(qnoise/qshot));
+  plot(SqzAngle, 20*log10(qNoise/qShot));
 
 end
