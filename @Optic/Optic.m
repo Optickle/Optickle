@@ -187,7 +187,7 @@ classdef Optic < handle
       % return default expansion of the field matrix
       mCplMany = getDriveMatrix(obj, pos, par, varargin{:});
       
-      %%% Expand 3D coupling matrix to mGen
+      %%% reduce 3D coupling matrix to mGen with vDC
       
       % number of outputs and drives
       NoutRF = obj.Nout * par.Nrf;
@@ -317,7 +317,6 @@ classdef Optic < handle
       % qm = getBasisMatrix(obj)
       %
       % default basis matrix: no basis change
-      
       
       qm = repmat(OpHG, obj.Nin, obj.Nout);
     end

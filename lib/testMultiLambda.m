@@ -32,7 +32,7 @@
 
   % add an RF modulator
   %   opt = addRFmodulator(opt, name, fMod, aMod)
-  gamma = 0.2;
+  gamma = 1.2;
   opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
   opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
 

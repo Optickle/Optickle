@@ -9,7 +9,7 @@
 
 function mOptAC = getFieldMatrixAC(obj, pos, par)
   %Find the RF component which is squeezed
-  [freqMatch, freqClose] = isSameFreq(obj.fRF*ones(size(par.nu)), par.nu);
+  [freqMatch, freqClose] = Optickle.isSameFreq(obj.nu*ones(size(par.nu)), par.nu);
   samePol = obj.pol*ones(size(par.pol))==par.pol;
   RFMat =  freqMatch & samePol;
   
@@ -23,7 +23,7 @@ function mOptAC = getFieldMatrixAC(obj, pos, par)
   end
   
   % apply squeezing operator
-  r = obj.antidB*(ln(10)/20); %calculate squeezing factor
+  r = obj.antidB*(log(10)/20); %calculate squeezing factor
   
   % 2x2 squeezing matrix for signal/idler pair
   % with loss = 1-escape efficiency
