@@ -116,8 +116,12 @@ classdef Squeezer < Optic
               Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
               Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
               %Calculate x and escEff from Vs and Va
-              obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
-              obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
+              if Vs==1 && Va==1
+                obj.x = 0;
+              else
+                obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
+                obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
+              end
             end
           else
             % For 5 or fewer user specified inputs
@@ -128,11 +132,16 @@ classdef Squeezer < Optic
             Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
             Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
             %Calculate x and escEff from Vs and Va     
-            obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
-            obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
+            if Vs==1 && Va==1
+              obj.x = 0;
+            else
+              obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
+              obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
+            end
           end
           % Calculate squeezed frequency from lambda and fRF
           obj.nu = Optickle.c./obj.lambda + obj.fRF; 
+          
         otherwise
           % wrong number of input args
           error([errstr '%d input arguments.'], nargin);
@@ -152,8 +161,12 @@ classdef Squeezer < Optic
       obj.sqzOption = 0;           
       Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
       Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
-      %Calculate x and escEff from Vs and Va     
-      obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
+      %Calculate x and escEff from Vs and Va
+      if Vs==1 && Va==1
+        obj.x = 0;
+      else
+        obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
+      end
       obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);    
     end
     

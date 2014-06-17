@@ -1,7 +1,7 @@
 function eoDemoTestSqz
   % create model
   opt = eoOptTestSqz;
-  Sqz = opt.getOptic('Sqz1');  %Return handle for squeezer object
+  Sqz = getOptic(opt, 'Sqz1');  %Return handle for squeezer object
   
   % get our probe index
   nSqz = getProbeNum(opt, 'Sqz_DC');
@@ -19,10 +19,12 @@ function eoDemoTestSqz
   
   % compute the unsqueezed shot noise level
   
-  Sqz.setSqueezing(0,0); %0 dB of squeezing, 0 dB of antisqueezing
+  Sqz.setSqueezing(1, 1); %0 dB of squeezing, 0 dB of antisqueezing
+  Sqz.x
+  Sqz.escEff
   
   [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
-  qShot = noiseAC0;
+  qShot = noiseAC0
   
   % plot the result
   plot(SqzAngle, 20*log10(qNoise/qShot))
