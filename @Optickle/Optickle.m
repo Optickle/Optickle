@@ -93,7 +93,9 @@ classdef Optickle < handle
   properties (SetAccess = public)
     minQuant = 1e-3; % minimum loss considered for quantum noise
     debug = 1;       % debugging level (set to 0 for no tickle info)
-    sigACunits = 0   % units of response matrix (see above)
+    sigACunits = 0;  % units of response matrix (see above)
+    
+    mProbeOut = [];  % probe to output matrix
   end
   
   properties (Constant)
@@ -327,6 +329,16 @@ classdef Optickle < handle
       
       % update drive counter
       opt.Ndrive = opt.Ndrive + obj.Ndrive;
+    end
+    
+    function obj = getOptic(opt, name)
+      % obj = getOptic(opt, name)
+      %   Get an optic by name
+      %
+      % Optics are handles, so you can use this to modify the optic.
+      
+      sn = getSerialNum(opt, name);
+      obj = opt.optic{sn};
     end
   end    % methods
   
