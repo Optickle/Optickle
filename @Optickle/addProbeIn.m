@@ -26,3 +26,4 @@ function [opt, snProbe] = addProbeIn(opt, name, snOpt, nameIn, freq, phase)
   
   % create new probe
   [opt, snProbe] = addProbe(opt, name, snLink, freq, phase);
+end

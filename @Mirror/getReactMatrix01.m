@@ -1,7 +1,7 @@
 % getReactMatrix method for TEM01 mode (pitch)
 %   returns a Ndrive x (Nrf * Nin) x Naf matrix
 %
-% mDrv = getReactMatrix01(obj, pos, vBasis, par)
+% [mRadAC, mFrc, vRspAF] = getReactMatrix01(obj, pos, vBasis, par)
 
 function [mRadAC, mFrc, vRspAF] = ...
     getReactMatrix01(obj, pos, par, vBasis, mOpt, mDirIn, mDirOut, mGen)

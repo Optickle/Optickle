@@ -1,22 +1,20 @@
-% getReactMatrix method for TEM01 mode
+% getReactMatrix method for TEM01 mode (pitch)
 %   returns a Ndrive x (Nrf * Nin) x Naf matrix
 %
-% HACK: using the TEM00 mechTF
-%
-% mDrv = getReactMatrix01(obj, pos, vBasis, par)
+% [mRadAC, mFrc, vRspAF] = getReactMatrix01(obj, pos, vBasis, par)
 
 function [mRadAC, mFrc, vRspAF] = ...
     getReactMatrix01(obj, pos, par, vBasis, mOpt, mDirIn, mDirOut, mGen)
-  
+
   % check for optional arguments
   if nargin < 5
     [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
-    [~, mGen] = getGenMatrix(obj, pos, par, vBasis, mOpt, dldx);
+    [~, mGen] = getGenMatrix01(obj, pos, par, vBasis, mOpt, dldx);
   end
   
   % constants
   Nrf = par.Nrf;
-  Naf = par.Naf;
+  vDC = par.vDC;
   Nin = 4;						% obj.Optic.Nin
   Nout = 8;						% obj.Optic.Nout
   LIGHT_SPEED = Optickle.c;
