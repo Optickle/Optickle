@@ -25,7 +25,7 @@ function opt = testOptFP
 
   % add an RF modulator
   %   opt = addRFmodulator(opt, name, fMod, aMod)
-  gamma = 0.2*1e-5;
+  gamma = 0.2;
   opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
   opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
 
@@ -41,8 +41,8 @@ function opt = testOptFP
   
   % set some mechanical transfer functions
   w = 2 * pi * 0.7;      % pendulum resonance frequency
-  mI = inf*40;               % mass of input mirror
-  mE = .40;               % mass of end mirror
+  mI = 40;               % mass of input mirror
+  mE = 40;               % mass of end mirror
 
   w_pit = 2 * pi * 0.5;   % pitch mode resonance frequency
 
@@ -84,7 +84,7 @@ function opt = testOptFP
   opt = addProbeIn(opt, 'TRANSb_DC', 'TRANSb', 'in', 0, 0);	% DC
 
   % add a source at the end, just for fun
-  opt = addSource(opt, 'FlashLight', 0*(1e-3)^2 * (vMod == 1));
+  opt = addSource(opt, 'FlashLight', (1e-3)^2 * (vMod == 1));
   opt = addGouyPhase(opt, 'FakeTele', pi / 4);
   %opt = addLink(opt, 'FlashLight', 'out', 'FakeTele', 'in', 0.1);
   %opt = addLink(opt, 'FakeTele', 'out', 'EX', 'bk', 0.1);
