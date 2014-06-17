@@ -4,14 +4,12 @@
 % mDrv = getReactMatrix01(obj, pos, vBasis, par)
 
 function [mRadAC, mFrc, vRspAF] = ...
-    getReactMatrix01(obj, pos, par, mOpt, mDirIn, mDirOut, mGen)
-
-  % mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d)
+    getReactMatrix01(obj, pos, par, vBasis, mOpt, mDirIn, mDirOut, mGen)
 
   % check for optional arguments
-  if nargin < 4
+  if nargin < 5
     [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
-    [~, mGen] = getGenMatrix(obj, pos, par, mOpt, dldx);
+    [~, mGen] = getGenMatrix(obj, pos, par, vBasis, mOpt, dldx);
   end
   
   % constants
@@ -19,7 +17,8 @@ function [mRadAC, mFrc, vRspAF] = ...
   vDC = par.vDC;
   Nin = 2;						% obj.Optic.Nin
   Nout = 4;						% obj.Optic.Nout
-
+  LIGHT_SPEED = Optickle.c;
+  
   % mechanical response
   vRspAF = getMechResp(obj, par.vFaf, 2);
   
@@ -38,18 +37,24 @@ function [mRadAC, mFrc, vRspAF] = ...
   %   the y-basis, vBout(:,2), is of interest for the vertical 01 mode
   z = real(vBout(:,2));
   z0 = -imag(vBout(:,2));
-  mW = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
+  vWOut = sqrt(z0 .* (1 + (z ./ z0).^2));
+  z = real(vBasis(:,2));
+  z0 = -imag(vBasis(:,2));
+  vWIn = sqrt(z0 .* (1 + (z ./ z0).^2));
   
-  % reflection reaction coefficient
-  reac = repmat(mW*sqrt(2./par.k).',Nin,1);
-  reac = diag(reac(:));
+  kk=repmat(par.k,1,length(vWOut))';
+  vWOut=repmat(vWOut,length(par.k),1);
+  mWOut=diag(vWOut.*kk(:));
+  kk=repmat(par.k,1,length(vWIn))';
+  vWIn=repmat(vWIn,length(par.k),1);
+  mWIn=diag(vWIn.*kk(:));
   
   % big mDirIn and mDirOut for all RF components
   mDirInRF = blkdiagN(mDirIn, Nrf);
   mDirOutRF = blkdiagN(mDirOut, Nrf);
   
   % field matrix and derivatives
-  mRad = (ctranspose(mOpt) * mDirOutRF * mOpt + mDirInRF) * reac/2 * vDC;  % CHECK
+  mRad = (ctranspose(mOpt) * mDirOutRF * mWOut * mOpt + mDirInRF * mWIn) * vDC / 2;  % CHECK
   mRadAC = 2 / LIGHT_SPEED * ctranspose([mRad; conj(mRad)]);
   
   % radiation reaction force matrix

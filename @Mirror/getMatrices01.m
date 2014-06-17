@@ -20,7 +20,7 @@ function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = ...
   %  [mGenAC, mGen] = getGenMatrix01(obj, pos, par, mOpt, dldx);
     [mGenAC, mGen] = getGenMatrix01(obj, pos, par, vBasis, mOpt, dldx);
   [mRadAC, mFrc, vRspAF] = ...
-    getReactMatrix01(obj, pos, par, mOpt, mDirIn, mDirOut, mGen);
+    getReactMatrix01(obj, pos, par, vBasis, mOpt, mDirIn, mDirOut, mGen);
 
   mQuant = getNoiseMatrix01(obj, pos, par);
 

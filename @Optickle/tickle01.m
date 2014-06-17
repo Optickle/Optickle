@@ -100,6 +100,7 @@ function varargout = tickle01(opt, pos, f, nDrive, is10)
     convertOptics01(opt, mapList, vBasis, pos, f, vDC, is10);
 
   % audio frequency and noise calculation
+  isNoise=0;    % No noise calculation for 01 now
   if ~isNoise
     shotPrb = zeros(Nprb, 1);
     mQuant = zeros(Narf, 0);
