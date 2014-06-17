@@ -10,17 +10,12 @@ function opt = eoOptTestHomodyne
   % add a source
   opt = addSource(opt, 'Laser', 1, 0, 0);
 
-  % add a mirror to pickoff LO
-  opt = addMirror(opt,'PO', 45, 0, 0.5, 0, 0, 0, 1.45);
-  opt = addLink(opt, 'Laser', 'out', 'PO', 'fr',0);
-  
-  % add a Squeezer
+   % add a Squeezer
   opt = addSqueezer(opt, 'Sqz1', 1064e-9 , 0, 1, 0, 10, 15, 0);
-  opt = addLink(opt, 'PO', 'bk', 'Sqz1', 'in', 0.25);
 
   % add Homodyne BS
-  opt = addMirror(opt, 'HDBS', 45, 0, 0.5, 0, 0, 0, 1.45);
-  opt = addLink(opt, 'PO', 'fr', 'HDBS', 'fr', 0.25);
+  opt = addMirror(opt, 'HDBS', 45, 0, 0.50, 0, 0, 0, 1.45);
+  opt = addLink(opt, 'Laser', 'out', 'HDBS', 'fr', 0.25);
   opt = addLink(opt, 'Sqz1', 'out', 'HDBS', 'bk', 0.5);
   
   % add 2 Sinks
