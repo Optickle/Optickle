@@ -1,5 +1,5 @@
 % Create an Optickle test case with
-%   just a source, a squeezer, and a sink
+% just a source, a squeezer, and a sink
 
 function opt = eoOptTestSqz
 

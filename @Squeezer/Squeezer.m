@@ -107,21 +107,39 @@ classdef Squeezer < Optic
                 obj.escEff, obj.sqzOption] = deal(args{1:(nargin-1)});
               %Calculate the level of squeezing and antisqueezing from x and
               %escEff
+              
+              % Value error checking
+              if not(obj.x < 1 & obj.x >= 0)
+                error('Not a valid value for x');
+              elseif not(obj.escEff <=1 & obj.escEff >=0)
+                error('Not a valid value for escape efficiency')
+              end
+
               obj.sqdB = -20*log10(1-4*obj.x*obj.escEff/(1+obj.x)^2);
               obj.antidB = 20*log10(1+4*obj.x*obj.escEff/(1-obj.x)^2);
             else  
               %The user is inputting the level of squeeizng and antisqueezing
               [obj.lambda, obj.fRF, obj.pol, obj.sqAng, obj.sqdB,...
                 obj.antidB, obj.sqzOption] = deal(args{1:(nargin-1)});
+              obj.sqzOption = 0; % guard against bad input value 
+              
+              % Value error checking
+              if not(obj.sqdB <= obj.antidB)
+                error('Level of squeezing cannot exceed level of antisqueezing')
+              elseif not(obj.sqdB >= 0 | obj.antidB >=0 )
+                error('Level of squeezing and antisqueezing must be non negative')
+              end
+              
               Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
               Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
               %Calculate x and escEff from Vs and Va
-              if Vs==1 && Va==1
+              if obj.sqdB==0 && obj.antidB==0
                 obj.x = 0;
+                obj.escEff = 1;
               else
-                obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
+                obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);              
                 obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
-              end
+              end    
             end
           else
             % For 5 or fewer user specified inputs
@@ -132,10 +150,11 @@ classdef Squeezer < Optic
             Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
             Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
             %Calculate x and escEff from Vs and Va     
-            if Vs==1 && Va==1
+            if obj.sqdB==0 && obj.antidB==0
               obj.x = 0;
+              obj.escEff=1;
             else
-              obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
+              obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);              
               obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);
             end
           end
@@ -145,7 +164,7 @@ classdef Squeezer < Optic
         otherwise
           % wrong number of input args
           error([errstr '%d input arguments.'], nargin);
-      end
+      end        
     end
     
     function obj = setSqueezing(obj, sqdB, antidB)
@@ -162,12 +181,21 @@ classdef Squeezer < Optic
       Vs = 10^(-1*obj.sqdB/10); %squeezed quadrature variance
       Va = 10^(obj.antidB/10); %antisqueezed quadrature variance
       %Calculate x and escEff from Vs and Va
-      if Vs==1 && Va==1
+      if sqdB==0 && antidB==0
         obj.x = 0;
+        obj.escEff=1;
       else
         obj.x = (Va-Vs-2*sqrt(-1+Va+Vs-Va*Vs))/(Va+Vs-2);
+        obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);    
       end
-      obj.escEff = (1-Vs)*(1+obj.x)^2/(4*obj.x);    
+      
+      % Value error checking
+      if not(obj.sqdB <= obj.antidB)
+        error('Level of squeezing cannot exceed level of antisqueezing')
+      elseif not(obj.sqdB >= 0 | obj.antidB >=0 ) 
+        error('Level of squeezing and antisqueezing must be non negative')
+      end        
+
     end
     
     function obj = setNLGain(obj, x, escEff)
@@ -186,6 +214,12 @@ classdef Squeezer < Optic
       %escEff
       obj.sqdB = -20*log10(1-4*obj.x*obj.escEff/(1+obj.x)^2);
       obj.antidB = 20*log10(1+4*obj.x*obj.escEff/(1-obj.x)^2);
+      % Value error checking
+      if not(obj.x < 1 & obj.x >= 0)
+        error('Not a valid value for x.  X must be 0 <= x < 1');
+      elseif not(obj.escEff <=1 & obj.escEff >=0)
+        error('Not a valid value for escape efficiency. Must have 0 <= eta <= 1')
+      end        
     end
   end
 end

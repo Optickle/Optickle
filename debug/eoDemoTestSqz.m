@@ -19,12 +19,10 @@ function eoDemoTestSqz
   
   % compute the unsqueezed shot noise level
   
-  Sqz.setSqueezing(1, 1); %0 dB of squeezing, 0 dB of antisqueezing
-  Sqz.x
-  Sqz.escEff
+  Sqz.setSqueezing(0, 0); %0 dB of squeezing, 0 dB of antisqueezing
   
   [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
-  qShot = noiseAC0
+  qShot = noiseAC0;
   
   % plot the result
   plot(SqzAngle, 20*log10(qNoise/qShot))
