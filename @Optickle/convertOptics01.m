@@ -82,7 +82,10 @@ function [mOptGen, mRadFrc, lResp, mQuant] = ...
       par.vDC = mIn * vDC; 
       
       %%%% Optic Properties
-      [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices01(obj, pos(obj.drive), par, vBasis);
+      vBin = NaN(obj.Nin, 2);
+      isInOk = obj.in ~= 0;
+      vBin(isInOk, :) = vBasis(obj.in(isInOk), :);
+      [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices01(obj, pos(obj.drive), par, vBin);
       
       % for debugging
 %       fprintf('\n ===================== %s\n', obj.name)

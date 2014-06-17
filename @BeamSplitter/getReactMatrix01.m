@@ -5,11 +5,13 @@
 %
 % mDrv = getReactMatrix01(obj, pos, vBasis, par)
 
-function mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d)
+function [mRadAC, mFrc, vRspAF] = ...
+    getReactMatrix01(obj, pos, par, vBasis, mOpt, mDirIn, mDirOut, mGen)
   
   % check for optional arguments
   if nargin < 5
-    [mOpt, d] = getFieldMatrix(obj, pos, par);
+    [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
+    [~, mGen] = getGenMatrix(obj, pos, par, vBasis, mOpt, dldx);
   end
   
   % constants
@@ -17,29 +19,45 @@ function mRct = getReactMatrix01(obj, pos, vBasis, par, mOpt, d)
   Naf = par.Naf;
   Nin = 4;						% obj.Optic.Nin
   Nout = 8;						% obj.Optic.Nout
-
+  LIGHT_SPEED = Optickle.c;
+  
   % mechanical response
-  rsp = getMechResp(obj, par.vFaf, 2);
+  vRspAF = getMechResp(obj, par.vFaf, 2);
   
   % output basis, where the basis is undefined, put z = 0, z0 = 1
   vBout = apply(getBasisMatrix(obj), vBasis);
   vBout(~isfinite(vBout)) = 1i;
   
-  % mirror TEM01 mode reaction matrix (see @Mirror/getReactMatrix01)
+  % mirror TEM01 mode reaction torque scales with beam size
+  %   torque = R * w * (A01 * A00)
+  % so here the reaction is proportional to waist size
+  %   w = sqrt(z0 * (1 + (z/z0)^2)) * sqrt(2 / k)
+  % The sqrt(2 / k) part is done separately for each RF component
+  % the sqrt(z0 * (1 + (z/z0)^2)) is done for each link using the
+  % the waist size matrix, mW, computed below.
+  %
+  %   the y-basis, vBout(:,2), is of interest for the vertical 01 mode
   z = real(vBout(:,2));
   z0 = -imag(vBout(:,2));
-  mW = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
+  vWOut = sqrt(z0 .* (1 + (z ./ z0).^2));
+  z = real(vBasis(:,2));
+  z0 = -imag(vBasis(:,2));
+  vWIn = sqrt(z0 .* (1 + (z ./ z0).^2));
+  
+  kk=repmat(par.k,1,length(vWOut))';
+  vWOut=repmat(vWOut,length(par.k),1);
+  mWOut=diag(vWOut.*kk(:));
+  kk=repmat(par.k,1,length(vWIn))';
+  vWIn=repmat(vWIn,length(par.k),1);
+  mWIn=diag(vWIn.*kk(:));
+  
+  % big mDirIn and mDirOut for all RF components
+  mDirInRF = blkdiagN(mDirIn, Nrf);
+  mDirOutRF = blkdiagN(mDirOut, Nrf);
   
   % field matrix and derivatives
-  mRct = zeros(1, Nrf * Nin, Naf);
-  for nAF = 1:Naf
-    for n = 1:Nrf
-      % reflection reaction coefficient
-      dr = mW * sqrt(2 / par.k(n)) * d;
-    
-      % enter this submatrix into mRct
-      nn = (1:Nout) + Nout * (n - 1);
-      mm = (1:Nin) + Nin * (n - 1);
-      mRct(1, mm, nAF) = rsp(nAF) * sum(abs(mOpt(nn, mm)).^2 .* dr, 1);
-    end
-  end
+  mRad = (ctranspose(mOpt) * mDirOutRF * mWOut * mOpt + mDirInRF * mWIn) * vDC / 2;  % CHECK
+  mRadAC = 2 / LIGHT_SPEED * ctranspose([mRad; conj(mRad)]);
+  
+  % radiation reaction force matrix
+  mFrc = 4 / LIGHT_SPEED * real(ctranspose(mOpt * vDC) * mDirOutRF * mGen);  % CHECK
