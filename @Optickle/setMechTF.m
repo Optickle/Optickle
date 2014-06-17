@@ -8,6 +8,7 @@
 %
 % nDOF = 1 is for position (default)
 % nDOF = 2 is for pitch
+% nDOF = 3 is for yaw
 
 function opt = setMechTF(opt, name, mechTF, nDOF)
 

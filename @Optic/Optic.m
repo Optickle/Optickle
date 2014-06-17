@@ -44,6 +44,12 @@ classdef Optic < handle
      %   rotations around the same axis (pitch) with units
      %   of rad/(N m).
      mechTFpit = [];
+     
+     % mechTFyaw - radiation torque response rad/(N m)
+     %   takes radiation torque around the Y axis, and outputs
+     %   rotations around the same axis (yaw) with units
+     %   of rad/(N m).
+     mechTFyaw = [];
   end
   
   methods
@@ -360,6 +366,7 @@ classdef Optic < handle
       %
       % nDOF = 1 is for position
       % nDOF = 2 is for pitch
+      % nDOF = 3 is for yaw
       
       
       if nargin < 3
@@ -372,8 +379,10 @@ classdef Optic < handle
           obj.mechTF = mechTF;
         case 2
           obj.mechTFpit = mechTF;
+        case 3
+          obj.mechTFyaw = mechTF;
         otherwise
-          error('nDOF must be 1 or 2, got %d', nDOF)
+          error('nDOF must be 1 (pos), 2 (pit) or 3 (yaw), got %d', nDOF)
       end
     end
     

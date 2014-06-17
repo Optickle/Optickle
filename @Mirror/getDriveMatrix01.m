@@ -1,4 +1,4 @@
-% getDriveMatrix method for TEM01 mode (pitch)
+% getDriveMatrix method for TEM01 mode (pitch) or TEM10 mode(yaw)
 %   returns the drive coupling matrix, (Nrf * obj.Nout) x (Nrf * obj.Nin) x Ndrive
 %   in this case, Nrf * (4 x 2)
 %
