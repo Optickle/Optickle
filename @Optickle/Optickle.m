@@ -99,8 +99,18 @@ classdef Optickle < handle
   end
   
   properties (Constant)
+    % fundamental constants
     h = 6.62606891e-34;   % Plank constant [J*s]
     c = 299792458;        % speed of light [m/s]
+    
+    % polarization types
+    polP = 0;
+    polS = 1;
+    
+    % drive types
+    drvPos = 0;
+    drvPit = 1;
+    drvYaw = 2;
   end
   
   methods
