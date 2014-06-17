@@ -1,11 +1,15 @@
-% [mOpt, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f)
+% [mOpt, rctList, drvList] = convertOptics01(opt, mapList, vBasis,
+% pos, f, is10)
+%
 %   tickle01 internal function, not for direct use
 %
 % Convert Optics to Matrices for TEM01 propagation
 %   mapList is from convertLinks
+%
+%  is10 is a switch to select yaw (1) or pitch (~=1 or not given)
 
-function [mOpt, rctList, drvList] = ...
-  convertOptics01(opt, mapList, vBasis, pos, f)
+function [mOptGen, mRadFrc, lResp, mQuant] = ...
+    convertOptics01(opt, mapList, vBasis, pos, f, vDC, is10)
 
   % === Argument Handling
   if nargin < 4
@@ -13,6 +17,9 @@ function [mOpt, rctList, drvList] = ...
   end
   if nargin < 5
     f = [];
+  end
+  if nargin < 6
+    is10 = 0;
   end
 
   % === Field Info
@@ -25,6 +32,7 @@ function [mOpt, rctList, drvList] = ...
   Nrf  = length(vFrf);			% number of RF components
   Naf  = length(f);				% number of audio frequencies
   Nfld = Nlnk * Nrf;            % number of RF fields
+  Narf = 2*Nfld;                % number of audio fields
   
   % default positions
   if isempty(pos)
@@ -43,54 +51,71 @@ function [mOpt, rctList, drvList] = ...
   par = getOptParam(opt);
   par.Naf = Naf;
   par.vFaf = f;
-
+  par.is10 = is10;
+  
   % system matrices
-  mOpt = sparse(Nfld, Nfld);
+  mOptGen = sparse(Narf,Ndrv+Narf);   % [mOpt, mGen]
+  mRadFrc = sparse(Ndrv,Ndrv+Narf);   % [mRad, mFrc]
+  
+  lResp = zeros(Naf,Ndrv); % frequency response of each drive
 
-  rctElem = struct('m', sparse(Ndrv, Nfld));
-  rctList = repmat(rctElem, Naf, 1);
-
-  drvElem = struct('m', sparse(Nfld, Nfld));
-  drvList = repmat(drvElem, Ndrv, 1);
+  mQuant = sparse(Narf, 0);  % quantum noises
   
   % build system matrices
   for n = 1:Nopt
-    obj = opt.optic{n};
-    mIn = mapList(n).mIn;
-    mOut = mapList(n).mOut;
-    mDOF = mapList(n).mDOF;
-    
-    %%%% Optic Properties
-    vBin = NaN(obj.Nin, 2);
-    isInOk = obj.in ~= 0;
-    vBin(isInOk, :) = vBasis(obj.in(isInOk), :);
-    [mOpt_n, mRct_n, mDrv_n] = getMatrices01(obj, pos(obj.drive), vBin, par);
-    
-    % check matrices
-    if any(~isfinite(mOpt_n))
-      error('Bad field matrix for optic %s', obj.name)
-    end
-    if any(~isfinite(mRct_n))
-      error('Bad reaction matrix for optic %s', obj.name)
-    end
-    if any(~isfinite(mDrv_n))
-      error('Bad drive matrix for optic %s', obj.name)
-    end
-    
-    % optical field transfer matrix
-    mOpt = mOpt + mOut * mOpt_n * mIn;
-
-    % reaction and drive matrices
-    % loop over frequencies
-    for m = 1:Naf
-      mRct_nm = sparse(mRct_n(:, :, m));
-      rctList(m).m = rctList(m).m + mDOF * mRct_nm * mIn;
-    end
-    
-    % loop over drives
-    for m = 1:obj.Ndrive
-      nDrv = obj.drive(m);
-      mDrv_nm = sparse(mDrv_n(:, :, m));
-      drvList(nDrv).m = mOut * mDrv_nm * mIn;
-    end
+      obj = opt.optic{n};
+      
+      %%%
+      % Mapping Matrices
+      %
+      % mIn   (obj.Nin*Nrf) x Nfld
+      % mOut  Nfld x (obj.Nout*Nrf)
+      % mDrv  Ndrv x obj.Ndrv
+      
+      mIn = mapList(n).mIn;
+      mInAC = blkdiag(mIn,mIn); % make block diagonal
+      mOut = mapList(n).mOut;
+      mOutAC = blkdiag(mOut,mOut); % make block diagonal
+      mDrv = mapList(n).mDrv;
+      
+      % mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
+      par.vDC = mIn * vDC; 
+      
+      %%%% Optic Properties
+      vBin = NaN(obj.Nin, 2);
+      isInOk = obj.in ~= 0;
+      vBin(isInOk, :) = vBasis(obj.in(isInOk), :);
+      [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices01(obj, pos(obj.drive), par, vBin);
+      
+      % for debugging
+%       fprintf('\n ===================== %s\n', obj.name)
+%       fprintf('\n === mOpt \n')
+%       disp(full(mOpt_n(1:obj.Nout*Nrf,1:obj.Nin*Nrf)))
+%       if obj.Ndrive > 0
+%         fprintf('\n === mGen \n')
+%         disp(full(mGen_n(1:obj.Nout*Nrf,:)))
+%         fprintf('\n === mRad^T \n')
+%         disp(full(mRad_n(:,1:obj.Nin*Nrf).'))
+%         fprintf('\n === mFrc \n')
+%         disp(full(mFrc_n(:,:)))
+%       end
+      
+      % optical field scatter/generation matrix
+      mOptGen = mOptGen + mOutAC * [ mOpt_n * mInAC, mGen_n * mDrv.' ] ;
+      
+      % optic radiation/force response
+      mRadFrc = mRadFrc + mDrv * [ mRad_n * mInAC, mFrc_n * mDrv.' ] ;
+      
+      % mechanical response list
+      lResp = lResp + lResp_n * mDrv.';
+      
+      % account for unconnected inputs
+      isCon = obj.in == 0;
+      isConRF = repmat(isCon(:), 2 * Nrf, 1);
+      mQuantCon_n = mOpt_n(:, isConRF);  % vacuum from disocnnected inputs
+      
+      % accumulate noises (removing ones that are zero)
+      mQ1 = mOutAC * sparse([mQuant_n, mQuantCon_n]);
+      isNonZero = full(any(mQ1, 1));
+      mQuant = [mQuant, mQ1(:, isNonZero)];  %#ok<AGROW>
   end
