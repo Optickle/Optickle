@@ -15,7 +15,7 @@ classdef TickleTestOnOpt < OptickleTest
             
             [fDC, sigDC, sigAC, mMech, noiseAC] = tickle(testCase.optFuncHandle(),[], f);
             
-            resultStruct = var2struct(fDC,sigDC,sigAC,mMech,noiseAC);
+            resultStruct = var2struct(f,fDC,sigDC,sigAC,mMech,noiseAC);
         end
     end
     % Exact numerical equality is automatically tested, define additional
