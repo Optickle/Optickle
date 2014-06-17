@@ -1,11 +1,15 @@
-% [mOpt, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f)
+% [mOpt, rctList, drvList] = convertOptics01(opt, mapList, vBasis,
+% pos, f, is10)
+%
 %   tickle01 internal function, not for direct use
 %
 % Convert Optics to Matrices for TEM01 propagation
 %   mapList is from convertLinks
+%
+%  is10 is a switch to select yaw (1) or pitch (~=1 or not given)
 
 function [mOpt, rctList, drvList] = ...
-  convertOptics01(opt, mapList, vBasis, pos, f)
+  convertOptics01(opt, mapList, vBasis, pos, f, is10)
 
   % === Argument Handling
   if nargin < 4
@@ -13,6 +17,9 @@ function [mOpt, rctList, drvList] = ...
   end
   if nargin < 5
     f = [];
+  end
+  if nargin < 6
+    is10 = 0;
   end
 
   % === Field Info
@@ -43,7 +50,8 @@ function [mOpt, rctList, drvList] = ...
   par = getOptParam(opt);
   par.Naf = Naf;
   par.vFaf = f;
-
+  par.is10 = is10
+  
   % system matrices
   mOpt = sparse(Nfld, Nfld);
 

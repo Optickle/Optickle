@@ -17,8 +17,8 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
   % dl/dx (non-zero for reflected fields)
   dldx = zeros(Nout, Nin);
   caoi = cos(pi * obj.aoi / 180);
-  dldx(1, 1) = -2 * caoi;
-  dldx(2:4, 2) = 2 * caoi;
+  dldx(1, 1)   = -2 * caoi;
+  dldx(2:4, 2) =  2 * caoi;
 
   % direction matrices
   mDirIn = diag([-caoi,caoi]);

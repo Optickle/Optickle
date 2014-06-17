@@ -26,7 +26,28 @@ function mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
   vBout = apply(getBasisMatrix(obj), vBasis);
   vBout(~isfinite(vBout)) = 1i;
   
-  % mirror TEM01 mode injections at the waist are
+  % select 01 (pitch) or 10 (yaw)
+  if par.is10
+      %10 (yaw) case
+      nBasis = 1;
+      dPhidTheta = sign(-dldx / 2);% Yaw of output beam for yaw of mirror.
+                                   % To understand where the factor of
+                                   % 1/2 comes from consider the
+                                   % longitudinal case - phase change
+                                   % on reflection is i k 2x but
+                                   % sideband amplitudes are i k x
+  else
+      %01 (pitch) case - default
+      nBasis = 2;
+      dPhidTheta = dldx / 2; %Pitch of output beam for pitch of
+                             %mirror. Includes cos(angle of incidence)
+                             %in pitch case. The `sign' removes this
+                             %in the yaw case.
+  end
+  
+      
+  
+  % mirror TEM01/10 mode injections at the waist are
   %   theta / theta0 = theta * sqrt(k * z0 / 2)
   % adding a non-zero distance from the waist, we must scale by
   %   w(z) / w0 = sqrt(1 + (z/z0)^2)
@@ -34,10 +55,13 @@ function mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
   % the sqrt(z0 * (1 + (z/z0)^2)) is done for each link using the
   % the injection matrix, mInj, computed below.
   %
-  %   the y-basis, vBout(:,2), is of interest for the vertical 01 mode
-  z = real(vBout(:,2));
-  z0 = -imag(vBout(:,2));
-  mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
+ 
+  %   the y-basis, vBout(:,2), is of interest for the vertical 01
+  %   mode
+  %   the x-basis, vBout(:,1), is of interest for the horizontal 10 mode
+  z    =  real(vBout(:,nBasis));
+  z0   = -imag(vBout(:,nBasis));
+  mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2))); %sqrt(z0*w(z)/w0)
   
   % drive matrix
   mCpl = zeros(Nrf * Nout, Nrf * Nin);
