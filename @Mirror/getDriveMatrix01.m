@@ -30,12 +30,17 @@ function mCpl = getDriveMatrix01(obj, pos, par, vBasis, mOpt, dldx)
   if par.is10
       %10 (yaw) case
       nBasis = 1;
-      dPhidTheta = sign(-dldx / 2);% Yaw of output beam for yaw of mirror.
+      dPhidTheta = sign(dldx / 2); %%%% CHECK SIGN%%%%%%%%
+                                   % Yaw of output beam for yaw of mirror.
                                    % To understand where the factor of
                                    % 1/2 comes from consider the
                                    % longitudinal case - phase change
                                    % on reflection is i k 2x but
-                                   % sideband amplitudes are i k x
+                                   % sideband amplitudes are i k
+                                   % x. Due to the sign the
+                                   % division doesn't actually do
+                                   % anything here. It is just
+                                   % included for consistency
   else
       %01 (pitch) case - default
       nBasis = 2;
@@ -67,7 +72,7 @@ function mCpl = getDriveMatrix01(obj, pos, par, vBasis, mOpt, dldx)
   mCpl = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
-    drp = 1i * sqrt(par.k(n) / 2) * (mInj * dldx / 2);
+    drp = 1i * sqrt(par.k(n) / 2) * (mInj * dPhidTheta);
 
     % enter this submatrix into mCpl
     nn = (1:Nout) + Nout * (n - 1);
