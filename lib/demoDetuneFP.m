@@ -2,7 +2,7 @@
 %   this function demonstrates the use of tickle with optFP
 %
 
-function [sigDC0, sigAC0, mMech0, noiseAC0] = demoDetuneFP
+function [f, sigDC2, sigAC2, mMech2, noiseAC2] = demoDetuneFP
 
   % create the model
   opt = optFP;
@@ -16,11 +16,9 @@ function [sigDC0, sigAC0, mMech0, noiseAC0] = demoDetuneFP
   nREFL_I = getProbeNum(opt, 'REFL_I');
   nREFL_Q = getProbeNum(opt, 'REFL_Q');
 
-  nTRANSa_DC = getProbeNum(opt, 'TRANSa_DC');
-  nTRANSb_DC = getProbeNum(opt, 'TRANSb_DC');
-
   % compute the DC signals and TFs on resonance
   f = logspace(-1, 3, 200)';
+  %f = 0.7;
   [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
   
   % Print out the fields and probes, just to demonstrate these functions:
@@ -33,12 +31,12 @@ function [sigDC0, sigAC0, mMech0, noiseAC0] = demoDetuneFP
   %fDC
   % compute the same a little off resonance
   pos = zeros(opt.Ndrive, 1);
-  pos(nEX) = 0.1e-9;
+  pos(nIX) = 0.1e-9;
   [fDC, sigDC1, sigAC1, mMech1, noiseAC1] = tickle(opt, pos, f);
   %fDC
   
   % and a lot off resonance
-  pos(nEX) = 1e-9;
+  pos(nIX) = 1e-9;
   [fDC, sigDC2, sigAC2, mMech2, noiseAC2] = tickle(opt, pos, f);
   %fDC
   
@@ -68,12 +66,13 @@ function [sigDC0, sigAC0, mMech0, noiseAC0] = demoDetuneFP
   grid on
   
   % make a response plot
-  h0 = getTF(sigAC0, nTRANSa_DC, nEX);
-  h1 = getTF(sigAC1, nTRANSa_DC, nEX);
-  h2 = getTF(sigAC2, nTRANSa_DC, nEX);
-  
-  figure(3)
-  zplotlog(f, [h0, h1, h2])
-  title('TR Response for Detuned Cavity', 'fontsize', 18);
-  legend('On resonance', '0.1 nm', '1 nm', 'Location','SouthEast');
+%   nTRANS_DC = getProbeNum(opt, 'TRANS_DC');
+%   h0 = getTF(sigAC0, nTRANS_DC, nEX);
+%   h1 = getTF(sigAC1, nTRANS_DC, nEX);
+%   h2 = getTF(sigAC2, nTRANS_DC, nEX);
+%   
+%   figure(3)
+%   zplotlog(f, [h0, h1, h2])
+%   title('TR Response for Detuned Cavity', 'fontsize', 18);
+%   legend('On resonance', '0.1 nm', '1 nm', 'Location','SouthEast');
   

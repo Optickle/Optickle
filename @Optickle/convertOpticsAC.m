@@ -21,10 +21,11 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   Nopt = opt.Noptic;			% number of optics
   Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
   Nlnk = opt.Nlink;				% number of links
-  Nrf  = length(vFrf);			% number of RF components
+  Nrf  = length(vFrf);    % number of RF components
   Naf  = length(f);				% number of audio frequencies
-  Nfld = Nlnk * Nrf;            % number of RF fields
-  Narf = 2*Nfld;                % number of audio fields
+  Nfld = Nlnk * Nrf;      % number of RF fields
+  Narf = 2 * Nfld;        % number of audio fields
+  Ndof = Narf + Ndrv;     % number of degrees of freedom
   
   % default positions
   if isempty(pos)
@@ -54,12 +55,12 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   par.vFaf = f;
 
   % system matrices
-  mOptGen = sparse(Narf,Ndrv+Narf);   % [mOpt, mGen]
-  mRadFrc = sparse(Ndrv,Ndrv+Narf);   % [mRad, mFrc]
+  mOptGen = sparse(Narf, Ndof);   % [mOpt, mGen]
+  mRadFrc = sparse(Ndrv, Ndof);   % [mRad, mFrc]
   
-  lResp = zeros(Naf,Ndrv); % frequency response of each drive
+  lResp = zeros(Naf, Ndrv); % frequency response of each drive
 
-  mQuant = sparse(Narf, 0);  % quantum noises
+  mQuant = sparse(Ndof, 0);  % quantum noises
   
   % build system matrices
   for n = 1:Nopt
@@ -117,3 +118,6 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       mQuant = [mQuant, mQ1(:, isNonZero)];  %#ok<AGROW>
   end
   
+%  fprintf('\n\n======== mQuant \n')
+%  disp(abs(full(mQuant)))
+end

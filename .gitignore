@@ -3,4 +3,5 @@
 *.aux
 *.log
 *.out
+*.pdf
 *.synctex.*

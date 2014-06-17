@@ -13,7 +13,9 @@ function [mQuant, shotPrb] = tickleNoise(opt, prbList, vDC, mQuant)
                                              % of loss points*2
 
   % get both upper and lower sidebands
-  aQuantMatrix = diag([aQuantTemp(:);aQuantTemp(:)]); 
+  aQuantMatrix = diag([aQuantTemp(:)
+    aQuantTemp(:) 
+    ones(opt.Ndrive, 1) * aQuant(1)]); % HACK!!!
   mQuant = aQuantMatrix * mQuant;
   
   % compile probe shot noise vector
@@ -26,13 +28,8 @@ function [mQuant, shotPrb] = tickleNoise(opt, prbList, vDC, mQuant)
     % This section attempts to account for the shot noise due to
     % fields which are not recorded by a detector. E.g. a 10
     % MHz detector will not see signal due to 37 MHz sidebands
-    % but it should see their shot noise
-    
-    % Define a new vDCin which includes the appropriate pQuant
-    % for each dc component
-    vDCinShot = mIn_k * vDC;
-    
+    % but it should see their shot noise    
     shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * ...
-      (pQuant .* abs(vDCinShot).^2);
+      (pQuant .* abs(mIn_k * vDC).^2);
   end
 end
