@@ -9,6 +9,6 @@
 
 function mQuant = getNoiseMatrix(obj, pos, par)
   
-  % unity noise amplitudes for all RF components
-  mQuant = eye(2 * par.Nrf);  
+  % unity noise amplitudes for all RF components (upper and lower ASBs)
+  mQuant = diag(sqrt(Optickle.h * [par.nu; par.nu]));
 end

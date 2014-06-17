@@ -19,23 +19,12 @@ function varargout = tickleAC(opt, f, nDrive, ...
   Ndof = Narf + Ndrv;	% number of degrees-of-freedom
   
   isNoise = ~isempty(mQuant);
-  Nnoise = size(mQuant, 2);
   
-  % useful indices
-  jMsb = 1:Nfld;
-  jPsb = Nfld + jMsb;
-  jAsb = 1:Narf;
-  jDrv = (1:Ndrv) + Narf;
-  if ~isempty(nDrive)
-    jDrv = jDrv(nDrive);
-    NdrvOut = numel(nDrive);
-  else
-    NdrvOut = Ndrv;
-  end
-  
-  % main inversion tools
-  mQOz = sparse(Ndrv, Nnoise);
-  eyeNdof = speye(Ndof);
+  % ==== Useful Indices
+  jMsb = 1:Nfld;          % minus sideband
+  jPsb = Nfld + jMsb;     % plus sideband
+  jAsb = 1:Narf;          % all fields
+  jDrv = (1:Ndrv) + Narf; % drives
   
   % combine probe and output matrix
   if isempty(opt.mProbeOut)
@@ -45,7 +34,16 @@ function varargout = tickleAC(opt, f, nDrive, ...
   end
   Nout = size(mOut, 1);
 
+  % output drive selection (HACK: change to output matrix)
+  if ~isempty(nDrive)
+    jDrv = jDrv(nDrive);
+    NdrvOut = numel(nDrive);
+  else
+    NdrvOut = Ndrv;
+  end
+  
   % intialize result space
+  eyeNdof = speye(Ndof);
   mExc = eyeNdof(:, jDrv);
   sigAC = zeros(Nout, NdrvOut, Naf);
   mMech = zeros(NdrvOut, NdrvOut, Naf);
