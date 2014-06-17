@@ -10,7 +10,7 @@
 %
 % mCpl = getDriveMatrix10(obj, pos, vBasis, par, mOpt, dldx)
 
-function mCpl = getDriveMatrix10(obj, pos, vBasis, par, mOpt, dldx)
+function mCpl = getDriveMatrix10(obj, pos, vBin, par, mOpt, dldx)
   
   % check for optional arguments
   if nargin < 6
@@ -23,7 +23,7 @@ function mCpl = getDriveMatrix10(obj, pos, vBasis, par, mOpt, dldx)
   Nout = 4;					% obj.Optic.Nout
 
   % output basis, where the basis is undefined, put z = 0, z0 = 1
-  vBout = apply(getBasisMatrix(obj), vBasis);
+  vBout = apply(getBasisMatrix(obj), vBin);
   vBout(~isfinite(vBout)) = 1i;
   
   % mirror TEM10 mode injections at the waist are
