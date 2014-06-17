@@ -9,7 +9,7 @@ function [mRadAC, mFrc, vRspAF] = ...
   % check for optional arguments
   if nargin < 5
     [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
-    [~, mGen] = getGenMatrix(obj, pos, par, vBasis, mOpt, dldx);
+    [~, mGen] = getGenMatrix01(obj, pos, par, vBasis, mOpt, dldx);
   end
   
   % constants

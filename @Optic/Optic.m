@@ -157,8 +157,8 @@ classdef Optic < handle
       
       % reaction, drive and noise matrices (only used in AC computation)
       mGen = getGenMatrix01(obj, pos, par, vBasis);
-      [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par);
-      mQuant = getNoiseMatrix01(obj, pos, par);
+      [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par, vBasis);
+      mQuant = getNoiseMatrix01(obj, pos, par, vBasis);
     end
     
     function [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par)
@@ -166,7 +166,7 @@ classdef Optic < handle
       mOpt = getFieldMatrix(obj, pos, par);
       mOptAC = Optic.expandFieldMatrixAF(mOpt);
     end
-    function [mOptAC, mOpt] = getFieldMatrix01(obj, pos, vBasis, par)
+    function [mOptAC, mOpt] = getFieldMatrix01(obj, pos, par, vBasis)
       % getFieldMatrixAC method for TEM01 mode
       [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par);
     end
@@ -239,11 +239,11 @@ classdef Optic < handle
       vRspAF = zeros(par.Naf, obj.Ndrive);
       
     end
-    function [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par)
+    function [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par, vBasis)
       % default getReactMatrix01 method
       %   returns a zero matrix, Ndrive x (Nrf * Nin) x Naf
       %
-      % [mRad, mFrc, vRsp] = getReactMatrix01(obj, pos, par);
+      % [mRad, mFrc, vRsp] = getReactMatrix01(obj, pos, par, vBasis);
       
       [mRad, mFrc, vRspAF] = getReactMatrix(obj, pos, par);
       
@@ -259,7 +259,7 @@ classdef Optic < handle
       % In this, the default implementation, Nnoise = 0.
       mQuant = zeros(2 * par.Nrf * obj.Nout, 0);
     end
-    function mQuant = getNoiseMatrix01(obj, pos, par)
+    function mQuant = getNoiseMatrix01(obj, pos, par, vBasis)
       mQuant = zeros(2 * par.Nrf * obj.Nout, 0);
     end
     
