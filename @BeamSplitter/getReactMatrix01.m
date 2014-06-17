@@ -19,27 +19,40 @@ function [mRadAC, mFrc, vRspAF] = ...
   Nout = 8;						% obj.Optic.Nout
   LIGHT_SPEED = Optickle.c;
   
+  % select 01 (pitch) or 10 (yaw)
+  if par.is10
+      %10 (yaw) case
+      nBasis = 1;
+      nDOF   = 3;
+  else
+      %01 (pitch) case - default
+      nBasis = 2;
+      nDOF   = 2;
+  end
+  
   % mechanical response
-  vRspAF = getMechResp(obj, par.vFaf, 2);
+  vRspAF = getMechResp(obj, par.vFaf, nDOF);
   
   % output basis, where the basis is undefined, put z = 0, z0 = 1
   vBout = apply(getBasisMatrix(obj), vBasis);
   vBout(~isfinite(vBout)) = 1i;
   
-  % mirror TEM01 mode reaction torque scales with beam size
-  %   torque = R * w * (A01 * A00)
+  % mirror TEM01/10 mode reaction torque scales with beam size
+  %   torque = R * w * (A01/10 * A00)
   % so here the reaction is proportional to waist size
   %   w = sqrt(z0 * (1 + (z/z0)^2)) * sqrt(2 / k)
   % The sqrt(2 / k) part is done separately for each RF component
   % the sqrt(z0 * (1 + (z/z0)^2)) is done for each link using the
   % the waist size matrix, mW, computed below.
   %
-  %   the y-basis, vBout(:,2), is of interest for the vertical 01 mode
-  z = real(vBout(:,2));
-  z0 = -imag(vBout(:,2));
+  %   the y-basis, vBout(:,2), is of interest for the vertical 01
+  %   mode
+    %   the x-basis, vBout(:,1), is of interest for the horizontal 10 mode
+  z = real(vBout(:,nBasis));
+  z0 = -imag(vBout(:,nBasis));
   vWOut = sqrt(z0 .* (1 + (z ./ z0).^2));
-  z = real(vBasis(:,2));
-  z0 = -imag(vBasis(:,2));
+  z = real(vBasis(:,nBasis));
+  z0 = -imag(vBasis(:,nBasis));
   vWIn = sqrt(z0 .* (1 + (z ./ z0).^2));
   
   kk=repmat(par.k,1,length(vWOut))';
