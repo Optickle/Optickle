@@ -13,12 +13,8 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   % noise powers
   loss = obj.loss;
   if loss > par.minQuant
-    mNP = loss;
+    mQuant = diag(sqrt(loss * Optickle.h * [par.nu; par.nu]));
   else
-    mNP = zeros(1, 0);
-    loss = 0;
+    mQuant = zeros(2 * par.Nrf, 0);
   end
-  
-  % convert to noise amplitudes for all RF components
-  mQuant = blkdiagN(sqrt(mNP), 2 * par.Nrf);
 end

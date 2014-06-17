@@ -54,6 +54,10 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   par.Naf = Naf;
   par.vFaf = f;
 
+  % set the quantum scale
+  pQuant  = Optickle.h * opt.nu;
+  aQuant = sqrt(pQuant);
+    
   % system matrices
   mOptGen = sparse(Narf, Ndof);   % [mOpt, mGen]
   mRadFrc = sparse(Ndrv, Ndof);   % [mRad, mFrc]
@@ -100,6 +104,40 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
     mQuantCon_n = mOpt_n(:, isNotConRF);  % vacuum from disocnnected inputs
     mQuantRad_n = mRad_n(:, isNotConRF);  % vacuum from disocnnected inputs
     
+    if any(isNotCon)
+      % aQuant is Nrfx1. mQuantCon_n is Narf x (Ndiscon * 2 * Nrf)
+      Ndiscon = sum(isNotCon);
+      aQuantTemp = repmat(aQuant.', Ndiscon, 1);
+      aQuantMatrix = diag([aQuantTemp(:); aQuantTemp(:)]);
+      
+      % scale input noises
+      mQuantCon_n = mQuantCon_n * aQuantMatrix;
+      mQuantRad_n = mQuantRad_n * aQuantMatrix;
+    end
+    
+    % merge field and mechanical responses
+    NoutAC = 2 * obj.Nout * Nrf;
+    if size(mQuant_n, 1) == NoutAC
+      % mQuant_n does not have mechanical part
+      mQopt = mOutAC * [mQuant_n, mQuantCon_n];
+      
+      % fill in with zeros
+      mQrad = [zeros(Ndrv, size(mQuant_n, 2)), mDrv * mQuantRad_n];
+    else
+      % mQuant_n DOES not have mechanical part
+      mQopt = mOutAC * [mQuant_n(1:NoutAC, :), mQuantCon_n];
+      
+      % use mechanical response from mQuant_n
+      mQrad = mDrv * [mQuant_n(NoutAC + (1:obj.Ndrv), :), mQuantRad_n];
+    end
+    
+    % stack field and mechanical parts
+    mQ1 = [mQopt; mQrad];
+    
+    % accumulate noises (removing ones that are zero)
+    isNonZero = any(mQ1, 1);
+    mQuant = [mQuant, sparse(mQ1(:, isNonZero))];  %#ok<AGROW>
+
     % for debugging
 %     fprintf('\n ===================== %s\n', obj.name)
 %     fprintf('\n === mOpt \n')
@@ -113,14 +151,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
 %       disp(full(mFrc_n(:,:)))
 %     end
 %     fprintf('\n === [mQuant_n, mQuantCon_n] \n')
-%     disp(full(abs([mQuant_n, mQuantCon_n])))
-    
-    % accumulate noises (removing ones that are zero)
-    mQopt = mOutAC * [mQuant_n, mQuantCon_n];
-    mQrad = [zeros(Ndrv, size(mQuant_n, 2)), mDrv * mQuantRad_n];
-    mQ1 = [mQopt; mQrad];
-    isNonZero = any(mQ1, 1);
-    mQuant = [mQuant, sparse(mQ1(:, isNonZero))];  %#ok<AGROW>
+%     disp(full(abs([mQuant_n, mQuantCon_n])))    
   end
   
 %  fprintf('\n\n======== mQuant \n')

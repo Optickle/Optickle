@@ -131,14 +131,32 @@ function varargout = tickle(opt, pos, f, nDrive)
   
   % audio frequency and noise calculation
   if ~isNoise
+    % no noise calculation... easy!
     shotPrb = zeros(Nprb, 1);
     mQuant = zeros(Narf, 0);
     
     [sigAC, mMech] = tickleAC(opt, f, nDrive, vLen, ...
       [], mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   else
-    [mQuant, shotPrb] = tickleNoise(opt, prbList, vDC, mQuant);
+    % set the quantum scale
+    pQuant  = Optickle.h * opt.nu;
     
+    % compile probe shot noise vector
+    shotPrb = zeros(opt.Nprobe, 1);
+    
+    for k = 1:opt.Nprobe
+      mIn_k = prbList(k).mIn;
+      mPrb_k = prbList(k).mPrb;
+      
+      % This section attempts to account for the shot noise due to
+      % fields which are not recorded by a detector. E.g. a 10
+      % MHz detector will not see signal due to 37 MHz sidebands
+      % but it should see their shot noise
+      shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * ...
+        (pQuant .* abs(mIn_k * vDC).^2);
+    end
+    
+    % call tickleAC to do the rest
     [sigAC, mMech, noiseAC, noiseMech] = tickleAC(opt, f, nDrive, vLen, ...
       [], mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   end

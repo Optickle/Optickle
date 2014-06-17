@@ -3,16 +3,18 @@
 function opt = optFP
 
   % RF component vector
-  Pin = 10;
-  vMod = 0; %(-1:1)';
+  Pin = 100;
+  vMod = (-1:1)';
   fMod = 20e6;
-  vFrf = fMod * vMod;
+  vFrf = fMod * [vMod; 0];  % add green carrier, just for fun
+  
+  lambda = 1064e-9 * [1 1 1 0.5]';
   
   % create model
-  opt = Optickle(vFrf);
+  opt = Optickle(vFrf, lambda);
   
   % add a source
-  opt = addSource(opt, 'Laser', sqrt(Pin) * (vMod == 0));
+  opt = addSource(opt, 'Laser', sqrt(Pin) * (vFrf == 0));
 
   % add an AM modulator (for intensity control, and intensity noise)
   %   opt = addModulator(opt, name, cMod)
@@ -25,13 +27,13 @@ function opt = optFP
 
   % add an RF modulator
   %   opt = addRFmodulator(opt, name, fMod, aMod)
-  gamma = 0.2 * 1e-6;
+  gamma = 0.2;
   opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
   opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 0);
 
   % add mirrors
   %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
-  lCav = 4;
+  lCav = 4000;
   opt = addMirror(opt, 'IX', 0, 0, 0.03);
   opt = addMirror(opt, 'EX', 0, 0.7 / lCav, 0.003);
 
@@ -45,8 +47,8 @@ function opt = optFP
   
   % set some mechanical transfer functions
   w = 2 * pi * 0.7;      % pendulum resonance frequency
-  mI = Inf;               % mass of input mirror
-  mE = 0.040;               % mass of end mirror
+  mI = 40;               % mass of input mirror
+  mE = 40;               % mass of end mirror
 
   w_pit = 2 * pi * 0.5;   % pitch mode resonance frequency
 
@@ -80,7 +82,7 @@ function opt = optFP
   opt = addSink(opt, 'TRANS');
   %opt = addLink(opt, 'EX', 'bk', 'TRANS', 'in', 2);
   %opt = addProbeIn(opt, 'TRANS_DC', 'TRANS', 'in', 0, 0);
-  opt = addLink(opt, 'TRANS', 'out', 'EX', 'bk', 0);
+  %opt = addLink(opt, 'TRANS', 'out', 'EX', 'bk', 0);
   
 %   % add TRANS optics (adds telescope, splitter and sinks)
 %   % opt = addReadoutTelescope(opt, name, f, df, ts, ds, da, db)
