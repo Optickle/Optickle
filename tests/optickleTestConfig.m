@@ -4,4 +4,7 @@ function config = optickleTestConfig()
     config.referencePath = '~/tmp/Optickle';
     %config.referenceType = 'Files';
     %config.referencePath = './referenceFiles';
+    config.calculationPath = '~/repos/Optickle';
+    config.residualSize = 5e-5;
+    config.errorThreshold = 1e-6;
 end

@@ -4,7 +4,6 @@ classdef OptickleTest < matlab.unittest.TestCase
         testFunctionHandle;
         referenceStruct;
         calculatedStruct;
-        optickleLocation = which('Optickle');
     end
     properties
         config = optickleTestConfig();
@@ -13,24 +12,13 @@ classdef OptickleTest < matlab.unittest.TestCase
     % methods
     methods (Test)
         function testNumericalEquality(testCase)
-            testCase.verifyEqual(testCase.referenceStruct,testCase.calculatedStruct);
+            testCase.verifyEqual(testCase.calculatedStruct,testCase.referenceStruct);
         end
     end
     methods (TestClassSetup)
         function loadReferenceStruct(testCase)
-            
-            disp('---===Optickle Test===---')
-            disp(['Reference type is ' testCase.config.referenceType])
-            disp(['Reference path is ' testCase.config.referencePath])
-            disp(['Optickle path is ' testCase.optickleLocation])
-            
             switch testCase.config.referenceType
                 case 'Path'
-                    
-                    if strcmp(GetFullPath([testCase.config.referencePath '/@Optickle/Optickle.m']),...
-                              GetFullPath(testCase.optickleLocation))
-                        error('Reference path to Optickle is not different from current Optickle path. Your path definition may have been screwed up by a failed test, consider resetting path.')
-                    end
                     % remember path
                     origPath = path;
                     % add reference Optickle to path
@@ -64,12 +52,44 @@ classdef OptickleTest < matlab.unittest.TestCase
             end
         end
         function computeCalculatedStruct(testCase)
+            % remember path
+            origPath = path;
+            % add reference Optickle to path
+            addpath(testCase.config.calculationPath);
+            addpath([testCase.config.calculationPath '/lib'])
+            % call function
             testCase.calculatedStruct = testCase.testFunctionHandle();
+            % reset path
+            path(origPath);
         end
     end
     methods
+        % constructor
+        function testCase = OptickleTest()
+            disp('---===Optickle Test===---')
+            disp(['Reference type is ' testCase.config.referenceType])
+            disp(['Reference path is ' testCase.config.referencePath])
+            disp(['Optickle path is ' testCase.config.calculationPath])
+            
+            % it's OK if you are doing reference type and your calc path is
+            % the same as what is in the current path... otherwise there
+            % shouldn't be anything in the current path
+            
+            if exist('Optickle','file')==2
+                % Optickle is in the path
+                if ~ ( strcmp(GetFullPath([testCase.config.calculationPath '/@Optickle/Optickle.m']),...
+                              GetFullPath(which('Optickle')))...
+                       && ...
+                       strcmp(testCase.config.referenceType,'Files') )
+                    % you have optickle in the path, but it is different
+                    % from the calculation path, or you are doing a true
+                    % path comparison, this is bad
+                    
+                    error('You have Optickle in the path, this can potentially conflict with the code you are testing, remove Optickle from your path and try again')
+                end
+            end
+        end
         function saveTestFunctionOutputToReference(testCase)
-            % TODO make this function
             
             if ~strcmp(testCase.config.referenceType,'Files')
                 error('cannot save unless config.referenceType is Files')
@@ -99,8 +119,8 @@ classdef OptickleTest < matlab.unittest.TestCase
         end
         function warnOnMatrixFieldsInequalityInStruct(testCase,label, fieldNames)
             % precision is the product of these two numbers
-            errorThreshold = 1e-6;
-            smallNumber = 5e-5;
+            errorThreshold = testCase.config.errorThreshold;
+            smallNumber = testCase.config.residualSize;
             
             % helper function
             function stringOut = cell2CommaSeparatedString(cellIn)
@@ -132,10 +152,13 @@ classdef OptickleTest < matlab.unittest.TestCase
             end
         end
         function saveDataToDisk(testCase)
+            % used as diagnostic when test fails.
             temporaryFile = tempname;
             calcStruct = testCase.calculatedStruct; %#ok<NASGU>
             refStruct = testCase.referenceStruct; %#ok<NASGU>
             save(temporaryFile, 'calcStruct', 'refStruct');
+            global optickleTestResultsFile
+            optickleTestResultsFile = temporaryFile;
             fprintf('<a href="matlab:load(''%s'')">Load data into workspace</a>\n', temporaryFile);
         end
     end % methods
