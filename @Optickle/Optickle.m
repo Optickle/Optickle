@@ -409,6 +409,19 @@ classdef Optickle < handle
         end
       end        
     end
+    
+    function [isMatch, isClose] = matchFreqPol(par, nu, pol)
+      % look for frequency and polarization match
+      %   par should contain vectors nu and pol (e.g., par.nu)
+      %
+      % [isMatch, isClose] = matchFreqPol(par, nu, pol)
+      
+      [isMatch, isClose] = Optickle.isSameFreq(par.nu, nu);
+      
+      isMatch = isMatch & (pol == par.pol);
+      isClose = isClose & (pol == par.pol);
+    end
+    
     function [isMatch, isClose] = isSameFreq(f1, f2)
       % frequency differences for match and close
       matchFreqDiff = 0.1; 
