@@ -923,7 +923,9 @@ plane. For an angle of incidence $\phi_\mathrm{aoi}$ the input beam vector is
   \label{eq:inVec}
   \myVec{\mathrm{in}}=\threeVec{-\sin(\phi_\mathrm{aoi})}{0}{-\cos(\phi_\mathrm{aoi})}.
 \end{equation}
-Angles of incidence are measured in the same way as mirror yaws. Pitch and yaw angles of the beam are represented by the symbol $\phi$.
+Angles of incidence are measured in the same way as mirror yaws. Pitch
+and yaw angles of the beam are represented by the symbol $\phi$.
+
 
 \subsubsection{Mirror yaw}
 If the mirror is rotated in yaw by angle $\theta_y$ its surface normal
@@ -960,7 +962,7 @@ These results are precisely what one would naively expect.
 If the mirror is rotated in pitch by angle $\theta_p$ then its surface
 normal is given by
 \begin{equation}
-  \hat{n}_\mathrm{mirr} = \threeVec{\sin(\theta_y)}{0}{\cos(\theta_y)}
+  \hat{n}_\mathrm{mirr} = \threeVec{0}{-\sin(\theta_p)}{\cos(\theta_p)}
 \end{equation}
 and the output beam is given, again from (\ref{eq:vectorReflection})
 and (\ref{eq:inVec}), by
@@ -994,7 +996,48 @@ where, in the final lines, we have approximated the $\sin$ and $\arccos$
 functions to first order as their argument is assumed small (since
 $\theta_p$ is assumed small).
 
-\subsection{What does tickle10/01 do with components which are not mirrors/beamsplitters?}
+\subsection{Linear expansion and derivatives}
+Optickle treats mirror misalignments as small perturbations around a
+static operating point. In this regime, the important quantities are
+the derivatives of the above-derived beam output angles with respect
+to pitch and yaw perturbations. These derivatives are presented in
+Jacobian-like form below
+\begin{equation}
+  J_\phi(\theta)=
+\matrixBegin{cc}
+ \partial \phi_p/\partial \theta_p & \partial \phi_p/\partial \theta_y \\
+\partial \phi_y/\partial \theta_p & \partial \phi_y/\partial \theta_y
+\matrixEnd
+=\matrixBegin{cc}
+ 2\cos(\phi_\mathrm{aoi}) & 0 \\
+0 & 2 
+\matrixEnd.
+\end{equation}
+
+Alignment perturbations transfer some power from the fundamental mode
+to higher-order modes. The coupling to first order modes due to
+misalignment $\phi_{p/y}$ of the optical axis is given by
+\begin{equation}
+  \Psi = \Psi_{00}+i\frac{\phi_{p/y}}{\phi_0}\Psi_{01/10},
+\end{equation}
+where $\phi_0 = \lambda\pi/w(z)$. Hence the portion of first order
+mode created on reflection from a mirror misaligned by angle $\theta_{p/y}$
+will be
+\begin{equation}
+\matrixBegin{c}
+\Psi_{01} \\
+\Psi_{10}
+\matrixEnd=i\frac{ J_\phi(\theta)}{\phi_0}
+\matrixBegin{c}
+\theta_p \\
+\theta_y
+\matrixEnd.
+\end{equation}
+
+
+
+\subsection{What does tickle10/01 do with components which are not
+  mirrors/beamsplitters?}
 
 Fill me in.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
