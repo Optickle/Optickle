@@ -8,15 +8,8 @@
 %
 %  is10 is a switch to select yaw (1) or pitch (~=1 or not given)
 
-<<<<<<< HEAD
-function [mOpt, rctList, drvList] = ...
-  convertOptics01(opt, mapList, vBasis, pos, f, is10)
-=======
 function [mOptGen, mRadFrc, lResp, mQuant] = ...
-    convertOptics01(opt, mapList, vBasis, pos, f, vDC)
-
-% [mOpt, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f)
->>>>>>> Optickle2-yuta
+    convertOptics01(opt, mapList, vBasis, pos, f, vDC, is10)
 
   % === Argument Handling
   if nargin < 4
