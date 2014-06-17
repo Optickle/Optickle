@@ -251,16 +251,30 @@ classdef Optickle < handle
       [opt, sn] = addOptic(opt, obj);
     end
     function [opt, sn] = addSqueezer( opt, name, varargin )
-      % [opt, sn] = addSqueezer(opt, name, loss, sqAng, sqdB)
-      %
+      % [opt, sn] = addSqueezer(opt, name, lambda, fRF, pol,...
+      %                          sqAng, sqdB, antidB, sqzOption = 0)
+      % [opt, sn] = addSqueezer(opt, name, lambda, fRF, pol,...
+      %                         sqAng, x, escEff, sqzOption = 1)
+      % Add a squeezer to the model
+      % 
       % Parameters:
       %
-      % loss - This represents the escape efficiency of the OPO
-      %   (1-loss = escape efficiency)
+      % name - object name
+      % lambda - wavelength to be squeezed
+      % fRF - RF sideband of chosen lambda to be used
+      % pol - polarization of chosen RF sideband to be squeezed
       % sqAng - squeezing angle
-      % sqdB - amount of squeezing in dB with perfect escape efficiency
+      % sqdB - amount of squeezing in dB at OPO output
+      % antidB - amount of antisqueezing in dB at OPO output
+      % escEff - escape efficiency.
+      % x - normalized nonlinear interaction strength
+      %     x = sqrt(P_pump/P_thresh) = 1 - 1/sqrt(g) where g is nonlinear gain
+      % sqzOption - select inputs for specifying squeezer.
       %
-      % See squeezer for more options
+      % Default parameters are:
+      % [lambda, fRF , pol, sqAng, sqdB, antidB, x, escEff, sqzOption] =
+      % [par.lambda[1], 0, 0, 1, 10, 10, 0.5195, 1, 0]        
+      % See Squeezer for more options
       
       obj = Squeezer(name, varargin{:});
       [opt, sn] = addOptic(opt, obj);
@@ -402,7 +416,7 @@ classdef Optickle < handle
         mPhiFrf = zeros(Nlink,Nrf);
       end
       
-      v = exp(-1i * (vLen(:) * vFreq(:).'...      % WE PUT MINUS FOR NOW
+      v = exp(1i * (vLen(:) * vFreq(:).'...      % WE PUT MINUS FOR NOW
         + repmat(vPhiLinks, 1, Nrf)...
         + mPhiFrf...
         )... % close phases

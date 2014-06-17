@@ -4,11 +4,11 @@
 %
 % mDrv = getDriveMatrix01(obj, pos, vBasis, par)
 
-function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
+function mCpl = getDriveMatrix01(obj, pos, par, vBasis, mOpt, dldx)
   
   % check for optional arguments
-  if nargin < 5
-    [mOpt, d] = getFieldMatrix(obj, pos, par);
+  if nargin < 6
+    [mOpt, ~, ~, dldx] = getFieldMatrix(obj, pos, par);
   end
   
   % constants
@@ -26,13 +26,13 @@ function mDrv = getDriveMatrix01(obj, pos, vBasis, par, mOpt, d)
   mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
   
   % drive matrix
-  mDrv = zeros(Nrf * Nout, Nrf * Nin);
+  mCpl = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
-    drp = 1i * sqrt(par.k(n) / 2) * (mInj * d / 2);
+    drp = 1i * sqrt(par.k(n) / 2) * (mInj * dldx / 2);
 
     % enter this submatrix into mDrv
     nn = (1:Nout) + Nout * (n - 1);
     mm = (1:Nin) + Nin * (n - 1);
-    mDrv(nn, mm) = mOpt(nn, mm) .* drp;
+    mCpl(nn, mm) = mOpt(nn, mm) .* drp;
   end

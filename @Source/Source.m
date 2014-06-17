@@ -28,8 +28,8 @@ classdef Source < Optic
   methods
     function obj = Source(varargin)
       
-      % a default basis
-      qxy = [0 - 1i, 0 - 1i];
+      % uses propagated basis by default
+      qxy = [];
       
       % switch on arguments
       errstr = 'Don''t know what to do with ';	% for argument error messages

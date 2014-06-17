@@ -78,11 +78,24 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
       mOutAC = blkdiag(mOut,mOut); % make block diagonal
       mDrv = mapList(n).mDrv;
       
-      %mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
+      % mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
       par.vDC = mIn * vDC; 
       
       %%%% Optic Properties
       [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
+      
+      % for debugging
+      fprintf('\n ===================== %s\n', obj.name)
+      fprintf('\n === mOpt \n')
+      disp(full(mOpt_n(1:obj.Nout*Nrf,1:obj.Nin*Nrf)))
+      if obj.Ndrive > 0
+        fprintf('\n === mGen \n')
+        disp(full(mGen_n(1:obj.Nout*Nrf,:)))
+        fprintf('\n === mRad^T \n')
+        disp(full(mRad_n(:,1:obj.Nin*Nrf).'))
+        fprintf('\n === mFrc \n')
+        disp(full(mFrc_n(:,:)))
+      end
       
       % optical field scatter/generation matrix
       mOptGen = mOptGen + mOutAC * [ mOpt_n * mInAC, mGen_n * mDrv.' ] ;

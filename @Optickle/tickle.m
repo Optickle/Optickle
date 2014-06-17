@@ -90,7 +90,7 @@ function varargout = tickle(opt, pos, f, nDrive)
   % For easier use outside this function, the DC fields are
   % reshaped and returned in a matrix fDC, which is Nlnk x Nrf.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+  
   [vLen, prbList, mapList, mPhiFrf, vDC, mPrb, mPrbQ] = ...
     tickleDC(opt, pos);
 
@@ -121,14 +121,14 @@ function varargout = tickle(opt, pos, f, nDrive)
   % These are arranged such that sigAC(n, m, :) is the TF from
   % drive m to probe n, at all frequencies.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
+  
   % expand the probe matrix to both audio SBs
   mPrb = sparse([mPrb, conj(mPrb)]);
   
   % get optic matricies for AC part
   [mOptGen, mRadFrc, lResp, mQuant] = ...
     convertOpticsAC(opt, mapList, pos, f, vDC);
-  
+
   % audio frequency and noise calculation
   if ~isNoise
     shotPrb = zeros(Nprb, 1);
