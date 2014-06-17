@@ -26,6 +26,11 @@ classdef OptickleTest < matlab.unittest.TestCase
             
             switch testCase.config.referenceType
                 case 'Path'
+                    
+                    if strcmp(GetFullPath([testCase.config.referencePath '/@Optickle/Optickle.m']),...
+                              GetFullPath(testCase.optickleLocation))
+                        error('Reference path to Optickle is not different from current Optickle path. Your path definition may have been screwed up by a failed test, consider resetting path.')
+                    end
                     % remember path
                     origPath = path;
                     % add reference Optickle to path
