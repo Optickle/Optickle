@@ -37,6 +37,12 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
     at =  sqrt(1 - vRar(n));           % AR trans
     bt =  sqrt(1 - vLmd(n));           % bulk trans
     
+    % flip reflection signs for P-polarization
+    if par.pol(n) == Optickle.polP
+      hr = -hr;
+      ar = -ar;
+    end
+      
     % transmission combinations
     hrbt = -hr * bt;
     arbt = -ar * bt;

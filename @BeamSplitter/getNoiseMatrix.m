@@ -19,6 +19,9 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   % Calculate noise powers for all rf components and put them in a
   % block-diagonal matrix
 
+  % set the quantum scale
+  pQuant  = Optickle.h * par.nu;
+  
   % Loop over rf frequencies (which now include other wavelengths)
   mNA = []; % should pre-allocate index in for more speed
   for n = 1:par.Nrf
@@ -32,7 +35,7 @@ function mQuant = getNoiseMatrix(obj, pos, par)
         vLmd(n), phi(n), obj.in(3:4), par.minQuant);
       
       % iteratively build a block diagonal matrix
-      mNA = blkdiag(mNA, sqrt(blkdiag(mNPa, mNPb)));
+      mNA = blkdiag(mNA, sqrt(pQuant(n) * blkdiag(mNPa, mNPb)));
   end
 
   % these noises are unsqueezed, so make amplitude and phase
