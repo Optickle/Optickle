@@ -85,7 +85,7 @@ function varargout = tickleAC(opt, f, nDrive, ...
     if isNoise
       %%%% With Quantum Noise
       %mQinj = [mPhi * mQuant;  mQOz];  % put this back! HACK
-      mQinj = mQuant;
+      mQinj = blkdiag(mPhi, mResp) * mQuant;
       mNoise = (eyeNdof - mDof) \ mQinj;
       noisePrb = mOut * mNoise(jAsb, :);
       noiseDrv = mNoise(jDrv, :);
