@@ -1,4 +1,4 @@
-% getDriveMatrix method for TEM01 mode (pitch) or TEM10 mode(yaw)
+% getDriveMatrix method for TEM10 mode (yaw)
 %   returns the drive coupling matrix, (Nrf * obj.Nout) x (Nrf * obj.Nin) x Ndrive
 %   in this case, Nrf * (4 x 2)
 %
@@ -8,9 +8,9 @@
 %   dldx = (non-zero for reflected fields), from getFieldMatrix
 %        = -2 from the front of a mirror at normal incidence (aoi = 0)
 %
-% mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
+% mCpl = getDriveMatrix10(obj, pos, vBasis, par, mOpt, dldx)
 
-function mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
+function mCpl = getDriveMatrix10(obj, pos, vBasis, par, mOpt, dldx)
   
   % check for optional arguments
   if nargin < 6
@@ -26,7 +26,7 @@ function mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
   vBout = apply(getBasisMatrix(obj), vBasis);
   vBout(~isfinite(vBout)) = 1i;
   
-  % mirror TEM01 mode injections at the waist are
+  % mirror TEM10 mode injections at the waist are
   %   theta / theta0 = theta * sqrt(k * z0 / 2)
   % adding a non-zero distance from the waist, we must scale by
   %   w(z) / w0 = sqrt(1 + (z/z0)^2)
@@ -34,16 +34,16 @@ function mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
   % the sqrt(z0 * (1 + (z/z0)^2)) is done for each link using the
   % the injection matrix, mInj, computed below.
   %
-  %   the y-basis, vBout(:,2), is of interest for the vertical 01 mode
-  z = real(vBout(:,2));
-  z0 = -imag(vBout(:,2));
+  %   the x-basis, vBout(:,1), is of interest for the vertical 10 mode
+  z = real(vBout(:,1));
+  z0 = -imag(vBout(:,1));
   mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2)));
   
   % drive matrix
   mCpl = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % reflection phase drive coefficient
-    drp = 1i * sqrt(par.k(n) / 2) * (mInj * dldx / 2);
+    drp = 1i * sqrt(par.k(n) / 2) * (mInj * sign(-dldx / 2) );
 
     % enter this submatrix into mCpl
     nn = (1:Nout) + Nout * (n - 1);
