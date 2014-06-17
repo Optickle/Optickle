@@ -1,6 +1,7 @@
 function eoDemoTestSqz
   % create model
   opt = eoOptTestSqz;
+  Sqz = opt.getOptic('Sqz1');  %Return handle for squeezer object
   
   % get our probe index
   nSqz = getProbeNum(opt, 'Sqz_DC');
@@ -11,19 +12,15 @@ function eoDemoTestSqz
   SqzAngle = pi/180*[0:1:360];
   qNoise = [];
   for i=1:(length(SqzAngle));
-    opt = setOpticParam(opt, 'Sqz1', 'sqAng', SqzAngle(i));
+    Sqz.sqAng = SqzAngle(i); %change squeezing angle
     [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
     qNoise = cat(2,qNoise,noiseAC0);
   end
   
   % compute the unsqueezed shot noise level
-  % Changing the level of squeezing/antisqueezing clearly needs its own function
-  % to recalculate x and etaEsc.  Fix this later!
   
-  setOpticParam(opt, 'Sqz1', 'sqdB', 0);  %Set squeezing to 0 dB
-  setOpticParam(opt, 'Sqz1', 'antidB', 0);  %Set anti squeezing to 0 dB
-  setOpticParam(opt, 'Sqz1', 'x', 0);
-  setOpticParam(opt, 'Sqz1', 'escEff', 1); 
+  Sqz.setSqueezing(0,0); %0 dB of squeezing, 0 dB of antisqueezing
+  
   [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
   qShot = noiseAC0;
   
