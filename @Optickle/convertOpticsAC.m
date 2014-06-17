@@ -64,58 +64,63 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   
   % build system matrices
   for n = 1:Nopt
-      obj = opt.optic{n};
-      
-      %%%
-      % Mapping Matrices
-      %
-      % mIn   (obj.Nin*Nrf) x Nfld
-      % mOut  Nfld x (obj.Nout*Nrf)
-      % mDrv  Ndrv x obj.Ndrv
-      
-      mIn = mapList(n).mIn;
-      mInAC = blkdiag(mIn,mIn); % make block diagonal
-      mOut = mapList(n).mOut;
-      mOutAC = blkdiag(mOut,mOut); % make block diagonal
-      mDrv = mapList(n).mDrv;
-      
-      % mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
-      par.vDC = mIn * vDC; 
-      
-      %%%% Optic Properties
-      [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
-      
-      % for debugging
-%       fprintf('\n ===================== %s\n', obj.name)
-%       fprintf('\n === mOpt \n')
-%       disp(full(mOpt_n(1:obj.Nout*Nrf,1:obj.Nin*Nrf)))
-%       if obj.Ndrive > 0
-%         fprintf('\n === mGen \n')
-%         disp(full(mGen_n(1:obj.Nout*Nrf,:)))
-%         fprintf('\n === mRad^T \n')
-%         disp(full(mRad_n(:,1:obj.Nin*Nrf).'))
-%         fprintf('\n === mFrc \n')
-%         disp(full(mFrc_n(:,:)))
-%       end
-      
-      % optical field scatter/generation matrix
-      mOptGen = mOptGen + mOutAC * [ mOpt_n * mInAC, mGen_n * mDrv.' ] ;
-      
-      % optic radiation/force response
-      mRadFrc = mRadFrc + mDrv * [ mRad_n * mInAC, mFrc_n * mDrv.' ] ;
-      
-      % mechanical response list
-      lResp = lResp + lResp_n * mDrv.';
-      
-      % account for unconnected inputs
-      isCon = obj.in == 0;
-      isConRF = repmat(isCon(:), 2 * Nrf, 1);
-      mQuantCon_n = mOpt_n(:, isConRF);  % vacuum from disocnnected inputs
-      
-      % accumulate noises (removing ones that are zero)
-      mQ1 = mOutAC * sparse([mQuant_n, mQuantCon_n]);
-      isNonZero = full(any(mQ1, 1));
-      mQuant = [mQuant, mQ1(:, isNonZero)];  %#ok<AGROW>
+    obj = opt.optic{n};
+    
+    %%%
+    % Mapping Matrices
+    %
+    % mIn   (obj.Nin*Nrf) x Nfld
+    % mOut  Nfld x (obj.Nout*Nrf)
+    % mDrv  Ndrv x obj.Ndrv
+    
+    mIn = mapList(n).mIn;
+    mInAC = blkdiag(mIn,mIn); % make block diagonal
+    mOut = mapList(n).mOut;
+    mOutAC = blkdiag(mOut,mOut); % make block diagonal
+    mDrv = mapList(n).mDrv;
+    
+    % mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
+    par.vDC = mIn * vDC;
+    
+    %%%% Optic Properties
+    [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
+    
+    % optical field scatter/generation matrix
+    mOptGen = mOptGen + mOutAC * [ mOpt_n * mInAC, mGen_n * mDrv.' ] ;
+    
+    % optic radiation/force response
+    mRadFrc = mRadFrc + mDrv * [ mRad_n * mInAC, mFrc_n * mDrv.' ] ;
+    
+    % mechanical response list
+    lResp = lResp + lResp_n * mDrv.';
+    
+    % account for unconnected inputs
+    isNotCon = obj.in == 0;
+    isNotConRF = repmat(isNotCon(:), 2 * Nrf, 1);
+    mQuantCon_n = mOpt_n(:, isNotConRF);  % vacuum from disocnnected inputs
+    mQuantRad_n = mRad_n(:, isNotConRF);  % vacuum from disocnnected inputs
+    
+    % for debugging
+%     fprintf('\n ===================== %s\n', obj.name)
+%     fprintf('\n === mOpt \n')
+%     disp(full(mOpt_n(1:obj.Nout*Nrf,1:obj.Nin*Nrf)))
+%     if obj.Ndrive > 0
+%       fprintf('\n === mGen \n')
+%       disp(full(mGen_n(1:obj.Nout*Nrf,:)))
+%       fprintf('\n === mRad^T \n')
+%       disp(full(mRad_n(:,1:obj.Nin*Nrf).'))
+%       fprintf('\n === mFrc \n')
+%       disp(full(mFrc_n(:,:)))
+%     end
+%     fprintf('\n === [mQuant_n, mQuantCon_n] \n')
+%     disp(full(abs([mQuant_n, mQuantCon_n])))
+    
+    % accumulate noises (removing ones that are zero)
+    mQopt = mOutAC * [mQuant_n, mQuantCon_n];
+    mQrad = [zeros(Ndrv, size(mQuant_n, 2)), mDrv * mQuantRad_n];
+    mQ1 = [mQopt; mQrad];
+    isNonZero = any(mQ1, 1);
+    mQuant = [mQuant, sparse(mQ1(:, isNonZero))];  %#ok<AGROW>
   end
   
 %  fprintf('\n\n======== mQuant \n')
