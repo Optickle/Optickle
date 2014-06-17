@@ -3,8 +3,8 @@ classdef TickleTestOnOpt < OptickleTest
         optFuncHandle
     end
     
-    % Define the constructor method
     methods
+        % Define the constructor method
         function testCase = TickleTestOnOpt(optFuncHandle) 
             testCase.optFuncHandle = optFuncHandle;
             
