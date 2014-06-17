@@ -10,7 +10,7 @@ function opt = eoOptTestSqz
   opt = addSource(opt, 'Laser', 1, 0, 0);
 
   % add a Squeezer
-  opt = addSqueezer(opt, 'Sqz1', 1064e-9 , 0, 1, 0, 10, 10, 0);
+  opt = addSqueezer(opt, 'Sqz1', 1064e-9 , 0, 1, 0, 10, 15, 0);
   opt = addLink(opt, 'Laser', 'out', 'Sqz1', 'in', 0);
 
   % add a Sink
