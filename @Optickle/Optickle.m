@@ -108,9 +108,14 @@ classdef Optickle < handle
     polS = 1;
     
     % drive types
-    drvPos = 0;
-    drvPit = 1;
-    drvYaw = 2;
+    tfPos = 1;
+    tfPit = 2;
+    tfYaw = 3;
+    
+    % drive types, with different names
+    tf00 = 1;
+    tf01 = 2;
+    tf10 = 3;
   end
   
   methods
