@@ -9,8 +9,6 @@
 
 function mOptAC = getFieldMatrixAC(obj, pos, par)
   %Find the RF component which is squeezed
-%   [freqMatch, freqClose] = Optickle.isSameFreq(obj.nu*ones(size(par.nu)), par.nu);
-%   samePol = obj.pol*ones(size(par.pol))==par.pol;
   RFMat =  Optickle.matchFreqPol(par, obj.nu, obj.pol);
   
   RFNonZero = find(RFMat); %Get indicies of nonzero matrix elements
