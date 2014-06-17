@@ -51,7 +51,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = ...
   par = getOptParam(opt);
   par.Naf = Naf;
   par.vFaf = f;
-  par.is10 = is10
+  par.is10 = is10;
   
   % system matrices
   mOptGen = sparse(Narf,Ndrv+Narf);   % [mOpt, mGen]

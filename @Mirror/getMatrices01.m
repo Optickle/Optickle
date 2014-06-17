@@ -4,10 +4,11 @@
 % This version differs from that of Optic to prevent multiple
 % calls to getFieldMatrix by the other get-matrix functions.
 %
-% [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = getMatrices01(obj, pos, par)
+% [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] =
+% getMatrices01(obj, pos, par, vBasis)
 
 function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = ...
-  getMatrices01(obj, pos, par)
+  getMatrices01(obj, pos, par, vBasis)
 
   % optical field transfer matrix
   [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
@@ -16,7 +17,8 @@ function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = ...
   mOptAC = Optic.expandFieldMatrixAF(mOpt);
 
   % reaction, drive and noise matrices (only used in AC computation)
-  [mGenAC, mGen] = getGenMatrix01(obj, pos, par, mOpt, dldx);
+  %  [mGenAC, mGen] = getGenMatrix01(obj, pos, par, mOpt, dldx);
+    [mGenAC, mGen] = getGenMatrix01(obj, pos, par, vBasis, mOpt, dldx);
   [mRadAC, mFrc, vRspAF] = ...
     getReactMatrix01(obj, pos, par, mOpt, mDirIn, mDirOut, mGen);
 
