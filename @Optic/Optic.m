@@ -151,7 +151,7 @@ classdef Optic < handle
       % [mOptAC, mGen, mRad, mFrc, mRsp, mQuant] = getMatrices01(obj, pos, par)
       
       % optical field transfer matrix
-      mOptAC = getFieldMatrix(obj, pos, par);
+      mOptAC = getFieldMatrixAC(obj, pos, par);
       
       % reaction, drive and noise matrices (only used in AC computation)
       mGen = getGenMatrix01(obj, pos, par);
@@ -209,9 +209,9 @@ classdef Optic < handle
       % expand to upper and lower audio SBs
       mGenAC = [mGen; conj(mGen)];
     end
-    function [mGenAC, mGen] = getGenMatrix01(obj, pos, par, varargin)
+    function [mGenAC, mGen] = getGenMatrix01(obj, pos, par, vBasis, varargin)
       % return default expansion of the field matrix
-      mCplMany = getDriveMatrix01(obj, pos, par, varargin{:});
+      mCplMany = getDriveMatrix01(obj, pos, par, vBasis, varargin{:});
       
       %%% Expand 3D coupling matrix to mGen
       
@@ -254,23 +254,23 @@ classdef Optic < handle
       % getDriveMatrix method
       %   returns the default drive coupling matrix: an empty matrix
       %
-      % mDrv = getDriveMatrix(obj, pos, par)
+      % mCpl = getDriveMatrix(obj, pos, par)
       
       mCpl = [];
     end
-    function mCpl = getDriveMatrix01(obj, pos, vBasis, par)
+    function mCpl = getDriveMatrix01(obj, pos, par, vBasis)
       % getDriveMatrix01 method
       %   returns the default drive coupling matrix for TEM01 mode:
       %   just the same matrix as for the TEM00 mode
       
-      mCpl = obj.getDriveMatrix(pos, par);
+      mCpl = getDriveMatrix(obj, pos, par);
     end
-    function mCpl = getDriveMatrix10(obj, pos, vBasis, par)
+    function mCpl = getDriveMatrix10(obj, pos, par, vBasis)
       % getDriveMatrix10 method
       %   returns the default drive coupling matrix for TEM10 mode:
       %   just the same matrix as for the TEM00 mode
       
-      mCpl = obj.getDriveMatrix(pos, par);
+      mCpl = getDriveMatrix(obj, pos, par);
     end
     
     function [mRad, mFrc, vRspAF] = getReactMatrix(obj, pos, par)

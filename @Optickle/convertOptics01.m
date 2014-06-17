@@ -5,7 +5,7 @@
 %   mapList is from convertLinks
 
 function [mOptGen, mRadFrc, lResp, mQuant] = ...
-    convertOptics01(opt, mapList, pos, f, vDC)
+    convertOptics01(opt, mapList, vBasis, pos, f, vDC)
 
 % [mOpt, rctList, drvList] = convertOptics01(opt, mapList, vBasis, pos, f)
 
@@ -76,7 +76,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = ...
       par.vDC = mIn * vDC; 
       
       %%%% Optic Properties
-      [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices01(obj, pos(obj.drive), par);
+      [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices01(obj, pos(obj.drive), par, vBasis);
       
       % for debugging
 %       fprintf('\n ===================== %s\n', obj.name)

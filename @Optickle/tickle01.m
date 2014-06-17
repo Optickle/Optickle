@@ -94,7 +94,7 @@ function varargout = tickle01(opt, pos, f, nDrive)
   
   % get optic matricies for AC part
   [mOptGen, mRadFrc, lResp, mQuant] = ...
-    convertOptics01(opt, mapList, pos, f, vDC);
+    convertOptics01(opt, mapList, vBasis, pos, f, vDC);
 
   % audio frequency and noise calculation
   if ~isNoise

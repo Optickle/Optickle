@@ -10,7 +10,7 @@
 %
 % mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
 
-function mCpl = getDriveMatrix01(obj, pos, vBasis, par, mOpt, dldx)
+function mCpl = getDriveMatrix01(obj, pos, par, vBasis, mOpt, dldx)
   
   % check for optional arguments
   if nargin < 6
