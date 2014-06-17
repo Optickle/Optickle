@@ -21,9 +21,9 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   end
   
   %Find the RF component which is squeezed
-  [freqMatch, freqClose] = Optickle.isSameFreq(obj.nu*ones(size(par.nu)), par.nu);
-  samePol = obj.pol*ones(size(par.pol))==par.pol;
-  RFMat =  freqMatch & samePol;
+%   [freqMatch, freqClose] = Optickle.isSameFreq(obj.nu*ones(size(par.nu)), par.nu);
+%   samePol = obj.pol*ones(size(par.pol))==par.pol;
+  RFMat =  Optickle.matchFreqPol(par, obj.nu, obj.pol);
   
   %Warning message if zero or n>1 RF components are squeezed
   if nnz(RFMat)==0
