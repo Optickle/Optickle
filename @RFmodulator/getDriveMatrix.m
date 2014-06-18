@@ -33,15 +33,15 @@ function mCpl = getDriveMatrix(obj, pos, par)
         r_df = df - n_df * fMod;
 
         % check for match
-        [isMatch, isClose] = Optickle.isSameFreq(r_df,0);
+        isMatch = Optickle.isSameFreq(r_df, 0);
         
         if isMatch && n_df ~= 0
   	      % phase and amplitude audio SBs on RF phase modulation
           mPhi(m, n) = besselj(n_df, pMod) * 1i^n_df * n_df / 2;
           mAmp(m, n) = dbessel(n_df, pMod) * 1i^n_df / 2;
-	      if n_df == 1 || n_df == -1
-	        mPhi(m, n) = mPhi(m, n) + n_df * aMod / 4;
-	        mAmp(m, n) = mAmp(m, n) + aMod / 4;
+          if n_df == 1 || n_df == -1
+            mPhi(m, n) = mPhi(m, n) + n_df * aMod / 4;
+            mAmp(m, n) = mAmp(m, n) + aMod / 4;
           end
         end
       end
@@ -52,3 +52,4 @@ function mCpl = getDriveMatrix(obj, pos, par)
   mCpl = zeros(Nrf, Nrf, 2);
   mCpl(:, :, 1) = mAmp;
   mCpl(:, :, 2) = 1i * mPhi;
+end

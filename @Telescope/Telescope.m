@@ -69,6 +69,84 @@ classdef Telescope < Optic
       obj.f = f_arg;
       obj.df = df_arg;
     end
-    
+    function mOpt = getFieldMatrix(obj, pos, par)
+      % getFieldMatrix method
+      %   returns a mOpt, the field transfer matrix for this optic
+      %
+      % mOpt = getFieldMatrix(obj, pos, par)
+      
+      if isempty(obj.df)
+        % send inputs to outputs
+        mOpt = speye(par.Nrf, par.Nrf);
+      else
+        % account for RF propagation phase
+        d = sum(obj.df(:, 1));
+        v = exp(1i * d * 2 * pi * par.vFrf / Optickle.c);
+        
+        % send inputs to outputs
+        mOpt = sparse(diag(v));
+      end
+    end
+    function [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par)
+      % getFieldMatrixAC method
+      %   returns a mOpt, the field transfer matrix for this optic
+      %   a telescope adds Gouy phase for the TEM01 and TEM10 modes
+      %
+      % mOpt = getFieldMatrixAC(obj, pos, par)
+      
+      % start with default field matrix
+      mOpt = getFieldMatrix(obj, pos, par);
+      
+      % add Gouy phase
+      if par.tfType ~= Optickle.pos
+        % compute Gouy phase
+        phi = getTelescopePhase(obj, par.vBin);
+      
+        % send inputs to outputs with Gouy phase
+        mOpt = mOpt * exp(1i * phi(par.nBasis));
+      end
+      
+      % expand to both audio sidebands
+      mOptAC = Optic.expandFieldMatrixAF(mOpt);
+    end
+
+    function [phi, bOut] = getTelescopePhase(obj, bOut)
+      % [phi, bOut] = getTelescopePhase(obj, bIn)
+      %   returns the Gouy phase accumulated in this telescope by
+      %   an input beam with basis bIn (1x2).  The output basis is
+      %   also computed and returned as bOut.
+      
+      % compute Gouy phase
+      qm = focus(OpHG, 1 ./ obj.f);
+      
+      my_df = obj.df;
+      phi = [0 0];
+      for n = 1:size(my_df, 1)
+        % add shift to focus operator
+        qm = shift(qm, my_df(n, 1));
+        
+        % apply the focus-shift operator to the input basis
+        bOut = apply(qm, bOut);
+        
+        % add the resulting Gouy phase
+        phi = phi + angle(bOut - my_df(n, 1)) - angle(bOut);
+        
+        % compute next focus operator
+        qm = focus(OpHG, 1 ./ my_df(n, 2));
+      end
+      
+      % compute final output basis
+      bOut = apply(qm, bOut);
+    end
+    function qm = getBasisMatrix(obj)
+      % get the basis change matrix for this Telescope
+      
+      qm = focus(OpHG, 1 ./ obj.f);
+      my_df = obj.df;
+      for n = 1:size(my_df, 1)
+        qm = shift(qm, my_df(n, 1));
+        qm = focus(qm, 1 ./ my_df(n, 2));
+      end
+    end
   end    % methods
 end      % classdef

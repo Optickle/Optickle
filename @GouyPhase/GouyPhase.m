@@ -7,6 +7,8 @@ classdef GouyPhase < Optic
   %
   % obj = GouyPhase(name, phi)
   %   phi - Gouy phase in radians, see also setPhase and getPhase
+  %         if phi is a 2 element vector, phi(1) is used for TEM10
+  %         and phi(2) is used for TEM01
   %
   % A telescope has 1 input and 1 output.
   % Input:  1, in
@@ -70,6 +72,40 @@ classdef GouyPhase < Optic
       
       % set phase
       obj.phi = phi_arg;
+    end
+    
+    %%%% Field Matrix: mOpt
+    function mOpt = getFieldMatrix(obj, pos, par)
+      % getFieldMatrix method
+      %   returns a mOpt, the field transfer matrix for this optic
+      %
+      % which, for the GouyPhase optic, is just the identity matrix!
+      %
+      % mOpt = getFieldMatrix(obj, pos, par)
+      
+      % send inputs to outputs
+      mOpt = speye(par.Nrf, par.Nrf);
+    end
+    function mOptAC = getFieldMatrixAC(obj, pos, par)
+      % getFieldMatrixAC method
+      %   returns a mOpt, the field transfer matrix for this optic
+      %   a telescope adds Gouy phase for the TEM01 and TEM10 modes
+      %   (see help GouyPhase) 
+      %
+      % mOpt = getFieldMatrix01(obj, par)
+      
+      % send inputs to outputs with Gouy phase
+      mOpt = eye(par.Nrf, par.Nrf);
+      if par.tfType ~= Optickle.tfPos
+        if numel(obj.phi) == 1
+          mOpt = mOpt * exp(1i * obj.phi);
+        else
+          mOpt = mOpt * exp(1i * obj.phi(par.nBasis));
+        end
+      end
+      
+      % expand to both audio sidebands
+      mOptAC = Optic.expandFieldMatrixAF(mOpt);
     end
     
     %%%% Legacy %%%%
