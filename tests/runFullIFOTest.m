@@ -1,8 +1,9 @@
 % optickle should NOT be in the path, set the paths in optickleTestConfig
 
-% make sure we're cleared
+%% Clear classes
 clear classes
 
+%%
 % run the test using the optFullIFO function that returns the opt object to
 % test
 addpath('testFunctions')
@@ -11,11 +12,22 @@ results = test.run();
 
 disp(results)
 
+global optickleTestResultsFile
+load(optickleTestResultsFile);
+
+%% run the Tickle01 tests
+
+test = Tickle01TestOnOpt(@optFullIFO);
+results = test.run();
+
+disp(results)
+
+global optickleTestResultsFile
+data01 = load(optickleTestResultsFile);
+
 %% extract the result data
 % load the calculated data from disk, this makes variables with the names
 % refStruct and calcStruct with the results of both calculations.
-global optickleTestResultsFile
-load(optickleTestResultsFile);
 
 % plot the TF from ETMX to OMCDC
 
@@ -33,6 +45,14 @@ refOMCNoise = refStruct.noiseAC(probe_OMCDC,:);
 
 calcPOPNoise = calcStruct.noiseAC(probe_POPI1,:);
 refPOPNoise = refStruct.noiseAC(probe_POPI1,:);
+
+%% grab the 01 data
+f = data01.refStruct.f;
+probe01 = 5;
+drive01 = 13;
+
+calcTF01 = squeeze(data01.calcStruct.sigAC(probe01,drive01,:));
+refTF01 = squeeze(data01.refStruct.sigAC(probe01,drive01,:));
 
 %% plots
 figure(333)
@@ -52,3 +72,12 @@ figure(335)
 loglog(f,refPOPNoise,f,calcPOPNoise,f,abs(refPOPNoise-calcPOPNoise))
 title('POPI1 Noise')
 legend('Reference (Optickle 1)','Calculated (Optickle 2)','Residual')
+
+%% 01 plots
+
+figure(455)
+loglog(f,abs(refTF01),f,abs(calcTF01),f,abs(refTF01-calcTF01));
+title('EX pos to OMC DC');
+legend('Reference (Optickle 1)','Calculated (Optickle 2)','Residual')
+subplot(2,1,2)
+semilogx(f,180/pi*angle(refTF01),f,180/pi*angle(calcTF01));
