@@ -11,7 +11,7 @@ function [mRadAC,mFrc,vRspAF] = ...
   
   % check for optional arguments
   if nargin < 4
-    [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
+    [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par, par.tfType);
     [~, mGen] = getGenMatrix(obj, pos, par, mOpt, dldx);
   end
   
