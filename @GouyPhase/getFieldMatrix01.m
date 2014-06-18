@@ -4,7 +4,9 @@
 %
 % mOpt = getFieldMatrix01(obj, par)
 
-function mOpt = getFieldMatrix01(obj, pos, vBasis, par)
+function mOptAC = getFieldMatrix01(obj, pos, par)
   
   % send inputs to outputs with Gouy phase
   mOpt = getFieldMatrix(obj, pos, par) * exp(1i * obj.phi);
+  mOptAC = Optic.expandFieldMatrixAF(mOpt);
+  

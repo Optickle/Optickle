@@ -12,7 +12,6 @@ function varargout = tickleAC(opt, f, nDrive, ...
   % ==== Sizes of Things
   Ndrv = opt.Ndrive;	% number of drives (internal DOFs)
   Nlnk = opt.Nlink;		% number of links
-  Nprb = opt.Nprobe;	% number of probes
   Nrf  = length(vFrf);	% number of RF components
   Naf  = length(f);		% number of audio frequencies
   Nfld = Nlnk * Nrf;	% number of RF fields
@@ -23,6 +22,8 @@ function varargout = tickleAC(opt, f, nDrive, ...
   Nnoise = size(mQuant, 2);
   
   % useful indices
+  jMsb = 1:Nfld;
+  jPsb = Nfld + jMsb;
   jAsb = 1:Narf;
   jDrv = (1:Ndrv) + Narf;
   if ~isempty(nDrive)
@@ -35,12 +36,20 @@ function varargout = tickleAC(opt, f, nDrive, ...
   % main inversion tools
   mQOz = sparse(Ndrv, Nnoise);
   eyeNdof = speye(Ndof);
+  
+  % combine probe and output matrix
+  if isempty(opt.mProbeOut)
+    mOut = mPrb;
+  else
+    mOut = opt.mProbeOut * mPrb;
+  end
+  Nout = size(mOut, 1);
 
   % intialize result space
   mExc = eyeNdof(:, jDrv);
-  sigAC = zeros(Nprb, NdrvOut, Naf);
+  sigAC = zeros(Nout, NdrvOut, Naf);
   mMech = zeros(NdrvOut, NdrvOut, Naf);
-  noiseAC = zeros(Nprb, Naf);
+  noiseAC = zeros(Nout, Naf);
   noiseMech = zeros(NdrvOut, Naf);
   
   % since this can take a while, let's time it
@@ -70,16 +79,27 @@ function varargout = tickleAC(opt, f, nDrive, ...
     tfAC = (eyeNdof - mDof) \ mExc;
 
     % extract optic to probe transfer functions
-    sigAC(:, :, nAF) = 2 * mPrb * tfAC(jAsb, :);
+    sigAC(:, :, nAF) = 2 * mOut * tfAC(jAsb, :);
     mMech(:, :, nAF) = tfAC(jDrv, :);
     
     if isNoise
       %%%% With Quantum Noise
-      mQinj = [mPhi * mQuant;  mQOz];
+      %mQinj = [mPhi * mQuant;  mQOz];  % put this back! HACK
+      mQinj = blkdiag(mPhi, mResp) * mQuant;
       mNoise = (eyeNdof - mDof) \ mQinj;
-      noisePrb = mPrb * mNoise(jAsb, :);
+      noisePrb = mOut * mNoise(jAsb, :);
       noiseDrv = mNoise(jDrv, :);
       
+      % HACK
+%   fprintf('\n\n======== mNoise \n')
+%   disp((full(mNoise)) * 1e10 / 4.3208)
+%   fprintf('\n-- mPrb 1\n')
+%   disp(full(mPrb(1, jMsb) * mNoise(jMsb, :)) * 1e10 / 4.3208)
+%   disp(full(mPrb(1, jPsb) * mNoise(jPsb, :)) * 1e10 / 4.3208)
+%   fprintf('\n-- mPrb 2\n')
+%   disp(full(mPrb(2, jMsb) * mNoise(jMsb, :)) * 1e10 / 4.3208)
+%   disp(full(mPrb(2, jPsb) * mNoise(jPsb, :)) * 1e10 / 4.3208)
+  
       % incoherent sum of amplitude and phase noise
       noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
       noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));

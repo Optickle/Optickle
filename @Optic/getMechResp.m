@@ -3,6 +3,7 @@
 %
 % nDOF = 1 is for position
 % nDOF = 2 is for pitch
+% nDOF = 3 is for yaw
 
 function rsp = getMechResp(obj, f, nDOF)
 
@@ -18,11 +19,13 @@ function rsp = getMechResp(obj, f, nDOF)
       mechTF = obj.mechTF;
     case 2
       mechTF = obj.mechTFpit;
+    case 3
+      mechTF = obj.mechTFyaw;
     otherwise
       error('nDOF must be 1 or 2, got %d', nDOF)
   end
       
-  % dechipher mechanical response
+  % decipher mechanical response
   if isempty(mechTF)
     % Any object who's opto-mechanical transfer function is not set ends up
     % here (and is "taken care of" elsewhere)
