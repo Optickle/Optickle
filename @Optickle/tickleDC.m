@@ -59,7 +59,7 @@ function [vLen, prbList, mapList, mPhiFrf, vDC, mPrb, mPrbQ] = ...
     vDCinCT = (mIn_k * vDC)';
     
     % compute the row of mPrb for this probe
-    mPrb(k, :) = vDCinCT * mPrb_k * mIn_k;
+    mPrb(k, :) = vDCinCT * mPrb_k.' * mIn_k;
     
     % quad phase signals, for oscillator phase noise
     mPrbQ_k = prbList(k).mPrbQ;

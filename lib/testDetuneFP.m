@@ -1,6 +1,14 @@
-function exitCond = testDetuneFP(referenceStruct, calculationStruct)
+function exitCond = testDetuneFP()
     exitCond = 0;
     
+    referenceStruct = load('testDetuneFP.mat');
+    % referenceStruct is saved with commands:
+    % output = demoDetuneFP(0);
+    % save('testDetuneFP.mat','-struct','output')
+    
+    tic
+    calculationStruct = demoDetuneFP(0);
+    toc
     
     numericalEquality = isequaln(referenceStruct,calculationStruct);
 
@@ -26,30 +34,19 @@ end
 
 function errorCount = checkForErrors(label, fieldNames, calcStruct, refStruct)
     errorCount = 0;
-    % precision is the product of these two numbers
-    errorThreshold = 1e-6;
-    smallNumber = 1e-6;
+    errorThreshold = 1e-10;
 
     for name = fieldNames
         try
-            calcMat = abs(calcStruct.(name{:}));
-            refMat = abs(refStruct.(name{:}));
+            calcMat = calcStruct.(name{:});
+            refMat = refStruct.(name{:});
             
-            small = max(calcMat(:))*smallNumber;
-            
-            errorMat = (calcMat-refMat)./(calcMat+refMat+small);
+            errorMat = abs(1 - calcMat./refMat);
             
             error = max(errorMat(:));
             
             if error > errorThreshold
-                
-                dim = length(size(errorMat));
-                
-                % find the index of the error
-                [ind{1:dim}] = ind2sub(size(errorMat),find(errorMat == max(errorMat(:))));
-                
-                warning([label ' error is ' num2str(error) ' at index '...
-                    cell2CommaSeparatedString(ind) ' in variable ' name{:}])
+                warning([label ' error is ' num2str(error) ' in variable ' name{:}])
                 errorCount = errorCount + 1;
             end
         catch err
@@ -57,14 +54,5 @@ function errorCount = checkForErrors(label, fieldNames, calcStruct, refStruct)
             errorCount = errorCount + 1;
         end
     end
-
-end
-
-function stringOut = cell2CommaSeparatedString(cellIn)
-    stringOut = '';
-    for jj = 1:length(cellIn)
-        stringOut = [stringOut num2str(cellIn{jj}) ', '];
-    end
-    stringOut = stringOut(1:end-2);
 
 end

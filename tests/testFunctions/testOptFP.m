@@ -1,6 +1,6 @@
 % Create an Optickle Fabry-Perot
 
-function opt = jmOptFP
+function opt = testOptFP
 
   % RF component vector
   Pin = 100;
@@ -29,22 +29,19 @@ function opt = jmOptFP
   opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
   opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
 
-
   % add mirrors
   %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
   lCav = 4000;
   opt = addMirror(opt, 'IX', 0, 0, 0.03);
-  opt = addMirror(opt, 'EX', 0, 0.7 / lCav, 0.001);
+  opt = addMirror(opt, 'EX', 0, 0.7 / lCav, .01);
 
   opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 2);
-  %opt = addLink(opt, 'PM', 'out', 'IX', 'bk', 1);
-    
   opt = addLink(opt, 'IX', 'fr', 'EX', 'fr', lCav);
   opt = addLink(opt, 'EX', 'fr', 'IX', 'fr', lCav);
   
   % set some mechanical transfer functions
   w = 2 * pi * 0.7;      % pendulum resonance frequency
-  mI = inf*40;               % mass of input mirror
+  mI = 40;               % mass of input mirror
   mE = 40;               % mass of end mirror
 
   w_pit = 2 * pi * 0.5;   % pitch mode resonance frequency
@@ -56,7 +53,7 @@ function opt = jmOptFP
   iI = mE * iTM;          % moment of input mirror
   iE = mE * iTM;          % moment of end mirror
 
-  dampRes = [0.1 + 1i, 0.1 - 1i];
+  dampRes = [0.01 + 1i, 0.01 - 1i];
   
   opt = setMechTF(opt, 'IX', zpk([], -w * dampRes, 1 / mI));
   opt = setMechTF(opt, 'EX', zpk([], -w * dampRes, 1 / mE));
@@ -77,7 +74,8 @@ function opt = jmOptFP
   
   % add TRANS optics (adds telescope, splitter and sinks)
   % opt = addReadoutTelescope(opt, name, f, df, ts, ds, da, db)
-  opt = addReadoutTelescope(opt, 'TRANS', 2, [2.2 0.19], ...
+  testTeleLength = 0;
+  opt = addReadoutTelescope(opt, 'TRANS', 2, [testTeleLength * 2.2 0.19], ...
     0.5, 0.1, 0.1, 4.1);
   opt = addLink(opt, 'EX', 'bk', 'TRANS_TELE', 'in', 0.3);
   
@@ -86,10 +84,12 @@ function opt = jmOptFP
   opt = addProbeIn(opt, 'TRANSb_DC', 'TRANSb', 'in', 0, 0);	% DC
 
   % add a source at the end, just for fun
-  opt = addSource(opt, 'FlashLight', 0*(1e-3)^2 * (vMod == 1));
+  opt = addSource(opt, 'FlashLight', (1e-3)^2 * (vMod == 1));
   opt = addGouyPhase(opt, 'FakeTele', pi / 4);
-  opt = addLink(opt, 'FlashLight', 'out', 'FakeTele', 'in', 0.1);
-  opt = addLink(opt, 'FakeTele', 'out', 'EX', 'bk', 0.1);
+  %opt = addLink(opt, 'FlashLight', 'out', 'FakeTele', 'in', 0.1);
+  %opt = addLink(opt, 'FakeTele', 'out', 'EX', 'bk', 0.1);
+  opt = addSink(opt,'MattSink');
+  opt = addLink(opt,'MattSink','out','EX','bk',0);
   opt = setGouyPhase(opt, 'FakeTele', pi / 8);
   
   % add unphysical intra-cavity probes
