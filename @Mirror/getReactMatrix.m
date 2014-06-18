@@ -43,6 +43,7 @@ function [mRadAC,mFrc,vRspAF] = ...
       vBout(~isfinite(vBout)) = 1i;
 
       % input basis, where the basis is undefined, put z = 0, z0 = 1
+      vBin = par.vBin;
       vBin(~isfinite(par.vBin)) = 1i;
   
       % mirror TEM01/10 mode reaction torque scales with beam size
@@ -59,8 +60,8 @@ function [mRadAC,mFrc,vRspAF] = ...
       z     =  real(vBout(:, par.nBasis));
       z0    = -imag(vBout(:, par.nBasis));
       vWOut = sqrt(z0 .* (1 + (z ./ z0).^2));
-      z     =  real(par.vBin(:, par.nBasis));
-      z0    = -imag(par.vBin(:, par.nBasis));
+      z     =  real(vBin(:, par.nBasis));
+      z0    = -imag(vBin(:, par.nBasis));
       vWIn  = sqrt(z0 .* (1 + (z ./ z0).^2));
       
       kk    = repmat(par.k, 1, length(vWOut))';
