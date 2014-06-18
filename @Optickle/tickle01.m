@@ -17,7 +17,7 @@
 % NOTE: like tickle, sigAC is the product of the DC field amplitude
 % with the AC sideband amplitude.  This IGNORES the overlap integral
 % between the TEM00 and TEM01 modes on a given detector geometry.
-% For a half plane detector, the correction factor is sqrt(pi/2).
+% For a half plane detector, the correction factor is sqrt(2/pi).
 %   === Thanks to Yuta Michimura!!! ===
 %
 % To convert DC signals to beam-spot motion, scale by w/(2 * Pdc),
@@ -87,10 +87,15 @@ function varargout = tickle01(opt, pos, f, nDrive, is10)
   % get basis vector
   vBasis = getAllFieldBases(opt);
   
-  % Gouy phases... take y-basis for TEM01 mode (pitch)
+  % Gouy phases... 
+  if is10
+      nBasis = 1; % yaw case
+  else
+      nBasis = 2; % default pitch case
+  end
   lnks = opt.link;
   vDist = [lnks.len]';
-  vPhiGouy = getGouyPhase(vDist, vBasis(:, 2));
+  vPhiGouy = getGouyPhase(vDist, vBasis(:, nBasis));
 
   % expand the probe matrix to both audio SBs
   mPrb = sparse([mPrb, conj(mPrb)]);
@@ -114,6 +119,7 @@ function varargout = tickle01(opt, pos, f, nDrive, is10)
       vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   end
 
+  
   % Build the outputs
   varargout{1} = sigAC;
   varargout{2} = mMech;

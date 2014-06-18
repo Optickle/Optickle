@@ -43,7 +43,14 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
       hr = -hr;
       ar = -ar;
     end
+    
+    % flip reflection signs for 10-modes
+    if par.is10
+      hr = -hr;
+      ar = -ar;
+    end
       
+    
     % transmission combinations
     hrbt = -hr * bt;
     arbt = -ar * bt;
