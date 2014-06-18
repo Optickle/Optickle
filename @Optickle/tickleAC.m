@@ -43,11 +43,11 @@ function varargout = tickleAC(opt, f, nDrive, ...
   end
   
   % intialize result space
-  eyeNdof = speye(Ndof);
-  mExc = eyeNdof(:, jDrv);
-  sigAC = zeros(Nout, NdrvOut, Naf);
-  mMech = zeros(NdrvOut, NdrvOut, Naf);
-  noiseAC = zeros(Nout, Naf);
+  eyeNdof   = speye(Ndof);
+  mExc      = eyeNdof(:, jDrv);
+  sigAC     = zeros(Nout, NdrvOut, Naf);
+  mMech     = zeros(NdrvOut, NdrvOut, Naf);
+  noiseAC   = zeros(Nout, Naf);
   noiseMech = zeros(NdrvOut, Naf);
   
   % since this can take a while, let's time it
@@ -75,7 +75,7 @@ function varargout = tickleAC(opt, f, nDrive, ...
              mResp * mRadFrc ];
     
     tfAC = (eyeNdof - mDof) \ mExc;
-
+    whos
     % extract optic to probe transfer functions
     sigAC(:, :, nAF) = 2 * mOut * tfAC(jAsb, :);
     mMech(:, :, nAF) = tfAC(jDrv, :);
