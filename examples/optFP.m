@@ -30,7 +30,7 @@ function opt = optFP
   %   opt = addRFmodulator(opt, name, fMod, aMod)
   gamma = 0.2;
   opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
-  opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 0);
+  opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
 
   % add mirrors
   %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
@@ -73,7 +73,7 @@ function opt = optFP
   
   % add REFL optics
   opt = addSink(opt, 'REFL');
-  opt = addLink(opt, 'IX', 'bk', 'REFL', 'in', 2);
+  opt = addLink(opt, 'IX', 'bk', 'REFL', 'in', 7.5);
   
   % add REFL probes (this call adds probes REFL_DC, I and Q)
   phi = 0;
