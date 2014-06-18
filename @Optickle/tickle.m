@@ -150,7 +150,9 @@ function varargout = tickle(opt, pos, f, tfType, nDrive)
     end
     
     % scale outputs by half-plane overlap integral
-    mPrb = sqrt(2 / pi) * mPrb;
+    modeOverlapFactor = sqrt(2 / pi); % Overlap integral of 01/10
+                                      % with 00 mode on split diode
+    mPrb = modeOverlapFactor * mPrb;
   else
     % TEM00, so no basis or Gouy phase
     vBasis = [];
