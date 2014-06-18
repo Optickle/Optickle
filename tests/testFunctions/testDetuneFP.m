@@ -18,6 +18,9 @@ function outstruct = testDetuneFP()
     pos = zeros(opt.Ndrive, 1);
     pos(nEX) = 0.1e-9;
     [fDC1, sigDC1, sigAC1, mMech1, noiseAC1] = tickle(opt, pos, f);
+    
+    % also do a tickle01
+    [sigAC01,mMech01] = tickle01(opt, pos, f);
 
     % and a lot off resonance
     pos(nEX) = 1e-9;
@@ -25,5 +28,5 @@ function outstruct = testDetuneFP()
 
     outstruct = var2struct(f,fDC0,fDC1,fDC2,sigDC0,sigDC1,sigDC2,...
                            sigAC0,sigAC1,sigAC2,mMech0,mMech1,mMech2,...
-                           noiseAC0,noiseAC1,noiseAC2);
+                           noiseAC0,noiseAC1,noiseAC2,sigAC01,mMech01);
 end

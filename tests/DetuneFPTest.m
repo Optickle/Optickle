@@ -21,5 +21,8 @@ classdef DetuneFPTest < OptickleTest
         function testNoises(testCase)
             testCase.verifyCalcAndRefMatrices('Noise',{'noiseAC0','noiseAC1','noiseAC2'});
         end
+        function test01TFs(testCase)
+            testCase.verifyCalcAndRefMatrices('01 Transfer function',{'sigAC01','mMech01'});
+        end
     end
 end
