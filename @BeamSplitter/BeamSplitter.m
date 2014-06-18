@@ -27,15 +27,30 @@ classdef BeamSplitter < Optic
   % Example: a beam splitter 49.5% transmission
   % obj = BeamSplitter('BS', 45, 0, 0.495);
       
-  properties
-      aoi = [];    % angle of incidence (in degrees)
-      Chr = [];    % curvature of HR surface (Chr = 1 / radius of curvature)
-      Thr = [];    % power transmission of HR suface
-      Lhr = [];    % power loss on reflection from HR surface
-      Rar = [];    % power reflection of AR surface
-      Lmd = [];    % refractive index of medium (1.45 for fused silica, SiO2)
-      Nmd = [];    % power loss in medium (one pass)
-      dWaist = []; % distance from the front of the mirror to the beam waist
+  properties (SetAccess = protected)
+    aoi = [];    % angle of incidence (in degrees)
+    Chr = [];    % curvature of HR surface (Chr = 1 / radius of curvature)
+    Thr = [];    % power transmission of HR suface
+    Lhr = [];    % power loss on reflection from HR surface
+    Rar = [];    % power reflection of AR surface
+    Lmd = [];    % refractive index of medium (1.45 for fused silica, SiO2)
+    Nmd = [];    % power loss in medium (one pass)
+    dWaist = []; % distance from the front of the mirror to the beam waist
+  
+    % a mirror contained here to do calculations
+    % most methods of BS rely on Mirror methods, combining the results
+    % for side A and side B.
+    mir = [];
+  end
+  
+  properties (Constant)
+    % map from side-A and B inputs to mirror inputs
+    mInA = [eye(2), zeros(2)];
+    mInB = [zeros(2), eye(2)];
+    
+    % map from mirror outputs to side-A and B outputs
+    mOutA = [eye(4); zeros(4)];
+    mOutB = [zeros(4); eye(4)];
   end
 
   methods
@@ -51,52 +66,52 @@ classdef BeamSplitter < Optic
       %
       
       % deal with no arguments
-          if nargin == 0
-              name = '';
-          end
-
-          % build optic
-          inNames = {{'frA'}, {'bkA'}, {'frB'}, {'bkB'}};
-          outNames = {{'frA'}, {'bkA'}, {'piA'}, {'poA'}, ...
-                      {'frB'}, {'bkB'}, {'piB'}, {'poB'}};
-          driveNames = {'pos'};
-          obj@Optic(name, inNames, outNames, driveNames);
-
-          % deal with arguments
-          errstr = 'Don''t know what to do with ';	% for argument error messages
-          switch( nargin )
-            case 0					% default constructor, do nothing
-            case {1 2 3 4 5 6 7 8}
-              % copy constructor
-              %if( isa(arg, class(obj)) )
-              %    obj = arg;
-              %    return
-              %end
-
-              %aoi, Chr, Thr, Lhr, Rar, Lmd, Nmd
-              args = {45, 0, 0.5, 0, 0, 0, 1.45};
-              args(1:(nargin-1)) = varargin(1:end);
-      
-
-              % store stuff in class
-              [obj.aoi, obj.Chr, obj.Thr, obj.Lhr, ...
-               obj.Rar, obj.Lmd, obj.Nmd] = deal(args{:});
-
-            otherwise
-              % wrong number of input args
-              error([errstr '%d input arguments.'], nargin);
-          end
+      if nargin == 0
+        name = '';
       end
       
+      % build optic
+      inNames = {{'frA'}, {'bkA'}, {'frB'}, {'bkB'}};
+      outNames = {{'frA'}, {'bkA'}, {'piA'}, {'poA'}, ...
+        {'frB'}, {'bkB'}, {'piB'}, {'poB'}};
+      driveNames = {'pos'};
+      obj@Optic(name, inNames, outNames, driveNames);
+      
+      % deal with arguments
+      errstr = 'Don''t know what to do with ';	% for argument error messages
+      switch( nargin )
+        case 0					% default constructor, do nothing
+        case {1 2 3 4 5 6 7 8}
+          % copy constructor
+          %if( isa(arg, class(obj)) )
+          %    obj = arg;
+          %    return
+          %end
+          
+          %aoi, Chr, Thr, Lhr, Rar, Lmd, Nmd
+          args = {45, 0, 0.5, 0, 0, 0, 1.45};
+          args(1:(nargin-1)) = varargin(1:end);
+          
+          
+          % store stuff in class
+          [obj.aoi, obj.Chr, obj.Thr, obj.Lhr, ...
+            obj.Rar, obj.Lmd, obj.Nmd] = deal(args{:});
+          
+        otherwise
+          % wrong number of input args
+          error([errstr '%d input arguments.'], nargin);
+      end
+      
+      % set internal mirrors to match
+      obj.mir = Mirror('mir', obj.aoi, obj.Chr, obj.Thr, obj.Lhr, ...
+            obj.Rar, obj.Lmd, obj.Nmd);
+    end      
     function [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
       % optic parametes as vectors for each field component
       %
       % [vThr, vLhr, vRar, vLmd] = getVecProperties(obj, lambda, pol)
       
-      vThr = Optickle.mapByLambda(obj.Thr, lambda, pol);
-      vLhr = Optickle.mapByLambda(obj.Lhr, lambda, pol);
-      vRar = Optickle.mapByLambda(obj.Rar, lambda, pol);
-      vLmd = Optickle.mapByLambda(obj.Lmd, lambda, pol);
+      [vThr, vLhr, vRar, vLmd] = obj.mir.getVecProperties(lambda, pol);
     end
     
     %%%% Hermite Gauss Basis %%%%
@@ -106,10 +121,19 @@ classdef BeamSplitter < Optic
       %
       % qm = getBasisMatrix(obj)
       
-      qm = repmat(OpHG(NaN), 8, 4);
-      q0 = planeConvex(OpHG, obj.aoi, obj.Chr, obj.Nmd);
-      qm(1:4, 1:2) = q0;
-      qm(5:8, 3:4) = q0;
+      qm = obj.mir.getBasisMatrix;
+    end
+  end
+  
+  methods (Static)
+    function [mInArf, mInBrf, mOutArf, mOutBrf] = getMirrorIO(Nrf)
+      % map from side-A and B inputs to mirror inputs
+      mInArf = blkdiagN(BeamSplitter.mInA, Nrf);
+      mInBrf = blkdiagN(BeamSplitter.mInB, Nrf);
+      
+      % map from mirror outputs to side-A and B outputs
+      mOutArf = blkdiagN(BeamSplitter.mOutA, Nrf);
+      mOutBrf = blkdiagN(BeamSplitter.mOutB, Nrf);
     end
   end
 end

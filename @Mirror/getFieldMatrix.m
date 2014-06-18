@@ -3,7 +3,14 @@
 %
 % [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
 
-function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
+function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, ...
+                                                             par,tfType)
+    
+  % Parse inputs
+  if nargin < 4
+      tfType = Optickle.tfPos; %Default to pos if nothing given
+  end
+    
   
   % constants
   Nrf = par.Nrf;
@@ -37,6 +44,19 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
     at =  sqrt(1 - vRar(n));           % AR trans
     bt =  sqrt(1 - vLmd(n));           % bulk trans
     
+    % flip reflection signs for P-polarization
+    if par.pol(n) == Optickle.polP
+      hr = -hr;
+      ar = -ar;
+    end
+    
+    % flip reflection signs for 10-modes
+    if tfType == Optickle.tfYaw
+        hr = -hr;
+        ar = -ar;    
+    end
+
+      
     % transmission combinations
     hrbt = -hr * bt;
     arbt = -ar * bt;

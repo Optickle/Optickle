@@ -10,32 +10,21 @@ function varargout = tickleAC(opt, f, nDrive, ...
   vFrf = opt.vFrf;
   
   % ==== Sizes of Things
-  Ndrv = opt.Ndrive;	% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;		% number of links
-  Nrf  = length(vFrf);	% number of RF components
-  Naf  = length(f);		% number of audio frequencies
-  Nfld = Nlnk * Nrf;	% number of RF fields
-  Narf = 2 * Nfld;		% number of audio fields
-  Ndof = Narf + Ndrv;	% number of degrees-of-freedom
+  Ndrv = opt.Ndrive;   % number of drives (internal DOFs)
+  Nlnk = opt.Nlink;    % number of links
+  Nrf  = length(vFrf); % number of RF components
+  Naf  = length(f);    % number of audio frequencies
+  Nfld = Nlnk * Nrf;   % number of RF fields
+  Narf = 2 * Nfld;     % number of audio fields
+  Ndof = Narf + Ndrv;  % number of degrees - of - freedom
   
   isNoise = ~isempty(mQuant);
-  Nnoise = size(mQuant, 2);
   
-  % useful indices
-  jMsb = 1:Nfld;
-  jPsb = Nfld + jMsb;
-  jAsb = 1:Narf;
-  jDrv = (1:Ndrv) + Narf;
-  if ~isempty(nDrive)
-    jDrv = jDrv(nDrive);
-    NdrvOut = numel(nDrive);
-  else
-    NdrvOut = Ndrv;
-  end
-  
-  % main inversion tools
-  mQOz = sparse(Ndrv, Nnoise);
-  eyeNdof = speye(Ndof);
+  % ==== Useful Indices
+  jMsb = 1:Nfld;          % minus sideband
+  jPsb = Nfld + jMsb;     % plus sideband
+  jAsb = 1:Narf;          % all fields
+  jDrv = (1:Ndrv) + Narf; % drives
   
   % combine probe and output matrix
   if isempty(opt.mProbeOut)
@@ -45,11 +34,20 @@ function varargout = tickleAC(opt, f, nDrive, ...
   end
   Nout = size(mOut, 1);
 
+  % output drive selection (HACK: change to output matrix)
+  if ~isempty(nDrive)
+    jDrv = jDrv(nDrive);
+    NdrvOut = numel(nDrive);
+  else
+    NdrvOut = Ndrv;
+  end
+  
   % intialize result space
-  mExc = eyeNdof(:, jDrv);
-  sigAC = zeros(Nout, NdrvOut, Naf);
-  mMech = zeros(NdrvOut, NdrvOut, Naf);
-  noiseAC = zeros(Nout, Naf);
+  eyeNdof   = speye(Ndof);
+  mExc      = eyeNdof(:, jDrv);
+  sigAC     = zeros(Nout, NdrvOut, Naf);
+  mMech     = zeros(NdrvOut, NdrvOut, Naf);
+  noiseAC   = zeros(Nout, Naf);
   noiseMech = zeros(NdrvOut, Naf);
   
   % since this can take a while, let's time it
@@ -77,7 +75,7 @@ function varargout = tickleAC(opt, f, nDrive, ...
              mResp * mRadFrc ];
     
     tfAC = (eyeNdof - mDof) \ mExc;
-
+    whos
     % extract optic to probe transfer functions
     sigAC(:, :, nAF) = 2 * mOut * tfAC(jAsb, :);
     mMech(:, :, nAF) = tfAC(jDrv, :);
@@ -90,7 +88,11 @@ function varargout = tickleAC(opt, f, nDrive, ...
       noisePrb = mOut * mNoise(jAsb, :);
       noiseDrv = mNoise(jDrv, :);
       
-      % HACK
+      % incoherent sum of amplitude and phase noise
+      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+      
+      % for debugging
 %   fprintf('\n\n======== mNoise \n')
 %   disp((full(mNoise)) * 1e10 / 4.3208)
 %   fprintf('\n-- mPrb 1\n')
@@ -100,10 +102,6 @@ function varargout = tickleAC(opt, f, nDrive, ...
 %   disp(full(mPrb(2, jMsb) * mNoise(jMsb, :)) * 1e10 / 4.3208)
 %   disp(full(mPrb(2, jPsb) * mNoise(jPsb, :)) * 1e10 / 4.3208)
   
-      % incoherent sum of amplitude and phase noise
-      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
-      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
-      
       % HACK: noise probe
       %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
     end

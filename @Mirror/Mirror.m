@@ -39,6 +39,27 @@ classdef Mirror < Optic
   % Positive curvatures are used for concave, zero for a flat mirror,
   % and negative values for convex mirrors.
   %
+  % Several of these parameters (Thr, Lhr, Rar, Lmd)may be
+  % specified for each wavelength and polarization.  This is
+  % done by giving an Nx2 or Nx3 matrix instead of a scalar
+  % for that parameter, where the first column is the value,
+  % the second is the wavelength, and (optionally) the thrid
+  % is the polarization.  For example,
+  %   Thr = [0.1, 1064e-9; 0.9, 532e-9];
+  % could be used to specify a dichroic mirror.  A PBS might
+  % specify
+  %   Thr = [1e-3, 1064e-9, 1; 0.99, 1064e-9, 0];
+  % or a dichroic mirror in a simulation with multiple polarzations
+  %   Thr = [0.1, 1064e-9, 1
+  %          0.2, 1064e-9, 0
+  %          0.9,  532e-9, 1
+  %          0.5,  532e-9, 0];
+  % Note that the wavelength must be specified, even if all
+  % wavelengths used in the simulation are the same.
+  %
+  % Any wavelengths/polarizations with unspecified values
+  % will use the first value specified (e.g., Thr(1, 1)).
+  %
   % Note that the three loss mechanisms (Lhr, Rar and Lmd) have default
   % values of zero.  Non-zero values will result in the entrance of
   % vacuum fluctuations, with a corresponding increase in quantum noise,
@@ -140,6 +161,11 @@ classdef Mirror < Optic
       vLhr = Optickle.mapByLambda(obj.Lhr, lambda, pol);
       vRar = Optickle.mapByLambda(obj.Rar, lambda, pol);
       vLmd = Optickle.mapByLambda(obj.Lmd, lambda, pol);
+    end
+    function [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par)
+      % return default expansion of the drive matrix
+      mOpt = getFieldMatrix(obj, pos, par, par.tfType);
+      mOptAC = Optic.expandFieldMatrixAF(mOpt);
     end
     
     %%%% Hermite Gauss Basis %%%%

@@ -4,28 +4,21 @@
 % Convert Optics to Matrices
 %   mapList is from convertLinks
 
-function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC)
-
-  % === Argument Handling
-  if nargin < 3
-    pos = [];
-  end
-  if nargin < 4
-    error('No audio frequencies defined');
-  end
+function [mOptGen, mRadFrc, lResp, mQuant] = ...
+  convertOpticsAC(opt, mapList, pos, f, vDC, tfType, vBasis)
 
   % === Field Info
   vFrf = getSourceInfo(opt);
   
   % ==== Sizes of Things
-  Nopt = opt.Noptic;			% number of optics
-  Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;				% number of links
-  Nrf  = length(vFrf);    % number of RF components
-  Naf  = length(f);				% number of audio frequencies
-  Nfld = Nlnk * Nrf;      % number of RF fields
-  Narf = 2 * Nfld;        % number of audio fields
-  Ndof = Narf + Ndrv;     % number of degrees of freedom
+  Nopt = opt.Noptic;	% number of optics
+  Ndrv = opt.Ndrive;	% number of drives (internal DOFs)
+  Nlnk = opt.Nlink;	% number of links
+  Nrf  = length(vFrf);  % number of RF components
+  Naf  = length(f);	% number of audio frequencies
+  Nfld = Nlnk * Nrf;    % number of RF fields
+  Narf = 2 * Nfld;      % number of audio fields
+  Ndof = Narf + Ndrv;   % number of degrees of freedom
   
   % default positions
   if isempty(pos)
@@ -53,7 +46,21 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   par = getOptParam(opt);
   par.Naf = Naf;
   par.vFaf = f;
-
+  par.tfType = tfType;
+  
+  % set basis index
+  if tfType == Optickle.tfPos
+    par.nBasis = 0;    % no basis to set!
+  elseif tfType == Optickle.tfYaw
+    par.nBasis = 1;
+  elseif tfType == Optickle.tfPit
+    par.nBasis = 2;
+  end
+  
+  % set the quantum scale
+  pQuant  = Optickle.h * opt.nu;
+  aQuant = sqrt(pQuant);
+    
   % system matrices
   mOptGen = sparse(Narf, Ndof);   % [mOpt, mGen]
   mRadFrc = sparse(Ndrv, Ndof);   % [mRad, mFrc]
@@ -73,14 +80,24 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
     % mOut  Nfld x (obj.Nout*Nrf)
     % mDrv  Ndrv x obj.Ndrv
     
-    mIn = mapList(n).mIn;
-    mInAC = blkdiag(mIn,mIn); % make block diagonal
-    mOut = mapList(n).mOut;
+    mIn    = mapList(n).mIn;
+    mInAC  = blkdiag(mIn,mIn); % make block diagonal
+    mOut   = mapList(n).mOut;
     mOutAC = blkdiag(mOut,mOut); % make block diagonal
-    mDrv = mapList(n).mDrv;
+    mDrv   = mapList(n).mDrv;
     
     % mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
     par.vDC = mIn * vDC;
+    
+    % mapped version of vBsis, if needed
+    if tfType ~= Optickle.tfPos
+      vBin = NaN(obj.Nin, 2);
+      isInOk = obj.in ~= 0;
+      vBin(isInOk, :) = vBasis(obj.in(isInOk), :);
+      
+      % pass this in with par
+      par.vBin = vBin;
+    end
     
     %%%% Optic Properties
     [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);
@@ -100,6 +117,40 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
     mQuantCon_n = mOpt_n(:, isNotConRF);  % vacuum from disocnnected inputs
     mQuantRad_n = mRad_n(:, isNotConRF);  % vacuum from disocnnected inputs
     
+    if any(isNotCon)
+      % aQuant is Nrfx1. mQuantCon_n is Narf x (Ndiscon * 2 * Nrf)
+      Ndiscon = sum(isNotCon);
+      aQuantTemp = repmat(aQuant.', Ndiscon, 1);
+      aQuantMatrix = diag([aQuantTemp(:); aQuantTemp(:)]);
+      
+      % scale input noises
+      mQuantCon_n = mQuantCon_n * aQuantMatrix;
+      mQuantRad_n = mQuantRad_n * aQuantMatrix;
+    end
+    
+    % merge field and mechanical responses
+    NoutAC = 2 * obj.Nout * Nrf;
+    if size(mQuant_n, 1) == NoutAC
+      % mQuant_n does not have mechanical part
+      mQopt = mOutAC * [mQuant_n, mQuantCon_n];
+      
+      % fill in with zeros
+      mQrad = [zeros(Ndrv, size(mQuant_n, 2)), mDrv * mQuantRad_n];
+    else
+      % mQuant_n DOES not have mechanical part
+      mQopt = mOutAC * [mQuant_n(1:NoutAC, :), mQuantCon_n];
+      
+      % use mechanical response from mQuant_n
+      mQrad = mDrv * [mQuant_n(NoutAC + (1:obj.Ndrv), :), mQuantRad_n];
+    end
+    
+    % stack field and mechanical parts
+    mQ1 = [mQopt; mQrad];
+    
+    % accumulate noises (removing ones that are zero)
+    isNonZero = any(mQ1, 1);
+    mQuant = [mQuant, sparse(mQ1(:, isNonZero))];  %#ok<AGROW>
+
     % for debugging
 %     fprintf('\n ===================== %s\n', obj.name)
 %     fprintf('\n === mOpt \n')
@@ -113,14 +164,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
 %       disp(full(mFrc_n(:,:)))
 %     end
 %     fprintf('\n === [mQuant_n, mQuantCon_n] \n')
-%     disp(full(abs([mQuant_n, mQuantCon_n])))
-    
-    % accumulate noises (removing ones that are zero)
-    mQopt = mOutAC * [mQuant_n, mQuantCon_n];
-    mQrad = [zeros(Ndrv, size(mQuant_n, 2)), mDrv * mQuantRad_n];
-    mQ1 = [mQopt; mQrad];
-    isNonZero = any(mQ1, 1);
-    mQuant = [mQuant, sparse(mQ1(:, isNonZero))];  %#ok<AGROW>
+%     disp(full(abs([mQuant_n, mQuantCon_n])))    
   end
   
 %  fprintf('\n\n======== mQuant \n')
