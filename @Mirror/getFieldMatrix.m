@@ -3,7 +3,14 @@
 %
 % [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
 
-function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
+function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, ...
+                                                             par,tfType)
+    
+  % Parse inputs
+  if nargin < 4
+      tfType = Optickle.tfPos; %Default to pos if nothing given
+  end
+    
   
   % constants
   Nrf = par.Nrf;
@@ -44,12 +51,9 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
     end
     
     % flip reflection signs for 10-modes
-    %HACK
-    try
-        if par.tfType == Optickle.tfYaw
-            hr = -hr;
-            ar = -ar;    
-        end
+    if tfType == Optickle.tfYaw
+        hr = -hr;
+        ar = -ar;    
     end
 
       

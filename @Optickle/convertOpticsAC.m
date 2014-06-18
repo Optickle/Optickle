@@ -11,14 +11,14 @@ function [mOptGen, mRadFrc, lResp, mQuant] = ...
   vFrf = getSourceInfo(opt);
   
   % ==== Sizes of Things
-  Nopt = opt.Noptic;			% number of optics
-  Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;				% number of links
-  Nrf  = length(vFrf);    % number of RF components
-  Naf  = length(f);				% number of audio frequencies
-  Nfld = Nlnk * Nrf;      % number of RF fields
-  Narf = 2 * Nfld;        % number of audio fields
-  Ndof = Narf + Ndrv;     % number of degrees of freedom
+  Nopt = opt.Noptic;	% number of optics
+  Ndrv = opt.Ndrive;	% number of drives (internal DOFs)
+  Nlnk = opt.Nlink;	% number of links
+  Nrf  = length(vFrf);  % number of RF components
+  Naf  = length(f);	% number of audio frequencies
+  Nfld = Nlnk * Nrf;    % number of RF fields
+  Narf = 2 * Nfld;      % number of audio fields
+  Ndof = Narf + Ndrv;   % number of degrees of freedom
   
   % default positions
   if isempty(pos)
