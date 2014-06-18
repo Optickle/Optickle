@@ -137,8 +137,6 @@ classdef Optic < handle
       % optical field transfer matrix
       mOptAC = getFieldMatrixAC(obj, pos, par);
       
-      size(mOptAC)
-      
       % reaction, drive and noise matrices (only used in AC computation)
       mGen = getGenMatrix(obj, pos, par);
       [mRad, mFrc, vRspAF] = getReactMatrix(obj, pos, par);
@@ -155,7 +153,7 @@ classdef Optic < handle
       % getMatrices01(obj, pos, par, vBasis)
       
       % optical field transfer matrix
-      mOptAC = getFieldMatrix01(obj, pos, par);
+      mOptAC = getFieldMatrix01(obj, pos, par, vBin);
       
       % reaction, drive and noise matrices (only used in AC computation)
       mGen = getGenMatrix01(obj, pos, par, vBin);
