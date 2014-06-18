@@ -11,7 +11,7 @@ function [mRadAC,mFrc,vRspAF] = ...
   
   % check for optional arguments
   if nargin < 4
-    [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
+    [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par, par.tfType);
     [~, mGen] = getGenMatrix(obj, pos, par, mOpt, dldx);
   end
   
@@ -21,7 +21,15 @@ function [mRadAC,mFrc,vRspAF] = ...
   LIGHT_SPEED = Optickle.c;
   
   % mechanical response
-  vRspAF = getMechResp(obj, par.vFaf, par.nBasis);
+  if par.tfType == Optickle.tfPos
+      nDOF = 1;
+  elseif par.tfType == Optickle.tfPit
+      nDOF = 2;
+  elseif par.tfType == Optickle.tfYaw
+      nDOF = 3;
+  end
+  
+  vRspAF = getMechResp(obj, par.vFaf, nDOF);
   
   % big mDirIn and mDirOut for all RF components
   mDirInRF  = blkdiagN(mDirIn, Nrf);

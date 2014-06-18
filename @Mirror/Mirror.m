@@ -162,6 +162,11 @@ classdef Mirror < Optic
       vRar = Optickle.mapByLambda(obj.Rar, lambda, pol);
       vLmd = Optickle.mapByLambda(obj.Lmd, lambda, pol);
     end
+    function [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par)
+      % return default expansion of the drive matrix
+      mOpt = getFieldMatrix(obj, pos, par, par.tfType);
+      mOptAC = Optic.expandFieldMatrixAF(mOpt);
+    end
     
     %%%% Hermite Gauss Basis %%%%
 

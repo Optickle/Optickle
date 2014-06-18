@@ -7,14 +7,13 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   
   % check for optional arguments
   if nargin < 4
-    [mOpt, ~, ~, dldx] = getFieldMatrix(obj, pos, par);
+    [mOpt, ~, ~, dldx] = getFieldMatrix(obj, pos, par, par.tfType);
   end
   
   % constants
   Nrf = par.Nrf;
-  Nin = 2;					% obj.Optic.Nin
-  Nout = 4;					% obj.Optic.Nout
-
+  Nin = 2;					% obj.Nin
+  Nout = 4;					% obj.Nout
   
   if par.tfType ~= Optickle.tfPos  % not pos case
       

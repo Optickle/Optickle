@@ -10,7 +10,7 @@ function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = ...
   getMatrices(obj, pos, par)
 
   % optical field transfer matrix
-  [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
+  [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par, par.tfType);
   
   % expand to both audio SBs
   mOptAC = Optic.expandFieldMatrixAF(mOpt);
