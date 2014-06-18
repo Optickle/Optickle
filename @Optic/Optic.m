@@ -142,6 +142,7 @@ classdef Optic < handle
       [mRad, mFrc, vRspAF] = getReactMatrix(obj, pos, par);
       mQuant = getNoiseMatrix(obj, pos, par);
     end
+
     function [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par)
       % return default expansion of the drive matrix
       mOpt = getFieldMatrix(obj, pos, par);
