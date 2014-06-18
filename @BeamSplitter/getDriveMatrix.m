@@ -11,8 +11,8 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   end
   
   % constants
-  Nrf = par.Nrf;
-  Nin = 4;					% obj.Optic.Nin
+  Nrf  = par.Nrf;
+  Nin  = 4;					% obj.Optic.Nin
   Nout = 8;					% obj.Optic.Nout
 
   mCpl = zeros(Nrf * Nout, Nrf * Nin);

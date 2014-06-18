@@ -12,9 +12,8 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   
   % constants
   Nrf = par.Nrf;
-  Nin = 2;					% obj.Optic.Nin
-  Nout = 4;					% obj.Optic.Nout
-
+  Nin = 2;					% obj.Nin
+  Nout = 4;					% obj.Nout
   
   if par.tfType ~= Optickle.tfPos  % not pos case
       

@@ -44,10 +44,11 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
     end
     
     % flip reflection signs for 10-modes
-    if par.is10
-      hr = -hr;
-      ar = -ar;
-    end
+% $$$     if par.tfType == Optickle.tfPos
+% $$$       hr = -hr;
+% $$$       ar = -ar;
+% $$$     end
+%    fprintf('Fix above - line 51 getFieldMatrix')
       
     % transmission combinations
     hrbt = -hr * bt;

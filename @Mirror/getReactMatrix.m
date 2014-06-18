@@ -21,7 +21,19 @@ function [mRadAC,mFrc,vRspAF] = ...
   LIGHT_SPEED = Optickle.c;
   
   % mechanical response
-  vRspAF = getMechResp(obj, par.vFaf, par.nBasis);
+  if par.tfType == Optickle.tfPos
+      nDOF = 1;
+  elseif par.tfType == Optickle.tfPit
+      nDOF = 2;
+  elseif par.tfType == Optickle.tfYaw
+      nDOF = 3;
+  end
+  
+  vRspAF = getMechResp(obj, par.vFaf, nDOF);% have to add
+                                                    % one to
+                                                    % convert from
+                                                    % nBasis which
+                                                    % is 0 (pos), 1 (yaw)
   
   % big mDirIn and mDirOut for all RF components
   mDirInRF  = blkdiagN(mDirIn, Nrf);
