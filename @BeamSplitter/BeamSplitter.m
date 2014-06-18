@@ -121,7 +121,10 @@ classdef BeamSplitter < Optic
       %
       % qm = getBasisMatrix(obj)
       
-      qm = obj.mir.getBasisMatrix;
+      qm = obj.mir.getBasisMatrix();
+      mop = repmat(OpHG(NaN), 4, 2);
+      
+      qm = [qm,mop;mop,qm]; % block diagonal
     end
   end
   

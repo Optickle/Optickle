@@ -73,7 +73,7 @@ function opt = optFP
   
   % add REFL optics
   opt = addSink(opt, 'REFL');
-  opt = addLink(opt, 'IX', 'bk', 'REFL', 'in', 7.5);
+  opt = addLink(opt, 'IX', 'bk', 'REFL', 'in', 2);
   
   % add REFL probes (this call adds probes REFL_DC, I and Q)
   phi = 0;

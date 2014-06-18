@@ -11,14 +11,17 @@
 function [mRadAC, mFrc, vRspAF] = ...
   getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOut, mGen)
   
+  % mapping matrices
+  [mInArf, mInBrf, mOutArf, mOutBrf] = BeamSplitter.getMirrorIO(par.Nrf);
+  
   % make A-side and B-side parameter structs
   parA = par;
-  parA.vDC = par.vDC(1:2);
-  parA.vBin = par.vBin(1:2);
+  parA.vDC = mInArf * par.vDC;
+  parA.vBin = par.vBin(1:2, :);
 
   parB = par;
-  parB.vDC = par.vDC(3:4);
-  parB.vBin = par.vBin(3:4);
+  parB.vDC = mInBrf * par.vDC;
+  parB.vBin = par.vBin(3:4, :);
 
   % check for optional arguments
   if nargin < 4
@@ -30,8 +33,8 @@ function [mRadAC, mFrc, vRspAF] = ...
     [~, mGenB] = obj.mir.getGenMatrix(pos, parB, mOpt, dldx);
   else
     % split mGen into A-side and B-side
-    mGenA = mGen(1:4, :);
-    mGenB = mGen(5:8, :);
+    mGenA = mOutArf.' * mGen;
+    mGenB = mOutBrf.' * mGen;
   end
   
   % mapping matrices
