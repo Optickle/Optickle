@@ -16,11 +16,14 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   % make A-side and B-side parameter structs
   parA = par;
   parA.vDC = mInArf * par.vDC;
-  parA.vBin = par.vBin(1:2, :);
 
   parB = par;
   parB.vDC = mInBrf * par.vDC;
-  parB.vBin = par.vBin(3:4, :);
+  
+  if par.tfType ~= Optickle.tfPos
+    parA.vBin = par.vBin(1:2, :);
+    parB.vBin = par.vBin(3:4, :);
+  end
   
   % get mirror matrix
   mCplA = obj.mir.getDriveMatrix(pos, parA, mOpt, dldx);
