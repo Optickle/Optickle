@@ -8,10 +8,11 @@ function opt = optFP
   fMod = 20e6;
   vFrf = fMod * [vMod; 0];  % add green carrier, just for fun
   
-  lambda = 1064e-9 * [1 1 1 0.5]';
+  lambda = 1064e-9 * [1 1 1 0.5]';  % green is last
+  pol = [1 1 1 0]';                 % and green is P-polarization!
   
   % create model
-  opt = Optickle(vFrf, lambda);
+  opt = Optickle(vFrf, lambda, pol);
   
   % add a source
   opt = addSource(opt, 'Laser', sqrt(Pin) * (vFrf == 0));

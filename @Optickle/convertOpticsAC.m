@@ -4,15 +4,8 @@
 % Convert Optics to Matrices
 %   mapList is from convertLinks
 
-function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, f, vDC)
-
-  % === Argument Handling
-  if nargin < 3
-    pos = [];
-  end
-  if nargin < 4
-    error('No audio frequencies defined');
-  end
+function [mOptGen, mRadFrc, lResp, mQuant] = ...
+  convertOpticsAC(opt, mapList, pos, f, vDC, tfType, vBasis)
 
   % === Field Info
   vFrf = getSourceInfo(opt);
@@ -53,6 +46,7 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
   par = getOptParam(opt);
   par.Naf = Naf;
   par.vFaf = f;
+  par.tfType = tfType;
 
   % set the quantum scale
   pQuant  = Optickle.h * opt.nu;
@@ -85,6 +79,16 @@ function [mOptGen, mRadFrc, lResp, mQuant] = convertOpticsAC(opt, mapList, pos, 
     
     % mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
     par.vDC = mIn * vDC;
+    
+    % mapped version of vBsis, if needed
+    if tfType ~= Optickle.tfPos
+      vBin = NaN(obj.Nin, 2);
+      isInOk = obj.in ~= 0;
+      vBin(isInOk, :) = vBasis(obj.in(isInOk), :);
+      
+      % pass this in with par
+      par.vBin = vBin;
+    end
     
     %%%% Optic Properties
     [mOpt_n, mGen_n, mRad_n, mFrc_n, lResp_n, mQuant_n] = getMatrices(obj, pos(obj.drive), par);

@@ -4,7 +4,7 @@
 %
 % mDrv = getDriveMatrix01(obj, pos, vBasis, par)
 
-function mCpl = getDriveMatrix01(obj, pos, par, vBasis, mOpt, dldx)
+function mCpl = getDriveMatrix01(obj, pos, par, vBin, mOpt, dldx)
   
   % check for optional arguments
   if nargin < 6
@@ -17,7 +17,7 @@ function mCpl = getDriveMatrix01(obj, pos, par, vBasis, mOpt, dldx)
   Nout = 8;					% obj.Optic.Nout
 
   % output basis, where the basis is undefined, put z = 0, z0 = 1
-  vBout = apply(getBasisMatrix(obj), vBasis);
+  vBout = apply(getBasisMatrix(obj), vBin);
   vBout(~isfinite(vBout)) = 1i;
   
   % select 01 (pitch) or 10 (yaw)

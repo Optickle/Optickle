@@ -4,12 +4,12 @@
 % [mRadAC, mFrc, vRspAF] = getReactMatrix01(obj, pos, vBasis, par)
 
 function [mRadAC, mFrc, vRspAF] = ...
-    getReactMatrix01(obj, pos, par, vBasis, mOpt, mDirIn, mDirOut, mGen)
+    getReactMatrix01(obj, pos, par, vBin, mOpt, mDirIn, mDirOut, mGen)
 
   % check for optional arguments
   if nargin < 5
     [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
-    [~, mGen] = getGenMatrix01(obj, pos, par, vBasis, mOpt, dldx);
+    [~, mGen] = getGenMatrix01(obj, pos, par, vBin, mOpt, dldx);
   end
   
   % constants
@@ -34,8 +34,11 @@ function [mRadAC, mFrc, vRspAF] = ...
   vRspAF = getMechResp(obj, par.vFaf, nDOF);
   
   % output basis, where the basis is undefined, put z = 0, z0 = 1
-  vBout = apply(getBasisMatrix(obj), vBasis);
+  vBout = apply(getBasisMatrix(obj), vBin);
   vBout(~isfinite(vBout)) = 1i;
+
+  % input basis, where the basis is undefined, put z = 0, z0 = 1
+  vBin(~isfinite(vBin)) = 1i;
   
   % mirror TEM01/10 mode reaction torque scales with beam size
   %   torque = R * w * (A01/10 * A00)

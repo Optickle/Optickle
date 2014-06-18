@@ -38,7 +38,7 @@
 % $Id: tickle.m,v 1.14 2011/07/26 23:09:57 tfricke Exp $
 
 
-function varargout = tickle(opt, pos, f, nDrive)
+function varargout = tickle(opt, pos, f, tfType, nDrive)
 
   % === Argument Handling
   if nargin < 2
@@ -48,6 +48,9 @@ function varargout = tickle(opt, pos, f, nDrive)
     f = [];
   end
   if nargin < 4
+    tfType = Optickle.tfPos;
+  end
+  if nargin < 5
     nDrive = [];
   end
     
@@ -77,6 +80,12 @@ function varargout = tickle(opt, pos, f, nDrive)
     if strcmp(rstr, 'No')
       error('Too much memory required.  Exiting.');
     end
+  end
+  
+  % check tfType
+  if ~(tfType == Optickle.tfPos || ...
+      tfType == Optickle.tfPit || tfType == Optickle.tfYaw)
+    error('tfType argument invalid.  Must be Optickle.tfXXX')
   end
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,12 +131,26 @@ function varargout = tickle(opt, pos, f, nDrive)
   % drive m to probe n, at all frequencies.
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
+  % check for TEM01 or TEM10 call
+  if tfType ~= Optickle.tfPos
+    % get basis vector
+    vBasis = getAllFieldBases(opt);
+    
+    % Gouy phases... take y-basis for TEM01 mode (pitch)
+    lnks = opt.link;
+    vDist = [lnks.len]';
+    vPhiGouy = getGouyPhase(vDist, vBasis(:, 2));
+  else
+    vBasis = [];
+    vPhiGouy = [];
+  end
+  
   % expand the probe matrix to both audio SBs
   mPrb = sparse([mPrb, conj(mPrb)]);
   
   % get optic matricies for AC part
   [mOptGen, mRadFrc, lResp, mQuant] = ...
-    convertOpticsAC(opt, mapList, pos, f, vDC);
+    convertOpticsAC(opt, mapList, pos, f, vDC, tfType, vBasis);
 
   % audio frequency and noise calculation
   if ~isNoise
@@ -136,7 +159,7 @@ function varargout = tickle(opt, pos, f, nDrive)
     mQuant = zeros(Narf, 0);
     
     [sigAC, mMech] = tickleAC(opt, f, nDrive, vLen, ...
-      [], mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+      vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   else
     % set the quantum scale
     pQuant  = Optickle.h * opt.nu;
@@ -158,7 +181,7 @@ function varargout = tickle(opt, pos, f, nDrive)
     
     % call tickleAC to do the rest
     [sigAC, mMech, noiseAC, noiseMech] = tickleAC(opt, f, nDrive, vLen, ...
-      [], mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+      vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   end
 
   % Build the rest of the outputs

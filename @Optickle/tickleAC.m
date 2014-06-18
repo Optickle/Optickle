@@ -10,13 +10,13 @@ function varargout = tickleAC(opt, f, nDrive, ...
   vFrf = opt.vFrf;
   
   % ==== Sizes of Things
-  Ndrv = opt.Ndrive;	% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;		% number of links
-  Nrf  = length(vFrf);	% number of RF components
-  Naf  = length(f);		% number of audio frequencies
-  Nfld = Nlnk * Nrf;	% number of RF fields
-  Narf = 2 * Nfld;		% number of audio fields
-  Ndof = Narf + Ndrv;	% number of degrees-of-freedom
+  Ndrv = opt.Ndrive;   % number of drives (internal DOFs)
+  Nlnk = opt.Nlink;    % number of links
+  Nrf  = length(vFrf); % number of RF components
+  Naf  = length(f);    % number of audio frequencies
+  Nfld = Nlnk * Nrf;   % number of RF fields
+  Narf = 2 * Nfld;     % number of audio fields
+  Ndof = Narf + Ndrv;  % number of degrees - of - freedom
   
   isNoise = ~isempty(mQuant);
   

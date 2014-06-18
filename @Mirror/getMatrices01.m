@@ -8,7 +8,7 @@
 % getMatrices01(obj, pos, par, vBasis)
 
 function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = ...
-  getMatrices01(obj, pos, par, vBasis)
+  getMatrices01(obj, pos, par, vBin)
 
   % optical field transfer matrix
   [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
@@ -18,9 +18,9 @@ function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = ...
 
   % reaction, drive and noise matrices (only used in AC computation)
   %  [mGenAC, mGen] = getGenMatrix01(obj, pos, par, mOpt, dldx);
-    [mGenAC, mGen] = getGenMatrix01(obj, pos, par, vBasis, mOpt, dldx);
+    [mGenAC, mGen] = getGenMatrix01(obj, pos, par, vBin, mOpt, dldx);
   [mRadAC, mFrc, vRspAF] = ...
-    getReactMatrix01(obj, pos, par, vBasis, mOpt, mDirIn, mDirOut, mGen);
+    getReactMatrix01(obj, pos, par, vBin, mOpt, mDirIn, mDirOut, mGen);
 
   mQuant = getNoiseMatrix01(obj, pos, par);
 

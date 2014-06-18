@@ -144,7 +144,7 @@ classdef Optic < handle
     end
     
     function [mOptAC, mGen, mRad, mFrc, vRspAF, mQuant] ...
-        = getMatrices01(obj, pos, par, vBasis)
+        = getMatrices01(obj, pos, par, vBin)
       % Get field transfer, reaction and drive TEM 01 matrices for this optic.
       %   see also getMatrices, getFieldMatrix, getReactMatrix01 and
       %   getDriveMatrix01
@@ -153,12 +153,13 @@ classdef Optic < handle
       % getMatrices01(obj, pos, par, vBasis)
       
       % optical field transfer matrix
-      mOptAC = getFieldMatrixAC(obj, pos, par);
+      mOptAC = getFieldMatrix01(obj, pos, par);
       
       % reaction, drive and noise matrices (only used in AC computation)
-      mGen = getGenMatrix01(obj, pos, par, vBasis);
-      [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par, vBasis);
-      mQuant = getNoiseMatrix01(obj, pos, par, vBasis);
+      mGen = getGenMatrix01(obj, pos, par, vBin);
+      
+      [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par, vBin);
+      mQuant = getNoiseMatrix01(obj, pos, par, vBin);
     end
     
     function [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par)
@@ -166,7 +167,7 @@ classdef Optic < handle
       mOpt = getFieldMatrix(obj, pos, par);
       mOptAC = Optic.expandFieldMatrixAF(mOpt);
     end
-    function [mOptAC, mOpt] = getFieldMatrix01(obj, pos, par, vBasis)
+    function [mOptAC, mOpt] = getFieldMatrix01(obj, pos, par, vBin)
       % getFieldMatrixAC method for TEM01 mode
       [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par);
     end
@@ -191,9 +192,9 @@ classdef Optic < handle
       % expand to upper and lower audio SBs
       mGenAC = [mGen; conj(mGen)];
     end
-    function [mGenAC, mGen] = getGenMatrix01(obj, pos, par, vBasis, varargin)
+    function [mGenAC, mGen] = getGenMatrix01(obj, pos, par, vBin, varargin)
       % return default expansion of the field matrix
-      mCplMany = getDriveMatrix01(obj, pos, par, vBasis, varargin{:});
+      mCplMany = getDriveMatrix01(obj, pos, par, vBin, varargin{:});
       
       %%% Expand 3D coupling matrix to mGen
       
@@ -220,7 +221,7 @@ classdef Optic < handle
       
       mCpl = [];
     end
-    function mCpl = getDriveMatrix01(obj, pos, par, vBasis)
+    function mCpl = getDriveMatrix01(obj, pos, par, vBin)
       % getDriveMatrix01 method
       %   returns the default drive coupling matrix for TEM01 mode:
       %   just the same matrix as for the TEM00 mode
@@ -239,7 +240,7 @@ classdef Optic < handle
       vRspAF = zeros(par.Naf, obj.Ndrive);
       
     end
-    function [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par, vBasis)
+    function [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par, vBin)
       % default getReactMatrix01 method
       %   returns a zero matrix, Ndrive x (Nrf * Nin) x Naf
       %
@@ -259,7 +260,7 @@ classdef Optic < handle
       % In this, the default implementation, Nnoise = 0.
       mQuant = zeros(2 * par.Nrf * obj.Nout, 0);
     end
-    function mQuant = getNoiseMatrix01(obj, pos, par, vBasis)
+    function mQuant = getNoiseMatrix01(obj, pos, par, vBin)
       mQuant = zeros(2 * par.Nrf * obj.Nout, 0);
     end
     
