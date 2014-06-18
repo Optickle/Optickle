@@ -88,7 +88,11 @@ function varargout = tickleAC(opt, f, nDrive, ...
       noisePrb = mOut * mNoise(jAsb, :);
       noiseDrv = mNoise(jDrv, :);
       
-      % HACK
+      % incoherent sum of amplitude and phase noise
+      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+      
+      % for debugging
 %   fprintf('\n\n======== mNoise \n')
 %   disp((full(mNoise)) * 1e10 / 4.3208)
 %   fprintf('\n-- mPrb 1\n')
@@ -98,10 +102,6 @@ function varargout = tickleAC(opt, f, nDrive, ...
 %   disp(full(mPrb(2, jMsb) * mNoise(jMsb, :)) * 1e10 / 4.3208)
 %   disp(full(mPrb(2, jPsb) * mNoise(jPsb, :)) * 1e10 / 4.3208)
   
-      % incoherent sum of amplitude and phase noise
-      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
-      noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
-      
       % HACK: noise probe
       %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
     end

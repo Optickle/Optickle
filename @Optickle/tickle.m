@@ -139,8 +139,20 @@ function varargout = tickle(opt, pos, f, tfType, nDrive)
     % Gouy phases... take y-basis for TEM01 mode (pitch)
     lnks = opt.link;
     vDist = [lnks.len]';
-    vPhiGouy = getGouyPhase(vDist, vBasis(:, 2));
+    
+    % get Gouy phase for pitch or yaw
+    if tfType == Optickle.tfPit
+      % take y-basis for TEM01 mode (pitch)
+      vPhiGouy = getGouyPhase(vDist, vBasis(:, 2));
+    else
+      % take x-basis for TEM10 mode (pitch)
+      vPhiGouy = getGouyPhase(vDist, vBasis(:, 1));
+    end
+    
+    % scale outputs by half-plane overlap integral
+    mPrb = sqrt(2 / pi) * mPrb;
   else
+    % TEM00, so no basis or Gouy phase
     vBasis = [];
     vPhiGouy = [];
   end

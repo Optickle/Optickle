@@ -47,7 +47,16 @@ function [mOptGen, mRadFrc, lResp, mQuant] = ...
   par.Naf = Naf;
   par.vFaf = f;
   par.tfType = tfType;
-
+  
+  % set basis index
+  if tfType == Optickle.tfPos
+    par.nBasis = 0;    % no basis to set!
+  elseif tfType == Optickle.tfYaw
+    par.nBasis = 1;
+  elseif tfType == Optickle.tfPit
+    par.nBasis = 2;
+  end
+  
   % set the quantum scale
   pQuant  = Optickle.h * opt.nu;
   aQuant = sqrt(pQuant);
