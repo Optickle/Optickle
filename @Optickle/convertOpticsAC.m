@@ -152,19 +152,19 @@ function [mOptGen, mRadFrc, lResp, mQuant] = ...
     mQuant = [mQuant, sparse(mQ1(:, isNonZero))];  %#ok<AGROW>
 
     % for debugging
-    fprintf('\n ===================== %s\n', obj.name)
-    fprintf('\n === mOpt \n')
-    disp(full(mOpt_n(1:obj.Nout*Nrf,1:obj.Nin*Nrf)))
-    if obj.Ndrive > 0
-      fprintf('\n === mGen \n')
-      disp(full(mGen_n(1:obj.Nout*Nrf,:)))
-      fprintf('\n === mRad^T \n')
-      disp(full(mRad_n(:,1:obj.Nin*Nrf).'))
-      fprintf('\n === mFrc \n')
-      disp(full(mFrc_n(:,:)))
-    end
-    fprintf('\n === [mQuant_n, mQuantCon_n] \n')
-    disp(full(abs([mQuant_n, mQuantCon_n])))    
+%     fprintf('\n ===================== %s\n', obj.name)
+%     fprintf('\n === mOpt \n')
+%     disp(full(mOpt_n(1:obj.Nout*Nrf,1:obj.Nin*Nrf)))
+%     if obj.Ndrive > 0
+%       fprintf('\n === mGen \n')
+%       disp(full(mGen_n(1:obj.Nout*Nrf,:)))
+%       fprintf('\n === mRad^T \n')
+%       disp(full(mRad_n(:,1:obj.Nin*Nrf).'))
+%       fprintf('\n === mFrc \n')
+%       disp(full(mFrc_n(:,:)))
+%     end
+%     fprintf('\n === [mQuant_n, mQuantCon_n] \n')
+%     disp(full(abs([mQuant_n, mQuantCon_n])))    
   end
   
 %  fprintf('\n\n======== mQuant \n')
