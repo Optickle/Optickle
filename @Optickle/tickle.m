@@ -69,7 +69,7 @@ function varargout = tickle(opt, pos, f, tfType, nDrive)
   
   % decide which calculation is necessary
   isAC = ~isempty(f) && nargout > 2;
-  isNoise = isAC && (nargout > 4 || (isCon && nargout > 3));
+  isNoise = isAC && (nargout > 4);
 
   % check the memory requirements
   memReq = (20 * Nprb *  Ndrv *  Naf) / 1e6;
