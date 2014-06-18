@@ -80,11 +80,11 @@ function [mOptGen, mRadFrc, lResp, mQuant] = ...
     % mOut  Nfld x (obj.Nout*Nrf)
     % mDrv  Ndrv x obj.Ndrv
     
-    mIn = mapList(n).mIn;
-    mInAC = blkdiag(mIn,mIn); % make block diagonal
-    mOut = mapList(n).mOut;
+    mIn    = mapList(n).mIn;
+    mInAC  = blkdiag(mIn,mIn); % make block diagonal
+    mOut   = mapList(n).mOut;
     mOutAC = blkdiag(mOut,mOut); % make block diagonal
-    mDrv = mapList(n).mDrv;
+    mDrv   = mapList(n).mDrv;
     
     % mapped version of global vDC (Narf x 1) -> (obj.Nin x 1)
     par.vDC = mIn * vDC;

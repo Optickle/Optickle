@@ -29,11 +29,7 @@ function [mRadAC,mFrc,vRspAF] = ...
       nDOF = 3;
   end
   
-  vRspAF = getMechResp(obj, par.vFaf, nDOF);% have to add
-                                                    % one to
-                                                    % convert from
-                                                    % nBasis which
-                                                    % is 0 (pos), 1 (yaw)
+  vRspAF = getMechResp(obj, par.vFaf, nDOF);
   
   % big mDirIn and mDirOut for all RF components
   mDirInRF  = blkdiagN(mDirIn, Nrf);
