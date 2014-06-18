@@ -143,24 +143,6 @@ classdef Optic < handle
       mQuant = getNoiseMatrix(obj, pos, par);
     end
     
-    function [mOptAC, mGen, mRad, mFrc, vRspAF, mQuant] ...
-        = getMatrices01(obj, pos, par, vBin)
-      % Get field transfer, reaction and drive TEM 01 matrices for this optic.
-      %   see also getMatrices, getFieldMatrix, getReactMatrix01 and
-      %   getDriveMatrix01
-      %
-      % [mOptAC, mGen, mRad, mFrc, mRsp, mQuant] =
-      % getMatrices01(obj, pos, par, vBasis)
-      
-      % optical field transfer matrix
-      mOptAC = getFieldMatrix01(obj, pos, par);
-      
-      % reaction, drive and noise matrices (only used in AC computation)
-      mGen = getGenMatrix01(obj, pos, par, vBin);
-      
-      [mRad, mFrc, vRspAF] = getReactMatrix01(obj, pos, par, vBin);
-      mQuant = getNoiseMatrix01(obj, pos, par, vBin);
-    end
     
     function [mOptAC, mOpt] = getFieldMatrixAC(obj, pos, par)
       % return default expansion of the drive matrix
