@@ -88,6 +88,7 @@ for n = 1:length(listMirror)
   
   if ~isempty(p.mechTF)
     opt = setMechTF(opt, name, p.mechTF);
+    opt = setMechTF(opt, name, p.mechTF,2); % add the same TF for pitch for testing
   end
 end
 
