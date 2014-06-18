@@ -10,15 +10,16 @@ function [mOptAC, mGenAC, mRadAC, mFrc, vRspAF, mQuant] = ...
   getMatrices(obj, pos, par)
 
   % optical field transfer matrix
-  [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
+  [mOpt, mOptMir, mDirIn, mDirOut, dldx] = ...
+    obj.getFieldMatrix(pos, par, par.tfType);
   
   % expand to both audio SBs
   mOptAC = Optic.expandFieldMatrixAF(mOpt);
 
   % reaction, drive and noise matrices (only used in AC computation)
-  [mGenAC, mGen] = getGenMatrix(obj, pos, par, mOpt, dldx);
+  [mGenAC, mGen] = obj.getGenMatrix(pos, par, mOptMir, dldx);
   [mRadAC, mFrc, vRspAF] = ...
-    getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOut, mGen);
+    obj.getReactMatrix(pos, par, mOptMir, mDirIn, mDirOut, mGen);
 
-  mQuant = getNoiseMatrix(obj, pos, par);  
+  mQuant = obj.getNoiseMatrix(pos, par);  
 end

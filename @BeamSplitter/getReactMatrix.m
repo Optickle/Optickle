@@ -5,33 +5,45 @@
 %
 % [mRadAC,mFrc,vRspAF] = getReactMatrix(obj, pos, par)
 % or [ ... ] = getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOut, mGen)
+%  where all of the extra arguments are from the internal mirror object
+%  and are there only for optimization!
 
-function [mRadAC,mFrc,vRspAF] = ...
+function [mRadAC, mFrc, vRspAF] = ...
   getReactMatrix(obj, pos, par, mOpt, mDirIn, mDirOut, mGen)
   
+  % make A-side and B-side parameter structs
+  parA = par;
+  parA.vDC = par.vDC(1:2);
+  parA.vBin = par.vBin(1:2);
+
+  parB = par;
+  parB.vDC = par.vDC(3:4);
+  parB.vBin = par.vBin(3:4);
+
   % check for optional arguments
   if nargin < 4
-    [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par);
-    [~, mGen] = getGenMatrix(obj, pos, par, mOpt, dldx);
+    [mOpt, mDirIn, mDirOut, dldx] = ...
+      obj.mir.getFieldMatrix(pos, par, par.tfType);
+    
+    % get mGen for A-side and B-side
+    [~, mGenA] = obj.mir.getGenMatrix(pos, parA, mOpt, dldx);
+    [~, mGenB] = obj.mir.getGenMatrix(pos, parB, mOpt, dldx);
+  else
+    % split mGen into A-side and B-side
+    mGenA = mGen(1:4, :);
+    mGenB = mGen(5:8, :);
   end
   
-  % constants
-  Nrf = par.Nrf;
-  vDC = par.vDC;
-  LIGHT_SPEED = Optickle.c;
+  % mapping matrices
+  [mInArf, mInBrf] = BeamSplitter.getMirrorIO(2 * par.Nrf);
   
-  % mechanical response
-  vRspAF = getMechResp(obj, par.vFaf);
+  % get radiation and force matrices for both sides
+  [mRadA, mFrcA, vRspAF] = ...
+    obj.mir.getReactMatrix(pos, parA, mOpt, mDirIn, mDirOut, mGenA);
+  [mRadB, mFrcB] = ...
+    obj.mir.getReactMatrix(pos, parB, mOpt, mDirIn, mDirOut, mGenB);
   
-  % big mDirIn and mDirOut for all RF components
-  mDirInRF = blkdiagN(mDirIn, Nrf);
-  mDirOutRF = blkdiagN(mDirOut, Nrf);
-  
-  % field matrix and derivatives
-  mRad = (ctranspose(mOpt) * mDirOutRF * mOpt + mDirInRF) * vDC;
-  mRadAC = 2 / LIGHT_SPEED * ctranspose([mRad; conj(mRad)]);
-  
-  % radiation reaction force matrix
-  mFrc = 4 / LIGHT_SPEED * real(ctranspose(mOpt * vDC) * mDirOutRF * mGen);
-  
+  % build total radiation and force matrices
+  mRadAC = mRadA * mInArf + mRadB * mInBrf;
+  mFrc = mFrcA + mFrcB;
 end
