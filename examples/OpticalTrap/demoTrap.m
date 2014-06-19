@@ -2,7 +2,7 @@
 %   this function demonstrates the use of tickle with optFP
 %
 
-function [f, sigDC2, sigAC2, mMech2, noiseAC2] = demoDetuneFP
+function [f, sigDC2, sigAC2, mMech2, noiseAC2] = demoTrap
 
   % create the model
   opt = optFP;
@@ -19,7 +19,7 @@ function [f, sigDC2, sigAC2, mMech2, noiseAC2] = demoDetuneFP
   % compute the DC signals and TFs on resonance
   f = logspace(-1, 3, 200)';
   %f = 0.7;
-  [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f, Optickle.tfPos);
+  [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f, Optickle.tfPit);
   
   % Print out the fields and probes, just to demonstrate these functions:
   fprintf('DC fields (fDC matrix):\n');
