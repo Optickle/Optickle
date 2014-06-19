@@ -11,15 +11,15 @@ addpath('testClasses')
 test = TickleTestOnOpt(@optFullIFO);
 results = test.run();
 
-global optickleTestResultsFile
-load(optickleTestResultsFile);
-
 %% display results
 disp(results)
 
 %% extract the result data
 % load the calculated data from disk, this makes variables with the names
 % refStruct and calcStruct with the results of both calculations.
+
+global optickleTestResultsFile
+load(optickleTestResultsFile);
 
 % plot the TF from ETMX to OMCDC
 

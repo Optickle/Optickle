@@ -12,13 +12,15 @@ test01 = Tickle01TestOnOpt(@optFullIFO);
 results01 = test01.run();
 
 warning(S);
-global optickleTestResultsFile
-data01 = load(optickleTestResultsFile);
 
 %% display results
 disp(results01)
 
 %% grab the 01 data
+    
+global optickleTestResultsFile
+data01 = load(optickleTestResultsFile);
+
 f = data01.refStruct.f;
 probe01 = 21;
 drive01 = 13;
