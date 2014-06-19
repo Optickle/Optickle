@@ -34,7 +34,7 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
       %   mode
       %   the x-basis, vBout(:,1), is of interest for the horizontal 10 mode
       z    =  real(vBout(:,par.nBasis));
-      z0   = -imag(vBout(:,par.nBasis));
+      z0   =  imag(vBout(:,par.nBasis));
       mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2))); %sqrt(z0*w(z)/w0)
   end
   
