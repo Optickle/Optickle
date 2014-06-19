@@ -208,7 +208,7 @@ classdef Mirror < Optic
             'to mirror with curvature %g.'], obj.Optic.name, z, obj.Chr);
         end
         z0 = sqrt(z02);
-        q = z - 1i * z0;
+        q = z + 1i * z0;  % CHECK
         qxy = [q q];
       end
       
