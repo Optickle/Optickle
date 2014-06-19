@@ -16,6 +16,12 @@ classdef OptickleTest < matlab.unittest.TestCase
         end
     end
     methods (TestClassSetup)
+        function displayConfig(testCase)
+            disp('---===Optickle Test===---')
+            disp(['Reference type is ' testCase.config.referenceType])
+            disp(['Reference path is ' testCase.config.referencePath])
+            disp(['Optickle path is ' testCase.config.calculationPath])
+        end
         function loadReferenceStruct(testCase)
             switch testCase.config.referenceType
                 case 'Path'
@@ -66,11 +72,6 @@ classdef OptickleTest < matlab.unittest.TestCase
     methods
         % constructor
         function testCase = OptickleTest()
-            disp('---===Optickle Test===---')
-            disp(['Reference type is ' testCase.config.referenceType])
-            disp(['Reference path is ' testCase.config.referencePath])
-            disp(['Optickle path is ' testCase.config.calculationPath])
-            
             % it's OK if you are doing reference type and your calc path is
             % the same as what is in the current path... otherwise there
             % shouldn't be anything in the current path
