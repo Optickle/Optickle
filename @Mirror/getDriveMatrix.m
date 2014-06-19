@@ -19,6 +19,7 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
       
       % output basis, where the basis is undefined, put z = 0, z0 = 1
       vBout = apply(getBasisMatrix(obj), par.vBin);
+      
       vBout(~isfinite(vBout)) = 1i;
       
       % mirror TEM01/10 mode injections at the waist are
@@ -35,10 +36,9 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
       %   the x-basis, vBout(:,1), is of interest for the horizontal 10 mode
       z    =  real(vBout(:,par.nBasis));
       z0   =  imag(vBout(:,par.nBasis));
+
       mInj = diag(sqrt(z0 .* (1 + (z ./ z0).^2))); %sqrt(z0*w(z)/w0)
   end
-  
-  
   
   
   %drive matrix
