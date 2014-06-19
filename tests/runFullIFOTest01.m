@@ -2,7 +2,7 @@
 
 %% Clear classes
 clear classes
-addpath('testFunctions')
+addpath('testModels')
 
 %% run the Tickle01 tests
 
