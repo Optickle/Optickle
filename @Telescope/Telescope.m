@@ -98,7 +98,7 @@ classdef Telescope < Optic
       mOpt = getFieldMatrix(obj, pos, par);
       
       % add Gouy phase
-      if par.tfType ~= Optickle.pos
+      if par.tfType ~= Optickle.tfPos
         % compute Gouy phase
         phi = getTelescopePhase(obj, par.vBin);
       
