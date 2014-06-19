@@ -7,6 +7,7 @@ clear classes
 % run the test using the optFullIFO function that returns the opt object to
 % test
 addpath('testModels')
+addpath('testClasses')
 test = TickleTestOnOpt(@optFullIFO);
 results = test.run();
 

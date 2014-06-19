@@ -3,6 +3,7 @@
 %% Clear classes
 clear classes
 addpath('testModels')
+addpath('testClasses')
 
 %% run the Tickle01 tests
 
