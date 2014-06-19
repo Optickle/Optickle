@@ -7,9 +7,11 @@ addpath('testClasses')
 
 %% run the Tickle01 tests
 
+S = warning('OFF','OPTICKLE:FieldInconsistency');
 test01 = Tickle01TestOnOpt(@optFullIFO);
 results01 = test01.run();
 
+warning(S);
 global optickleTestResultsFile
 data01 = load(optickleTestResultsFile);
 
