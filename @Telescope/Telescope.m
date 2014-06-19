@@ -98,7 +98,7 @@ classdef Telescope < Optic
       mOpt = getFieldMatrix(obj, pos, par);
       
       % add Gouy phase
-      if par.tfType ~= Optickle.pos
+      if par.tfType ~= Optickle.tfPos
         % compute Gouy phase
         phi = getTelescopePhase(obj, par.vBin);
       
@@ -129,6 +129,7 @@ classdef Telescope < Optic
         bOut = apply(qm, bOut);
         
         % add the resulting Gouy phase
+        %  NOTE: atan2(z, z0) = pi / 2 - angle(q)
         phi = phi + angle(bOut - my_df(n, 1)) - angle(bOut);
         
         % compute next focus operator

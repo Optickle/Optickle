@@ -76,7 +76,7 @@ function opt = optFP
   opt = addLink(opt, 'IX', 'bk', 'REFL', 'in', 2);
   
   % add REFL probes (this call adds probes REFL_DC, I and Q)
-  phi = 0;
+  phi = 30;
   opt = addReadout(opt, 'REFL', [fMod, phi]);
 
   % add TRANS probe
