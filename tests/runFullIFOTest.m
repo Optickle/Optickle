@@ -14,7 +14,10 @@ results = test.run();
 %% display results
 disp(results)
 
+numFailed = any(cell2mat({results01.Failed}));
+
 %% extract the result data
+if numFailed > 0
 % load the calculated data from disk, this makes variables with the names
 % refStruct and calcStruct with the results of both calculations.
 
@@ -56,3 +59,4 @@ figure(335)
 loglog(f,refPOPNoise,f,calcPOPNoise,f,abs(refPOPNoise-calcPOPNoise))
 title('POPI1 Noise')
 legend('Reference (Optickle 1)','Calculated (Optickle 2)','Residual')
+end

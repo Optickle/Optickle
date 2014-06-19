@@ -8,6 +8,7 @@ addpath('testClasses')
 %% run the Tickle01 tests
 
 S = warning('OFF','OPTICKLE:FieldInconsistency');
+
 test01 = Tickle01TestOnOpt(@optFullIFO);
 results01 = test01.run();
 
@@ -16,7 +17,10 @@ warning(S);
 %% display results
 disp(results01)
 
+numFailed = any(cell2mat({results01.Failed}));
+
 %% grab the 01 data
+if numFailed > 0
     
 global optickleTestResultsFile
 data01 = load(optickleTestResultsFile);
@@ -38,3 +42,4 @@ title('EY pit to TRXDC');
 legend('Reference (Optickle 1)','Calculated (Optickle 2)','Residual')
 subplot(2,1,2)
 semilogx(f,180/pi*angle(refTF01),f,180/pi*angle(calcTF01));
+end
