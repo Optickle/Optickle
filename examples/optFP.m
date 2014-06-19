@@ -30,7 +30,7 @@ function opt = optFP
   %   opt = addRFmodulator(opt, name, fMod, aMod)
   gamma = 0.2;
   opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
-  opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 0);
+  opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
 
   % add mirrors
   %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)

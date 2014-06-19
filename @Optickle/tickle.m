@@ -69,7 +69,7 @@ function varargout = tickle(opt, pos, f, tfType, nDrive)
   
   % decide which calculation is necessary
   isAC = ~isempty(f) && nargout > 2;
-  isNoise = isAC && (nargout > 4 || (isCon && nargout > 3));
+  isNoise = isAC && (nargout > 4);
 
   % check the memory requirements
   memReq = (20 * Nprb *  Ndrv *  Naf) / 1e6;
@@ -152,7 +152,7 @@ function varargout = tickle(opt, pos, f, tfType, nDrive)
     % scale outputs by half-plane overlap integral
     modeOverlapFactor = sqrt(2 / pi); % Overlap integral of 01/10
                                       % with 00 mode on split diode
-    mPrb = modeOverlapFactor * mPrb;
+    %mPrb = modeOverlapFactor * mPrb;
   else
     % TEM00, so no basis or Gouy phase
     vBasis = [];

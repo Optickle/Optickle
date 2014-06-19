@@ -33,7 +33,7 @@
 % to be performed faster if only a subset of the drive points will be used.
 
 
-function varargout = tickle01(opt, pos, f, nDrive, is10)
+function varargout = tickle01(opt, pos, f, nDrive)
 
   % === Argument Handling
   if nargin < 3
@@ -42,89 +42,21 @@ function varargout = tickle01(opt, pos, f, nDrive, is10)
   if nargin < 4
     nDrive = [];
   end
-  if nargin < 5
-    is10 = 0;
-  end
-
-  % === Field Info
-  vFrf = opt.vFrf;
   
-  % ==== Sizes of Things
-  Ndrv = opt.Ndrive;		% number of drives (internal DOFs)
-  Nlnk = opt.Nlink;		% number of links
-  Nprb = opt.Nprobe;		% number of probes
-  Nrf  = length(vFrf);		% number of RF components
-  Naf  = length(f);		% number of audio frequencies
-  Nfld = Nlnk * Nrf;		% number of RF fields
-  Narf = 2 * Nfld;		% number of audio fields
-  Ndof = Narf + Ndrv;		% number of degrees-of-freedom
+  isNoise = nargout > 2;
   
-  % check the memory requirements
-  memReq = (20 * Nprb *  Ndrv *  Naf) / 1e6;
-  if memReq > 200
-    qstr = sprintf('This will require about %.0f Mb of memory.', memReq);
-    rstr = questdlg([qstr ' Continue?'], 'ComputeFields', ...
-      'Yes', 'No', 'No');
-    if strcmp(rstr, 'No')
-      error('Too much memory required.  Exiting.');
-    end
-  end
-
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % ==== DC Fields and Signals
-  % duplicated from tickle
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  [vLen, prbList, mapList, mPhiFrf, vDC, mPrb, mPrbQ] = ...
-    tickleDC(opt, pos);
-
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-  % ==== Audio Frequency Loop
-  % mostly duplicated from tickle
-  %  phase includes Gouy phase
-  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-  % get basis vector
-  vBasis = getAllFieldBases(opt);
-  
-  % Gouy phases... 
-  if is10
-      nBasis = 1; % yaw case
-  else
-      nBasis = 2; % default pitch case
-  end
-  lnks = opt.link;
-  vDist = [lnks.len]';
-  vPhiGouy = getGouyPhase(vDist, vBasis(:, nBasis));
-
-  % expand the probe matrix to both audio SBs
-  mPrb = sparse([mPrb, conj(mPrb)]);
-  
-  % get optic matricies for AC part
-  [mOptGen, mRadFrc, lResp, mQuant] = ...
-    convertOptics01(opt, mapList, vBasis, pos, f, vDC, is10);
-
-  % audio frequency and noise calculation
-  isNoise=0;    % No noise calculation for 01 now
-  if ~isNoise
-    shotPrb = zeros(Nprb, 1);
-    mQuant = zeros(Narf, 0);
-    
-    [sigAC, mMech] = tickleAC(opt, f, nDrive, vLen, ...
-      vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
-  else
-    [mQuant, shotPrb] = tickleNoise(opt, prbList, vDC, mQuant);
-    
-    [sigAC, mMech, noiseAC, noiseMech] = tickleAC(opt, f, nDrive, vLen, ...
-      vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
-  end
-
-  
-  % Build the outputs
-  varargout{1} = sigAC;
-  varargout{2} = mMech;
+  % call tickle
   if isNoise
-      varargout{3} = noiseAC;
-      varargout{4} = noiseMech;
+    [~,~,sigAC, mMech, noiseAC, noiseMech] = ...
+      tickle(opt, pos, f, Optickle.tfPit, nDrive);
+    varargout{1} = sigAC;
+    varargout{2} = mMech;
+    varargout{3} = noiseAC;
+    varargout{4} = noiseMech;
+  else
+    [~,~,sigAC, mMech] = ...
+      tickle(opt, pos, f, Optickle.tfPit, nDrive);
+    varargout{1} = sigAC;
+    varargout{2} = mMech;
   end
 end

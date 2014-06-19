@@ -480,14 +480,14 @@ And also in the case of a perfect reflector: $F_r = 2 ( P_{back_{in}} - P_{front
 
 The modulation of each incoming and outgoing power by the co-propagating DC field and its audio SBs is given by
 \beq{power-force}
- P_X = \abs{ E_{DC_X}  + E_{+_X} e^{+i \Omega t} + E_{-_X} e^{-i \Omega t} }^2
+ P_X = \abs{ E_{DC_X}  + E_{-_X} e^{+i \Omega t} + E_{+_X} e^{-i \Omega t} }^2
 \eeq
  where $X \in \set{\rm back_{in, out} , {front_{in,out}} }$,
   $E_{\pm_X}$ are the upper and lower sideband amplitudes,
  and $\Omega = 2 \pi f_{\rm audio}$ is the audio angular frequency.
 Converting this expression to the frequency domain gives
 \beqa{power-force_trig}
-\tilde{P}_X &=& 2 \( E_{DC_X}^* E_{+_X} + E_{DC_X} E_{-_X}^* \) \elabel{tildePX}
+\tilde{P}_X &=& 2 \( E_{DC_X}^* E_{-_X} + E_{DC_X} E_{+_X}^* \) \elabel{tildePX}
 \eeqa
  as discussed in section \sref{freq_domain}.
  
@@ -745,6 +745,108 @@ The system wide matrix is made in the usual way, as a sum over all optics with t
 \eeq
  
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Signal Production}
+Converting DC and audio frequency fields to signals is the job of probes placed in the system.
+Probe signals result from power measured by the probe and is thus similar to the radiation pressure interaction described in $\matm{field-optic}$.
+The major difference is that probes can demodulate signals at RF frequencies, thereby mixing RF components.
+
+As with fields, there are two computations to perform: DC and AC.
+DC signals are the signals present given only the DC fields present, and are thus related to the current working point of the Optickle system.
+AC signals, on the other hand, are products between DC and audio frequency fields: they tell us about the response of the system around the current working point as seen in equation \eref{vSig}.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{DC Signals}
+To compute the DC signals, we start with an expression for the intensity present at a given FEP,
+\begin{eqnarray}
+I_{DC} &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{-i \omega_n t}  \right|^2 \\
+ &=& \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
+ E^*_{DC_m} E_{DC_n} e^{i (\omega_m - \omega_n) t}
+\elabel{intensity}
+\end{eqnarray}
+where $E_{DC_n}$ is the field amplitude of the $n^{th}$ RF component, at frequency $\omega_n = 2 \pi \nu_n$.
+
+Requiring that the output be at the demodulation frequency $\omega_{dmd} = 2 \pi f_{dmd}$, such that the integral
+\beqa{}
+S_{DC} &=& \lim_{T \rightarrow \infty} \frac{2}{T} \int^{T}_{-T} I_{DC}
+ \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
+ &=& \frac{1}{2} \sum^{\Nrf}_{m, n}
+ E^*_{DC_m} E_{DC_n} \cdots \\
+&& \lim_{T \rightarrow \infty} \int^{T}_{-T} \!\!\! e^{i (\omega_m - \omega_n) t} 
+   \(e^{i (\omega_{dmd} t + \phi_{dmd}) } + e^{-i (\omega_{dmd} t + \phi_{dmd})} \) dt \nonumber
+\eeqa
+is non-zero removes most of the terms in the sum by introducing a delta function
+\begin{equation}
+S_{DC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
+ E^*_{DC_m} E_{DC_n} \delta_{mn}
+\elabel{sigDC}
+\end{equation}
+where
+\begin{align}
+\delta_{mn} =
+& \tfrac{1}{2} \fun{\delta}{\nu_m - \nu_n + f_{dmd}} e^{ i \phi_{dmd}} ~ +  \nonumber \\
+& \tfrac{1}{2} \fun{\delta}{\nu_m - \nu_n - f_{dmd}} e^{-i \phi_{dmd}}.
+\end{align}
+
+Translating this into the language of matrix manipulation, the DC signal from the $k^{th}$ probe is
+\begin{equation}
+\vecv{sig_{DC}}(k) = \left( \mPrbInn{k} \vDC \right) ^\dagger \mPrbn{k} \mPrbInn{k} \vDC,
+\end{equation}
+where the probe's matrix expresses the delta function in equation \eref{sigDC} as the matrix
+\begin{equation}
+\mPrbn{k}(m, n) = \delta_{mn} ,
+\end{equation}
+and $\mPrbInn{k}$ is the input map for the probe.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%
+\subsection{AC Signals}
+The audio frequency signal, or ``AC signal'',
+ computation follows a very similar path to that of the DC signals in the previous section.
+Intensity present at a given FEP is
+\beq{I_AC}
+I = \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{-i \omega_n t} + E_{+_n} e^{-i (\omega_n + \Omega) t} 
+   + E_{-_n} e^{-i (\omega_n - \Omega) t}  \right) \right|^2
+\eeq
+ where $\Omega = 2 \pi f_{\rm audio}$ is the audio sideband frequency being considered.
+If we remove terms from the sum which are the product of the perturbative amplitudes
+ $E_+$ and $E_-$, and those which are the product of 2 DC fields and thus have
+ no audio frequency component, we are left with
+\begin{align}
+I_{AC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1} 2 Re & \left[
+  E_{DC_m}^{*} E_{-_n} e^{i (\omega_m - \omega_n + \Omega) t} ~~ + \right. \nonumber \\
+ & \left. ~~~ E_{DC_m} E_{+_n}^{*} e^{-i (\omega_m - \omega_n - \Omega) t} \right] .
+\elabel{intensity}
+\end{align}
+The audio frequency signal at a FEP, for $\Omega \ll 1/T \ll \omega_{dmd}$, is
+\beqa{sac}
+S_{AC} &=& \frac{2}{T} \int^{T}_{-T} I_{AC} \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
+&=& 2 \sum^{\Nrf}_{m, n} Re \left[
+  E_{DC_m}^{*} E_{-_n} ~ \delta_{mn} ~ e^{+i \Omega t} 
+   + E_{DC_m} E_{+_n}^{*} ~ \delta_{mn}^* ~ e^{+i \Omega t} \right] \nonumber \\
+\Rightarrow &&\tilde{S}_{AC} = 2 \sum^{\Nrf}_{m,n} (E_{DC_m}^* E_{-_n} \delta_{mn} + E_{DC_m} E_{+_n}^* \delta_{mn}^*)
+\eeqa
+(see section \sref{freq_domain}).
+
+The overall probe matrix is constructed from the individuals row at a time according to
+\begin{equation}
+\mPrb(k,:) =
+\matrixBegin{c}
+\mPrbInn{k} \vDC \\
+\mPrbInn{k} \vDC^{*}
+\matrixEnd ^\dagger
+\matrixBegin{cc}
+\mPrbn{k} & 0 \\
+0 & \mPrbn{k}^{*}
+\matrixEnd
+\matrixBegin{c}
+\mPrbInn{k} \\
+\mPrbInn{k}
+\matrixEnd ,
+\end{equation}
+where $k \in 1:\Nprb$.
+Note that the probe matrix $\mPrbn{k}$ for the upper audio sideband is the transpose of that for the lower sideband, as $m$ and $n$ are exchanged for the upper sideband in equation \eref{sac}.
+It may seem odd that the input map is used so may times: two instances are for the DC fields in $\vDC$ and $\vDC^*$, other two bring in the correct the upper and lower audio frequency fields from $\vAC$ which is expected to arrive on the right (see equations \eref{vAC} and \eref{vSig}).
+
 %%%%%%%%%%%%%%%%%%%%%%%%%
 \subsection{AC Matrix Inversion}
 
@@ -781,117 +883,17 @@ M &=& -D^{-1} C K = N C A^{-1}
 The part of $\mTF$ which takes drives to signals is $L$ in the above block inversion,
  and the corresponding piece of the inverse of $\matI - \mAC$ is
 \beqa{}
- \vSig &=& - \mPrb ~ \mOptTF ~ \matm{optic-field} ~ \mMech ~ \vDrv \\
- \mOptTF &=& \( \matI - \matm{field-field} \) ^{-1} \\
- \mMech &=& \( \matI - \matm{optic-optic} - \matm{field-optic} ~ \mOptTF ~ \matm{optic-field} \)^{-1}
+ \vSig &=& - \mPrb ~ \mOptTF ~ \matm{of} ~ \mMech ~ \vDrv \\
+ \mOptTF &=& \( \matI - \matm{ff} \) ^{-1} \\
+ \mMech &=& \( \matI - \matm{oo} - \matm{fo} ~ \mOptTF ~ \matm{of} \)^{-1}
 \eeqa
+ (we have shortened the subscripts ``optic'' and ``field'' to their first letter).
 This has the advantage that the result can be returned to the user in 2 parts,
  one representing the drive-to-signal matrix
 \beq{}
 \matm{drv-sig} = \mPrb ~ \mOptTF ~ \matm{optic-field}
 \eeq
  and the other representing the opto-mechanical modification of the drives, $\mMech$.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\section{Signal Production}
-Converting DC and audio frequency fields to signals is the job of probes placed in the system.
-Probe signals result from power measured by the probe and is thus similar to the radiation pressure interaction described in $\matm{field-optic}$.
-The major difference is that probes can demodulate signals at RF frequencies, thereby mixing RF components.
-
-As with fields, there are two computations to perform: DC and AC.
-DC signals are the signals present given only the DC fields present, and are thus related to the current working point of the Optickle system.
-AC signals, on the other hand, are products between DC and audio frequency fields: they tell us about the response of the system around the current working point as seen in equation \eref{vSig}.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{DC Signals}
-To compute the DC signals, we start with an expression for the intensity present at a given FEP,
-\begin{eqnarray}
-I &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{+i \Omega_n t}  \right|^2 \\
- &=& \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
- E^*_{DC_m} E_{DC_n} e^{i (\omega_m - \omega_n) t}
-\elabel{intensity}
-\end{eqnarray}
-where $E_{DC_n}$ is the field amplitude of the $n^{th}$ RF component, at frequency $\omega_n = 2 \pi \nu_n$.
-
-Requiring that the output be at the demodulation frequency $\omega_{dmd} = 2 \pi f_{dmd}$, such that the integral
-\beqa{}
-S_{DC} &=& \lim_{T \rightarrow \infty} \frac{2}{T} \int^{T}_{-T} I \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
- &=& \frac{1}{2} \sum^{\Nrf}_{m, n}
- E^*_{DC_m} E_{DC_n} \cdots \\
-&& \lim_{T \rightarrow \infty} \int^{T}_{-T} \!\!\! e^{i (\omega_m - \omega_n) t} 
-   \(e^{i (\omega_{dmd} t + \phi_{dmd}) } + e^{-i (\omega_{dmd} t + \phi_{dmd})} \) dt \nonumber
-\eeqa
-is non-zero removes most of the terms in the sum by introducing a delta function
-\begin{equation}
-S_{DC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
- E^*_{DC_m} E_{DC_n} \delta_{mn}
-\elabel{sigDC}
-\end{equation}
-where
-\begin{align}
-\delta_{mn} =
-& \tfrac{1}{2} \fun{\delta}{\nu_m - \nu_n + f_{dmd}} e^{ i \phi_{dmd}} ~ +  \nonumber \\
-& \tfrac{1}{2} \fun{\delta}{\nu_m - \nu_n - f_{dmd}} e^{-i \phi_{dmd}}.
-\end{align}
-
-Translating this into the language of matrix manipulation, the DC signal from the $k^{th}$ probe is
-\begin{equation}
-\vecv{sig_{DC}}(k) = \left( \mPrbInn{k} \vDC \right) ^\dagger \mPrbn{k} \mPrbInn{k} \vDC,
-\end{equation}
-where the probe's matrix expresses the delta function in equation \eref{sigDC} as the matrix
-\begin{equation}
-\mPrbn{k}(m, n) = \delta_{mn} ,
-\end{equation}
-and $\mPrbInn{k}$ is the input map for the probe.
-
-%%%%%%%%%%%%%%%%%%%%%%%%%
-\subsection{AC Signals}
-The audio frequency signal, or ``AC signal'',
- computation follows a very similar path to that of the DC signals in the previous section.
-Intensity present at a given FEP is
-\beq{I_AC}
-I = \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{+i \Omega_n t} + E_{+_n} e^{-i (\omega_n + \Omega) t} 
-   + E_{-_n} e^{-i (\omega_n - \Omega) t}  \right) \right|^2
-\eeq
- where $\Omega = 2 \pi f_{\rm audio}$ is the audio sideband frequency being considered.
-If we remove terms from the sum which are the product of the perturbative amplitudes
- $E_+$ and $E_-$, and those which are the product of 2 DC fields and thus have
- not audio frequency component, we are left with
-\begin{align}
-I_{AC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1} 2 Re & \left[
-  E_{DC_m}^{*} E_{+_n} e^{i (\omega_m - \omega_n - \Omega) t} ~~ + \right. \nonumber \\
- & \left. ~~~ E_{DC_m} E_{-_n}^{*} e^{-i (\omega_m - \omega_n + \Omega) t} \right] .
-\elabel{intensity}
-\end{align}
-The audio frequency signal at a FEP, for $\Omega \ll 1/T \ll \omega_{dmd}$, is
-\beqa{sac}
-S_{AC} &=& \frac{2}{T} \int^{T}_{-T} I_{AC} \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
-&=& 2 \sum^{\Nrf}_{m, n} Re \left[
-  E_{DC_m}^{*} E_{+_n} ~ \delta_{mn} ~ e^{+i \Omega t} 
-   + E_{DC_m} E_{-_n}^{*} ~ \delta_{mn}^* ~ e^{+i \Omega t} \right] \nonumber \\
-\Rightarrow &&\tilde{S}_{AC} = 2 \sum^{\Nrf}_{m,n} (E_{DC_m}^* E_{+_n} \delta_{mn} + E_{DC_m} E_{-_n}^* \delta_{mn}^*)
-\eeqa
-(see section \sref{freq_domain}).
-
-The overall probe matrix is constructed from the individuals row at a time according to
-\begin{equation}
-\mPrb(k,:) =
-\matrixBegin{c}
-\mPrbInn{k} \vDC \\
-\mPrbInn{k} \vDC^{*}
-\matrixEnd ^\dagger
-\matrixBegin{cc}
-\mPrbn{k} & 0 \\
-0 & \mPrbn{k}^{*}
-\matrixEnd
-\matrixBegin{c}
-\mPrbInn{k} \\
-\mPrbInn{k}
-\matrixEnd ,
-\end{equation}
-where $k \in 1:\Nprb$.
-Note that the probe matrix $\mPrbn{k}$ for the upper audio sideband is the transpose of that for the lower sideband, as $m$ and $n$ are exchanged for the upper sideband in equation \eref{sac}.
-It may seem odd that the input map is used so may times: two instances are for the DC fields in $\vDC$ and $\vDC^*$, other two bring in the correct the upper and lower audio frequency fields from $\vAC$ which is expected to arrive on the right (see equations \eref{vAC} and \eref{vSig}).
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Quantum Noise}

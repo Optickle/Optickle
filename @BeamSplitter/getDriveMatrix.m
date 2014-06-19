@@ -13,9 +13,22 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   % mapping matrices
   [mInArf, mInBrf, mOutArf, mOutBrf] = BeamSplitter.getMirrorIO(par.Nrf);
   
+  % make A-side and B-side parameter structs
+  parA = par;
+  parA.vDC = mInArf * par.vDC;
+
+  parB = par;
+  parB.vDC = mInBrf * par.vDC;
+  
+  if par.tfType ~= Optickle.tfPos
+    parA.vBin = par.vBin(1:2, :);
+    parB.vBin = par.vBin(3:4, :);
+  end
+  
   % get mirror matrix
-  mCplMir = obj.mir.getDriveMatrix(pos, par, mOpt, dldx);
+  mCplA = obj.mir.getDriveMatrix(pos, parA, mOpt, dldx);
+  mCplB = obj.mir.getDriveMatrix(pos, parB, mOpt, dldx);
   
   % build coupling matrix
-  mCpl = mOutArf * mCplMir * mInArf + mOutBrf * mCplMir * mInBrf;
+  mCpl = mOutArf * mCplA * mInArf + mOutBrf * mCplB * mInBrf;
 end
