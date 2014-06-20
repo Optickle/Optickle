@@ -101,6 +101,13 @@ classdef OptickleReferenceTest < matlab.unittest.TestCase
             
             output = testCase.testFunctionHandle(); %#ok<NASGU>
             
+            % get the git hash id
+            [retCode,retString] = system('git rev-parse HEAD');
+            gitHash = 'unknown!';
+            if ~retCode
+                gitHash = retString;
+            end
+            
             % write metadata
             textFileID = fopen([fileNameBase '.txt'],'w');
             fprintf(textFileID,'Optickle test reference data\n');
@@ -108,6 +115,7 @@ classdef OptickleReferenceTest < matlab.unittest.TestCase
             fprintf(textFileID,['Test function: ' func2str(testCase.testFunctionHandle) '\n']);
             fprintf(textFileID,['Path to Optickle: ' testCase.optickleLocation '\n']);
             fprintf(textFileID,['Run on: ' datestr(now) '\n']);
+            fprintf(textFileID,['Git hash ID: ' gitHash '\n']);
             fclose(textFileID);
             
             save([fileNameBase '.mat'],'-struct','output')
