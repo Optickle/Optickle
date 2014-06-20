@@ -1,4 +1,4 @@
-% opt = addHomodyne(opt, name, nu, pol, phase, power, conObj, conOut)
+% opt.addHomodyne(name, nu, pol, phase, power, conObj, conOut)
 % 
 % This function adds a homodyne readout which consists of two sinks, two
 % probes a splitter mirror, a source (for the local oscillator) and 
@@ -21,13 +21,13 @@
 % name - base name for all objects in the homodyne
 % nu - frequency for LO source
 % pol - polarization for LO source
-% phase - LO phase
+% phase - LO phase (in degrees)
 % power - LO power
 % conObj - Name of component which is connected to homodyne input
 % conOut - Name of conObj output which is connected to homodyne input
 %
 % Example:
-% opt = addHomodyne(opt, 'HD', opt.nu(1), 1, 0, 100, 'Sqz1', 'out');
+% opt.addHomodyne('HD', opt.nu(1), 1, 0, 100, 'Sqz1', 'out');
 %
 % This will create an object with 2 sinks 'HDA' and 'HDB', 2 probes
 % 'HDA_DC' and 'HDB_DC', a source 'HD_LO', a splitter mirror 'HD_SMIR', and
@@ -44,26 +44,26 @@ function opt = addHomodyne(opt, name, nu, pol, phase, power, conObj, conOut)
   snkB = [name 'B'];
   
   % Pick out correct polarization and frequency component for LO
-  vAmpRF = Optickle.matchFreqPol(opt, nu, pol);
+  vAmpRF = sqrt(power) * Optickle.matchFreqPol(opt, nu, pol);
   
   % add LO source
-  opt = addSource(opt, source, power*exp(1i*phase)*vAmpRF, 0, 0);
+  opt.addSource(source, exp(1i * pi * phase / 180) * vAmpRF, 0, 0);
 
   % add Homodyne Splitter Mirror
-  opt = addMirror(opt, smir, 45, 0, 0.50, 0, 0, 0, 1.45);
-  opt = addLink(opt, source, 'out', smir, 'fr', 0.1);
+  opt.addMirror(smir, 45, 0, 0.50, 0, 0, 0, 1.45);
+  opt.addLink(source, 'out', smir, 'fr', 0.1);
   
   % add link from component at input to splitter mirror
-  opt = addLink(opt, conObj, conOut, smir, 'bk', 0.1);
+  opt.addLink(conObj, conOut, smir, 'bk', 0.1);
   
   % add 2 Sinks and links to BS
-  opt = addSink(opt,snkA);
-  opt = addSink(opt,snkB);
-  opt = addLink(opt, smir, 'fr', snkA, 'in', 0.1);
-  opt = addLink(opt, smir, 'bk', snkB, 'in', 0.1);
+  opt.addSink(snkA);
+  opt.addSink(snkB);
+  opt.addLink(smir, 'fr', snkA, 'in', 0);
+  opt.addLink(smir, 'bk', snkB, 'in', 0);
   
   % add probes for Homodyne PDs
-  opt = addProbeIn(opt, [snkA '_DC'], snkA, 'in', 0, 0);
-  opt = addProbeIn(opt, [snkB '_DC'], snkB', 'in', 0, 0);
+  opt.addProbeIn([snkA '_DC'], snkA, 'in', 0, 0);
+  opt.addProbeIn([snkB '_DC'], snkB, 'in', 0, 0);
 
 end
