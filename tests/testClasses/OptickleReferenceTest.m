@@ -71,7 +71,7 @@ classdef OptickleReferenceTest < matlab.unittest.TestCase
     end
     methods
         % constructor
-        function testCase = OptickleTest()
+        function testCase = OptickleReferenceTest()
             % it's OK if you are doing reference type and your calc path is
             % the same as what is in the current path... otherwise there
             % shouldn't be anything in the current path
