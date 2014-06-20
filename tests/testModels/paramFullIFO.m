@@ -84,6 +84,9 @@ function par = paramFullIFO(inputPower)
   
   par.PR.T = par.Tprm;
   
+  %par.PR.T = 1;%test
+  %par.SR.T = 1;%test
+  
   % add a little mass asymmetry
   par.EX.mechTF = zpk([], par.w * dampRes, (1 + 0e-3) / par.EX.mass);
   
