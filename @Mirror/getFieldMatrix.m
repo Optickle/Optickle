@@ -56,7 +56,6 @@ function [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, ...
         ar = -ar;    
     end
 
-      
     % transmission combinations
     hrbt = -hr * bt;
     arbt = -ar * bt;

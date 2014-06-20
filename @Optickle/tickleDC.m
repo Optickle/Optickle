@@ -59,7 +59,13 @@ function [vLen, prbList, mapList, mPhiFrf, vDC, mPrb, mPrbQ] = ...
     vDCinCT = (mIn_k * vDC)';
     
     % compute the row of mPrb for this probe
+    %  HACK: transpose of mPrb_k is necessary, but not understood
     mPrb(k, :) = vDCinCT * mPrb_k.' * mIn_k;
+    
+%     fprintf('\n\n====== Prb %d %f\n', k, opt.probe(k).phase);
+%     disp(full(mPrb_k))
+%     fprintf('\n\n====== Prb^T %d %s\n', k, opt.probe(k).name);
+%     disp(full(mPrb_k.'))
     
     % quad phase signals, for oscillator phase noise
     mPrbQ_k = prbList(k).mPrbQ;
