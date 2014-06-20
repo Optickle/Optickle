@@ -1,4 +1,4 @@
-classdef OptickleTest < matlab.unittest.TestCase
+classdef OptickleReferenceTest < matlab.unittest.TestCase
     
     properties
         testFunctionHandle;

@@ -1,4 +1,4 @@
-classdef DetuneFPTest < OptickleTest
+classdef DetuneFPTest < OptickleReferenceTest
     % Define the constructor method
     methods
         function testCase = DetuneFPTest() 
