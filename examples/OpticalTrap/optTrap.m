@@ -1,12 +1,17 @@
 % Create an Optickle Fabry-Perot
 
-function opt = optTrap
+function opt = optTrap(Plaser)
 
- % RF component vector
- Pin  = 10;
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
+  % create the model
+
+% Create an Optickle Fabry-Perot
+
+% RF component vector
+ Pin  = Plaser;
  vMod = ( - 1:1)';
  fMod = 20e6;
- vFrf = fMod * [vMod; 0]; % add green carrier, just for fun
+ vFrf = fMod * [vMod]; % add green carrier, just for fun
  
  lambda = 1064e-9;   
 
@@ -34,7 +39,8 @@ function opt = optTrap
  % add mirrors
  %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
  lCav = 0.9;
- opt  = addMirror(opt, 'IX', 0, 0, 0.0008);
+ T1 = 0.0008;
+ opt  = addMirror(opt, 'IX', 0, 0, T1);
  opt  = addMirror(opt, 'EX', 0, 0.7 / lCav, 0.00);
 
  opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 0);
@@ -56,9 +62,13 @@ function opt = optTrap
  p2    = - w / (2 * Q) * (1 + sqrt(1 - 4 * Q^2));
 
  poles = [p1, p2];
+ pendulumModel = zpk([], poles, 1 / mE);
+
+
  
- %opt = setMechTF(opt, 'IX', zpk([], - w * dampRes, 1 / mI));
- opt = setMechTF(opt, 'EX', zpk([], poles, 1 / mE));
+ %opt = setMechTF(opt, 'IX', pendulumModel);
+ opt = setMechTF(opt, 'EX', pendulumModel);
+ 
  
  % tell Optickle to use this cavity basis
  opt = setCavityBasis(opt, 'IX', 'EX');
@@ -71,28 +81,5 @@ function opt = optTrap
  phi = 0;
  opt = addReadout(opt, 'REFL', [fMod, phi]);
 
- % add TRANS probe
- opt = addSink(opt, 'TRANS');
- %opt = addLink(opt, 'EX', 'bk', 'TRANS', 'in', 2);
- %opt = addProbeIn(opt, 'TRANS_DC', 'TRANS', 'in', 0, 0);
- %opt = addLink(opt, 'TRANS', 'out', 'EX', 'bk', 0);
-  
-%   % add TRANS optics (adds telescope, splitter and sinks)
-%   % opt = addReadoutTelescope(opt, name, f, df, ts, ds, da, db)
-%   opt = addReadoutTelescope(opt, 'TRANS', 2, [2.2 0.19], ...
-%     0.5, 0.1, 0.1, 4.1);
-%   opt = addLink(opt, 'EX', 'bk', 'TRANS_TELE', 'in', 0.3);
-%   
-%   % add TRANS probes
-%   opt = addProbeIn(opt, 'TRANSa_DC', 'TRANSa', 'in', 0, 0);	% DC
-%   opt = addProbeIn(opt, 'TRANSb_DC', 'TRANSb', 'in', 0, 0);	% DC
-
-  % add a source at the end, just for fun
-%   opt = addSource(opt, 'FlashLight', 0*(1e-3)^2 * (vMod == 1));
-%   opt = addGouyPhase(opt, 'FakeTele', pi / 4);
-%   opt = addLink(opt, 'FlashLight', 'out', 'FakeTele', 'in', 0.1);
-%   opt = addLink(opt, 'FakeTele', 'out', 'EX', 'bk', 0.1);
-%   opt = setGouyPhase(opt, 'FakeTele', pi / 8);
-  
 
 end
