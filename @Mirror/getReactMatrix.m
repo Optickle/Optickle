@@ -61,10 +61,8 @@ function [mRadAC,mFrc,vRspAF] = ...
       mWOut = diag(vWOut .* sqrt(2 ./ kk(:)));
       kk    = repmat(par.k, 1, length(vWIn))';
       vWIn  = repmat(vWIn, length(par.k), 1);
-  
       mWIn  = diag(vWIn .* sqrt(2 ./ kk(:)));
-  
-  
+
       % field matrix
       mRad = (ctranspose(mOpt) * mDirOutRF * mWOut * mOpt + mDirInRF * mWIn) * vDC / 2;  % CHECK
 
