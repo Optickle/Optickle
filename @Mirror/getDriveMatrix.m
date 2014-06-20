@@ -52,10 +52,10 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
       case Optickle.tfPit
         drp = 1i * sqrt(par.k(n) / 2) * (mInj * dldx / 2);
       case Optickle.tfYaw
-        % use abs(dldx / 2) to remove cos(aoi) dependence
-        % abs not sign because yaw motion moves reflected beam in same
-        % direction in x for front/back surfaces
-        drp = 1i * sqrt(par.k(n) / 2) * (mInj * -abs(dldx / 2));
+        % use (dldx ~= 0) to remove cos(aoi) dependence
+        %  and the sign of dldx because yaw motion moves reflected
+        %  beam in same direction in x for front/back surfaces
+        drp = 1i * sqrt(par.k(n) / 2) * (mInj * -(dldx ~= 0));
       otherwise
         error('Invalid tfType, got %d', par.tfType)
     end
