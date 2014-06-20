@@ -78,6 +78,10 @@ function par = paramFullIFO(inputPower)
     par.(nameOpt{n}).mechTF = zpk([], par.w * dampRes, 1 / co.mass);
   end
   
+  % these lines are good for comparing Optickle 1 and 2
+  %par.IX.mechTF = zpk([],[],0);
+  %par.IY.mechTF = zpk([],[],0);
+  
   par.PR.T = par.Tprm;
   
   % add a little mass asymmetry
