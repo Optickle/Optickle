@@ -1,6 +1,6 @@
 % Compute AC transfer functions for a TEM10 mode (yaw).
 %
-% [sigAC, mMech] = tickle01(opt, pos, f)
+% [sigAC, mMech] = tickle10(opt, pos, f)
 % opt - Optickle model
 % pos - optic positions (Ndrive x 1, or empty)
 % f - audio frequency vector (Naf x 1)
@@ -13,12 +13,6 @@
 %   is the TF from the drive m to probe n.
 %
 % mMech - modified drive transfer functions (Ndrv x Ndrv x Naf)
-%
-% NOTE: like tickle, sigAC is the product of the DC field amplitude
-% with the AC sideband amplitude.  This IGNORES the overlap integral
-% between the TEM00 and TEM01 modes on a given detector geometry.
-% For a half plane detector, the correction factor is sqrt(2/pi).
-%   === Thanks to Yuta Michimura!!! ===
 %
 % To convert DC signals to beam-spot motion, scale by w/(2 * Pdc),
 % where w is the beam size at the probe.
