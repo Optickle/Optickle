@@ -103,7 +103,7 @@ classdef Telescope < Optic
         phi = getTelescopePhase(obj, par.vBin);
       
         % send inputs to outputs with Gouy phase
-        mOpt = mOpt * exp(1i * phi(par.nBasis));
+        mOpt = mOpt * exp(-1i * phi(par.nBasis));
       end
       
       % expand to both audio sidebands
