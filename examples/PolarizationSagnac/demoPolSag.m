@@ -34,12 +34,13 @@ function demoPolSag
   % make a response plot
   h0 = getTF(sigAC, nREFL_I, [nEX, nEY]);
   h1 = getTF(sigAC, nAS_I, [nEX, nEY]);
+  hREFL = h0(:, 1) - h0(:, 2);
   hDARM = h1(:, 1) - h1(:, 2);
   
   figure(1)
-  zplotlog(f, [h0, h1])
+  zplotlog(f, [h0, h1, hREFL, hDARM])
   title('PDH Response to EX and EY', 'fontsize', 18);
-  legend({'EX REFL', 'EY REFL', 'EX AS', 'EY AS'}, 'Location','SouthEast');
+  legend({'EX REFL', 'EY REFL', 'EX AS', 'EY AS', 'DARM R', 'DARM AS'}, 'Location','SouthEast');
   
   % make a noise plot
   n0 = noiseAC(nREFL_I, :)';

@@ -3,26 +3,33 @@
 function opt = optPolSag
 
   % some parameters
-  PBSleakS = 0.0;    % leakage of S-pol power into transmission
-  PBSleakP = 0.0;    % leakage of P-pol power into reflection
+  lambda = 1064e-9;  % just one wavelength
+  Pin = 100;
+  gamma = 0.2;     % RF modulation depth
   
-  Tbs  = 0.5;        % non-polarizing BS transmission
+  PBSleakS = 0;    % leakage of S-pol power into transmission
+  PBSleakP = 0;      % leakage of P-pol power into reflection
+  
+  Tbs  = 0.5;      % non-polarizing BS transmission
   Tin = 0.01;      % input mirror transmission
   Tend = 10e-6;    % end mirror transmission
   lCav = 4000;     % long cavity length
   
-  gamma = 0.2;     % RF modulation depth
+  %posDARM = sqrt(2) * lambda / 4;
+  
   
   % RF component vector
-  Pin = 100;
   vMod = (-1:1)';
   fMod = 20e6;
   vFrf = fMod * [vMod; vMod];  % add vMod for both polarizations
   
-  lambda = 1064e-9;  % just one wavelength
   pol = [ones(size(vMod)) * Optickle.polS   % S-polarization
          ones(size(vMod)) * Optickle.polP];     % and P-polarization
   
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Add Optics
+  %%%%%%%%%%%%%%%%%%%%%%
+    
   % create model
   opt = Optickle(vFrf, lambda, pol);
   
@@ -64,6 +71,10 @@ function opt = optPolSag
   opt.addMirror('IY', 0, 0, Tin);
   opt.addMirror('EY', 0, 0.7 / lCav, Tend);
 
+  %%%%%%%%%%%%%%%%%%%%%%
+  % Add Links
+  %%%%%%%%%%%%%%%%%%%%%%
+    
   % link laser to modulators
   opt.addLink('Laser', 'out', 'AM', 'in', 0);
   opt.addLink('AM', 'out', 'PM', 'in', 0);
@@ -136,19 +147,21 @@ function opt = optPolSag
   phi = 0;
   opt.addReadout('REFL', [fMod, phi]);
 
-  % add AS optics
-  opt.addSink('AS');
-  opt.addLink('BS', 'bkB', 'AS', 'in', 0);
-  
-  % add AS probes (this call adds probes AS_DC, I and Q)
-  phi = 0;
-  opt.addReadout('AS', [fMod, phi]);
+%   % add AS optics
+%   opt.addSink('AS');
+%   opt.addLink('BS', 'bkB', 'AS', 'in', 0);
+%   
+%   % add AS probes (this call adds probes AS_DC, I and Q)
+%   phi = 0;
+%   opt.addReadout('AS', [fMod, phi]);
+% 
+%   % add unphysical intra-cavity probes
+%   opt.addProbeIn('EX_DC', 'EX', 'fr', 0, 0);
+%   opt.addProbeIn('EY_DC', 'EY', 'fr', 0, 0);  
 
-  % add unphysical intra-cavity probes
-  opt.addProbeIn('EX_DC', 'EX', 'fr', 0, 0);
-  opt.addProbeIn('EY_DC', 'EY', 'fr', 0, 0);  
+  % use homodyne readout at AS port
 
-  
+
   %%%%%%%%%%%%%%%%%%%%%%
   % HG Basis
   %%%%%%%%%%%%%%%%%%%%%%
