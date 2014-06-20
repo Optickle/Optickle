@@ -1,28 +1,28 @@
 % rsp = getMechResp(obj, f, nDOF)
 %   get a mechanical response vector for a given frequency vector
 %
-% nDOF = 1 is for position
-% nDOF = 2 is for pitch
-% nDOF = 3 is for yaw
+% nDOF = Optickle.tfPos is for position
+% nDOF = Optickle.tfPit is for pitch
+% nDOF = Optickle.tfYaw is for yaw
 
 function rsp = getMechResp(obj, f, nDOF)
 
   Naf = length(f);
   
   if nargin < 3
-    nDOF = 1;
+    nDOF = Optickle.tfPos;
   end
   
   % switch on DOF
   switch nDOF
-    case 1
+    case Optickle.tfPos
       mechTF = obj.mechTF;
-    case 2
+    case Optickle.tfPit
       mechTF = obj.mechTFpit;
-    case 3
+    case Optickle.tfYaw
       mechTF = obj.mechTFyaw;
     otherwise
-      error('nDOF must be 1 or 2, got %d', nDOF)
+      error('nDOF must be 1, 2 or 3, got %d', nDOF)
   end
       
   % decipher mechanical response

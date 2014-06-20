@@ -46,11 +46,11 @@ classdef Source < Optic
         case 4
           % ==== name, vArf, z0, z
           [name, vArf, z0x, zx] = deal(varargin{:});
-          qxy = [zx - 1i * z0x, zx - 1i * z0x];
+          qxy = [zx + 1i * z0x, zx + 1i * z0x];
         case 6
           % ==== name, vArf, z0x, zx, z0y, zy
           [name, vArf, z0x, zx, z0y, zy] = deal(varargin{:});
-          qxy = [zx - 1i * z0x, zy - 1i * z0y];
+          qxy = [zx + 1i * z0x, zy + 1i * z0y];
           
         otherwise
           % wrong number of input args

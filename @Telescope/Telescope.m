@@ -129,6 +129,7 @@ classdef Telescope < Optic
         bOut = apply(qm, bOut);
         
         % add the resulting Gouy phase
+        %  NOTE: atan2(z, z0) = pi / 2 - angle(q)
         phi = phi + angle(bOut - my_df(n, 1)) - angle(bOut);
         
         % compute next focus operator
