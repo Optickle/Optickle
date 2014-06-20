@@ -14,7 +14,7 @@ results = test.run();
 %% display results
 disp(results)
 
-numFailed = any(cell2mat({results01.Failed}));
+numFailed = any(cell2mat({results.Failed}));
 
 %% extract the result data
 if numFailed > 0
