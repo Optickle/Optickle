@@ -81,6 +81,8 @@ function par = paramFullIFO(inputPower)
   % these lines are good for comparing Optickle 1 and 2
   %par.IX.mechTF = zpk([],[],0);
   %par.IY.mechTF = zpk([],[],0);
+  %par.BS.mechTF = zpk([],[],0);
+  %par.PR2.mechTF = zpk([],[],0);
   
   par.PR.T = par.Tprm;
   
