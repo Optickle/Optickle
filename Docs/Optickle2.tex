@@ -806,7 +806,7 @@ AC signals, on the other hand, are products between DC and audio frequency field
 \subsection{DC Signals}
 To compute the DC signals, we start with an expression for the intensity present at a given FEP,
 \begin{eqnarray}
-I &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{+i \Omega_n t}  \right|^2 \\
+I_{DC} &=& \left| \sum^{\Nrf}_{n = 1} E_{DC_n} e^{-i \omega_n t}  \right|^2 \\
  &=& \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1}
  E^*_{DC_m} E_{DC_n} e^{i (\omega_m - \omega_n) t}
 \elabel{intensity}
@@ -815,7 +815,8 @@ where $E_{DC_n}$ is the field amplitude of the $n^{th}$ RF component, at frequen
 
 Requiring that the output be at the demodulation frequency $\omega_{dmd} = 2 \pi f_{dmd}$, such that the integral
 \beqa{}
-S_{DC} &=& \lim_{T \rightarrow \infty} \frac{2}{T} \int^{T}_{-T} I \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
+S_{DC} &=& \lim_{T \rightarrow \infty} \frac{2}{T} \int^{T}_{-T} I_{DC}
+ \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
  &=& \frac{1}{2} \sum^{\Nrf}_{m, n}
  E^*_{DC_m} E_{DC_n} \cdots \\
 && \lim_{T \rightarrow \infty} \int^{T}_{-T} \!\!\! e^{i (\omega_m - \omega_n) t} 
@@ -850,7 +851,7 @@ The audio frequency signal, or ``AC signal'',
  computation follows a very similar path to that of the DC signals in the previous section.
 Intensity present at a given FEP is
 \beq{I_AC}
-I = \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{+i \Omega_n t} + E_{+_n} e^{-i (\omega_n + \Omega) t} 
+I = \left| \sum^{\Nrf}_{n = 1} \left( E_{DC_n} e^{-i \omega_n t} + E_{+_n} e^{-i (\omega_n + \Omega) t} 
    + E_{-_n} e^{-i (\omega_n - \Omega) t}  \right) \right|^2
 \eeq
  where $\Omega = 2 \pi f_{\rm audio}$ is the audio sideband frequency being considered.
@@ -859,17 +860,17 @@ If we remove terms from the sum which are the product of the perturbative amplit
  not audio frequency component, we are left with
 \begin{align}
 I_{AC} = \sum^{\Nrf}_{m = 1} \sum^{\Nrf}_{n = 1} 2 Re & \left[
-  E_{DC_m}^{*} E_{+_n} e^{i (\omega_m - \omega_n - \Omega) t} ~~ + \right. \nonumber \\
- & \left. ~~~ E_{DC_m} E_{-_n}^{*} e^{-i (\omega_m - \omega_n + \Omega) t} \right] .
+  E_{DC_m}^{*} E_{-_n} e^{i (\omega_m - \omega_n + \Omega) t} ~~ + \right. \nonumber \\
+ & \left. ~~~ E_{DC_m} E_{+_n}^{*} e^{-i (\omega_m - \omega_n - \Omega) t} \right] .
 \elabel{intensity}
 \end{align}
 The audio frequency signal at a FEP, for $\Omega \ll 1/T \ll \omega_{dmd}$, is
 \beqa{sac}
 S_{AC} &=& \frac{2}{T} \int^{T}_{-T} I_{AC} \fcos{\omega_{dmd} ~ t + \phi_{dmd}} dt \\
 &=& 2 \sum^{\Nrf}_{m, n} Re \left[
-  E_{DC_m}^{*} E_{+_n} ~ \delta_{mn} ~ e^{+i \Omega t} 
-   + E_{DC_m} E_{-_n}^{*} ~ \delta_{mn}^* ~ e^{+i \Omega t} \right] \nonumber \\
-\Rightarrow &&\tilde{S}_{AC} = 2 \sum^{\Nrf}_{m,n} (E_{DC_m}^* E_{+_n} \delta_{mn} + E_{DC_m} E_{-_n}^* \delta_{mn}^*)
+  E_{DC_m}^{*} E_{-_n} ~ \delta_{mn} ~ e^{+i \Omega t} 
+   + E_{DC_m} E_{+_n}^{*} ~ \delta_{mn}^* ~ e^{+i \Omega t} \right] \nonumber \\
+\Rightarrow &&\tilde{S}_{AC} = 2 \sum^{\Nrf}_{m,n} (E_{DC_m}^* E_{-_n} \delta_{mn} + E_{DC_m} E_{+_n}^* \delta_{mn}^*)
 \eeqa
 (see section \sref{freq_domain}).
 
