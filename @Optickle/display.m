@@ -3,6 +3,8 @@
 function display(opt)
 
   vFrf = opt.vFrf;                  % vector of RF frequencies
+  lambda = opt.lambda;                  % vector of RF frequencies
+  pol = opt.pol;                  % vector of RF frequencies
   Nprb = opt.Nprobe;                % number of probes
   Nlnk = opt.Nlink;                 % number of links
   Nopt = opt.Noptic;                % number of optics
@@ -29,8 +31,8 @@ function display(opt)
   disp(sprintf('==== %d RF frequencies', Nrf)) %#ok
   for n = 1:Nrf
 %    str = sprintf('%d) %s', n, getFreqStr(vFrf(n)));
-    str = sprintf('%d) %s with amplitude %g', n, ...
-                  getFreqStr(vFrf(n)), vArf(n));
+    str = sprintf('%d) %.fnm (%s-pol) at %s with amplitude %g', n, ...
+      lambda(n) * 1e9, getPolStr(pol(n)), getFreqStr(vFrf(n)), vArf(n));
     disp(str)
   end
       
@@ -80,6 +82,7 @@ function display(opt)
     end
     disp(str)
   end
+end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % ==== getFreqStr
@@ -106,4 +109,18 @@ function str = getFreqStr(freq)
   else
     str = sprintf('%g Hz', freq);
   end
-  
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% ==== getPolStr
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function str = getPolStr(pol)
+
+  if pol == Optickle.polS
+    str = 'S';
+  elseif pol == Optickle.polP
+    str = 'P';
+  else
+    str = '?';
+  end
+end

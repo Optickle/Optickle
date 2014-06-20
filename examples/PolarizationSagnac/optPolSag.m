@@ -2,6 +2,16 @@
 
 function opt = optPolSag
 
+  % some parameters
+  PBSleakS = 0.01;    % leakage of S-pol power into transmission
+  PBSleakP = 0.01;    % leakage of P-pol power into reflection
+  
+  lCav = 4000;     % long cavity length
+  Tin = 0.01;      % input mirror transmission
+  Tend = 10e-6;    % end mirror transmission
+  
+  gamma = 0.2;     % RF modulation depth
+  
   % RF component vector
   Pin = 100;
   vMod = (-1:1)';
@@ -10,13 +20,13 @@ function opt = optPolSag
   
   lambda = 1064e-9;  % just one wavelength
   pol = [ones(size(vMod)) * Optickle.polS   % S-polarization
-    ones(size(vMod)) * Optickle.polP]';     % and P-polarization
+         ones(size(vMod)) * Optickle.polP];     % and P-polarization
   
   % create model
   opt = Optickle(vFrf, lambda, pol);
   
   % add a source, with all power in S-pol carrier
-  vArf = sqrt(Pin) * (vFrf == 0 & pol == Optickle.polS);
+  vArf = sqrt(Pin) * ((vFrf == 0) & (pol == Optickle.polP));
   opt.addSource('Laser', vArf);
 
   % add an AM modulator (for intensity control, and intensity noise)
@@ -28,27 +38,25 @@ function opt = optPolSag
 
   % add an RF modulator
   %   opt.addRFmodulator(name, fMod, aMod)
-  gamma = 0.2;
   opt.addRFmodulator('Mod1', fMod, 1i * gamma);
 
   % add beamsplitters mirrors
   %   opt.addBeamSplitter(name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
-  opt.addMirror('BS', 45, 0, 0.5);  % regular beamsplitter
+  opt.addBeamSplitter('BS', 45, 0, 0.5);  % regular beamsplitter
   
   % PBS
-  PBSleakS = 0;    % leakage of S-pol power into transmission
-  PBSleakP = 0;    % leakage of P-pol power into reflection
   Thr = [PBSleakS, 1064e-9, 1
          1 - PBSleakP, 1064e-9, 0];
-  opt.addMirror('PBS', 45, 0, Thr);
+  opt.addBeamSplitter('PBS', 45, 0, Thr);
 
+  % waveplates
+  opt.addWaveplate('WPX_A', 0.25, 45);
+  opt.addWaveplate('WPX_B', 0.25, -45);
+  opt.addWaveplate('WPY_A', 0.25, 45);
+  opt.addWaveplate('WPY_B', 0.25, -45);
   
   % add cavity mirrors
   %   opt.addMirror(name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
-  lCav = 4000;
-  Tin = 0.01;
-  Tend = 10e-6;
-  
   opt.addMirror('IX', 0, 0, Tin);
   opt.addMirror('EX', 0, 0.7 / lCav, Tend);
   opt.addMirror('IY', 0, 0, Tin);
@@ -61,16 +69,13 @@ function opt = optPolSag
   opt.addLink('Mod1', 'out', 'BS', 'frA', 0);
   
   % beam splitters - links going forward (A sides)
-  opt.addLink('BS', 'frA', 'PBS', 'frA', 0);
-  opt.addLink('BS', 'bkA', 'PBS', 'bkA', 0);
-  opt.addLink('PBS', 'frA', 'IY', 'bk', 0);
-  opt.addLink('PBS', 'bkA', 'IX', 'bk', 0);
+  opt.addLink('BS', 'frA', 'PBS', 'bkA', 0);
+  opt.addLink('BS', 'bkA', 'PBS', 'bkB',  0);
+  opt.addLink('PBS', 'frA', 'WPX_A', 'in', 0);
+  opt.addLink('PBS', 'frB', 'WPY_A', 'in', 0);
   
-  % beam splitters - links going forward (B sides)
-  opt.addLink('IY', 'bk', 'PBS', 'frB', 0);
-  opt.addLink('IX', 'bk', 'PBS', 'bkB', 0);
-  opt.addLink('PBS', 'frB', 'BS', 'frB', 0);
-  opt.addLink('PBS', 'bkB', 'BS', 'bkB', 0);
+  opt.addLink('WPY_A', 'out', 'IY', 'bk', 0);
+  opt.addLink('WPX_A', 'out', 'IX', 'bk', 0);
   
   % X-arm
   opt.addLink('IX', 'fr', 'EX', 'fr', lCav);
@@ -79,6 +84,15 @@ function opt = optPolSag
   % Y-arm
   opt.addLink('IY', 'fr', 'EY', 'fr', lCav);
   opt.addLink('EY', 'fr', 'IY', 'fr', lCav);
+  
+  % beam splitters - links going forward (B sides)
+  opt.addLink('IY', 'bk', 'WPY_B', 'in', 0);
+  opt.addLink('IX', 'bk', 'WPX_B', 'in', 0);
+  
+  opt.addLink('WPX_B', 'out', 'PBS', 'frB', 0);
+  opt.addLink('WPY_B', 'out', 'PBS', 'frA', 0);
+  opt.addLink('PBS', 'bkB', 'BS', 'frB', 0);
+  opt.addLink('PBS', 'bkA', 'BS', 'bkB', 0);
   
   
   %%%%%%%%%%%%%%%%%%%%%%
@@ -114,11 +128,19 @@ function opt = optPolSag
     
   % add REFL optics
   opt.addSink('REFL');
-  opt.addLink('BS', 'bkB', 'REFL', 'in', 0);
+  opt.addLink('BS', 'frB', 'REFL', 'in', 0);
   
   % add REFL probes (this call adds probes REFL_DC, I and Q)
   phi = 0;
   opt.addReadout('REFL', [fMod, phi]);
+
+  % add AS optics
+  opt.addSink('AS');
+  opt.addLink('BS', 'bkB', 'AS', 'in', 0);
+  
+  % add AS probes (this call adds probes AS_DC, I and Q)
+  phi = 0;
+  opt.addReadout('AS', [fMod, phi]);
 
   % add unphysical intra-cavity probes
   opt.addProbeIn('EX_DC', 'EX', 'fr', 0, 0);
@@ -130,5 +152,5 @@ function opt = optPolSag
   %%%%%%%%%%%%%%%%%%%%%%
     
   % tell Optickle to use this cavity basis
-  opt = setCavityBasis('IX', 'EX');  
+  opt.setCavityBasis('IX', 'EX');  
 end
