@@ -3,12 +3,13 @@
 function opt = optPolSag
 
   % some parameters
-  PBSleakS = 0.01;    % leakage of S-pol power into transmission
-  PBSleakP = 0.01;    % leakage of P-pol power into reflection
+  PBSleakS = 0.0;    % leakage of S-pol power into transmission
+  PBSleakP = 0.0;    % leakage of P-pol power into reflection
   
-  lCav = 4000;     % long cavity length
+  Tbs  = 0.5;        % non-polarizing BS transmission
   Tin = 0.01;      % input mirror transmission
   Tend = 10e-6;    % end mirror transmission
+  lCav = 4000;     % long cavity length
   
   gamma = 0.2;     % RF modulation depth
   
@@ -42,7 +43,7 @@ function opt = optPolSag
 
   % add beamsplitters mirrors
   %   opt.addBeamSplitter(name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
-  opt.addBeamSplitter('BS', 45, 0, 0.5);  % regular beamsplitter
+  opt.addBeamSplitter('BS', 45, 0, Tbs);  % regular beamsplitter
   
   % PBS
   Thr = [PBSleakS, 1064e-9, 1
@@ -50,8 +51,9 @@ function opt = optPolSag
   opt.addBeamSplitter('PBS', 45, 0, Thr);
 
   % waveplates
-  opt.addWaveplate('WPX_A', 0.25, 45);
-  opt.addWaveplate('WPX_B', 0.25, -45);
+  opt.addWaveplate('WPX_A', 0.25, 45);  % seen from the front; 45 dg
+  opt.addWaveplate('WPX_B', 0.25, -45); % seen from the back, so -45dg
+  
   opt.addWaveplate('WPY_A', 0.25, 45);
   opt.addWaveplate('WPY_B', 0.25, -45);
   

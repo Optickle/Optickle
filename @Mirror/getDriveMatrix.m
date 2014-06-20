@@ -41,21 +41,21 @@ function mCpl = getDriveMatrix(obj, pos, par, mOpt, dldx)
   end
   
   
-  %drive matrix
+  % compute the drive matrix
   mCpl = zeros(Nrf * Nout, Nrf * Nin);
   for n = 1:Nrf
     % select reflection phase drive coefficient depending on dof
 
-    if par.tfType == Optickle.tfPos
+    switch par.tfType
+      case Optickle.tfPos
         drp = 1i * par.k(n) * dldx / 2;
-        
-    elseif par.tfType == Optickle.tfPit %pitch/01 case
+      case Optickle.tfPit
         drp = 1i * sqrt(par.k(n) / 2) * (mInj * dldx / 2);
-                                               
-    elseif par.tfType == Optickle.tfYaw %yaw/10 case
-        drp = 1i * sqrt(par.k(n) / 2) * (mInj * sign(dldx / 2)); %sign removes
-                                                                 %angle of
-                                                                 %incidence dependence
+      case Optickle.tfYaw
+        % use sign(dldx / 2) to remove cos(aoi) dependence
+        drp = 1i * sqrt(par.k(n) / 2) * (mInj * sign(dldx / 2));
+      otherwise
+        error('Invalid tfType, got %d', par.tfType)
     end
     
     % enter this submatrix into mCpl

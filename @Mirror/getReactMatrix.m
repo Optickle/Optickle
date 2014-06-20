@@ -21,15 +21,7 @@ function [mRadAC,mFrc,vRspAF] = ...
   LIGHT_SPEED = Optickle.c;
   
   % mechanical response
-  if par.tfType == Optickle.tfPos
-      nDOF = 1;
-  elseif par.tfType == Optickle.tfPit
-      nDOF = 2;
-  elseif par.tfType == Optickle.tfYaw
-      nDOF = 3;
-  end
-  
-  vRspAF = getMechResp(obj, par.vFaf, nDOF);
+  vRspAF = getMechResp(obj, par.vFaf, par.tfType);
   
   % big mDirIn and mDirOut for all RF components
   mDirInRF  = blkdiagN(mDirIn, Nrf);
@@ -57,11 +49,11 @@ function [mRadAC,mFrc,vRspAF] = ...
       %   the y-basis, vBout(:,2), is of interest for the vertical 01
       %   mode
       %   the x-basis, vBout(:,1), is of interest for the horizontal 10 mode
-      z     =  real(vBout(:, par.nBasis));
-      z0    = -imag(vBout(:, par.nBasis));
+      z     = real(vBout(:, par.nBasis));
+      z0    = imag(vBout(:, par.nBasis));
       vWOut = sqrt(z0 .* (1 + (z ./ z0).^2));
-      z     =  real(vBin(:, par.nBasis));
-      z0    = -imag(vBin(:, par.nBasis));
+      z     = real(vBin(:, par.nBasis));
+      z0    = imag(vBin(:, par.nBasis));
       vWIn  = sqrt(z0 .* (1 + (z ./ z0).^2));
       
       kk    = repmat(par.k, 1, length(vWOut))';
