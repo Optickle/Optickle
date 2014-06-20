@@ -26,11 +26,11 @@ if numFailed > 0
     data01 = load(optickleTestResultsFile);
     
     f = data01.refStruct.f;
-    probe01 = 9;
+    probe01 = 21;
     drive01 = 13;
     
-    calcTF01 = squeeze(data01.calcStruct.mMech(probe01,drive01,:));
-    refTF01 = squeeze(data01.refStruct.mMech(probe01,drive01,:));
+    calcTF01 = squeeze(data01.calcStruct.sigAC(probe01,drive01,:));
+    refTF01 = squeeze(data01.refStruct.sigAC(probe01,drive01,:));
     
     
     %% 01 plots
