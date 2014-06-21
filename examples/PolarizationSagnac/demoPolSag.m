@@ -52,7 +52,7 @@ function demoPolSag
 %   title('PDH Response to EX and EY', 'fontsize', 18);
 %   legend({'EX REFL', 'EY REFL', 'EX AS', 'EY AS', 'DARM R', 'DARM AS'}, 'Location','SouthEast');
   zplotlog(f, [h0, h1])
-  title('PDH Response to EX and EY', 'fontsize', 18);
+  title('Homodyne Response to EX and EY', 'fontsize', 18);
   legend({'EX R', 'EY R', 'EX AS', 'EY AS'}, 'Location','NorthEast');
 %   legend({'BS R', 'PBS R', 'BS AS', 'PBS AS'}, 'Location','NorthEast');
   

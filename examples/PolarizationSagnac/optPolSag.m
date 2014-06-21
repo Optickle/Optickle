@@ -15,7 +15,7 @@ function opt = optPolSag
   Tend = 10e-6;    % end mirror transmission
   lCav = 4000;     % long cavity length
   
-  posPBS = sqrt(2) * lambda / 8;
+  posPBS = lambda / 16;
   
   
   % RF component vector
@@ -57,7 +57,6 @@ function opt = optPolSag
   Thr = [PBSleakS, 1064e-9, 1
          1 - PBSleakP, 1064e-9, 0];
   opt.addBeamSplitter('PBS', 45, 0, Thr);
-  opt.setPosOffset('PBS', posPBS);
 
   % waveplates
   opt.addWaveplate('WPX_A', 0.25, 45);  % seen from the front; 45 dg
@@ -73,6 +72,9 @@ function opt = optPolSag
   opt.addMirror('IY', 0, 0, Tin);
   opt.addMirror('EY', 0, 0.7 / lCav, Tend);
 
+  opt.setPosOffset('BS', posPBS);
+  %opt.setPosOffset('EX', -posPBS);
+  
   %%%%%%%%%%%%%%%%%%%%%%
   % Add Links
   %%%%%%%%%%%%%%%%%%%%%%
