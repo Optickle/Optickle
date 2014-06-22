@@ -1,17 +1,21 @@
 % Create an Optickle Fabry-Perot
 
-function opt = optTrap(Plaser)
+function opt = optTrap(Plaser, fDetune)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
   % create the model
 
-% Create an Optickle Fabry-Perot
+%Deal with args  
+  if nargin < 2
+      fDetune = [];
+  end
+    
 
 % RF component vector
  Pin  = Plaser;
  vMod = ( - 1:1)';
  fMod = 20e6;
- vFrf = fMod * [vMod]; % add green carrier, just for fun
+ vFrf = fMod * [vMod; fDetune/fMod] 
  
  lambda = 1064e-9;   
 
@@ -19,7 +23,13 @@ function opt = optTrap(Plaser)
  opt = Optickle(vFrf, lambda);
  
  % add a source
- opt = addSource(opt, 'Laser', sqrt(Pin) * (vFrf == 0));
+ ratioSC = 1/5;
+ if nargin > 1
+     powerDistribution = (vFrf == 0) + ratioSC * (vFrf == fDetune)
+ else
+     powerDistribution = (vFrf == 0)
+ end
+ opt = addSource(opt, 'Laser', sqrt(Pin) * powerDistribution);
 
  % add an AM modulator (for intensity control, and intensity noise)
  %   opt = addModulator(opt, name, cMod)
