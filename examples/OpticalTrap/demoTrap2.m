@@ -63,6 +63,7 @@ for ii = 1:nPower;
     f0 = 172;
     Q0 = 3200;
     m  = 1e-3;
+    %    Need to account for power lost due to modulation
     tf(ii,:) = optomechanicalTF(f0, Q0, m , opticalSpringK(P, -det2Factor, T1, lCav, f), f);
 
 
@@ -81,9 +82,9 @@ set(hLeg,'FontSize',12)
 
 figure(4)
 clf
-loglog(f, 180/pi*angle(mPerN))
+semilogx(f, 180/pi*angle(mPerN))
 hold all
-loglog(f, 180/pi*angle(tf),'--')
+semilogx(f, 180/pi*angle(tf),'--')
 hLeg = array2legend(powerVec, 'P = ', ' W', '%3.3e');
 set(hLeg,'FontSize',12)
 

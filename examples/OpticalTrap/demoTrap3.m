@@ -3,7 +3,7 @@
 %
 clear all
 
-f   = logspace(log10(500), 4, 600)';
+f   = logspace(2, 4, 600)';
 P   = 1;
 opt = optTrap(P);
 
@@ -49,6 +49,21 @@ optA     = optTrap(P, fDetuneA);
 
 [fDC, sigDC, sigAC, mMechA, noiseAC] = tickle(optA, pos, f);
 
+f0 = 172;
+Q0 = 3200;
+m  = 1e-3;
+
+laserA = getOptic(optA,'Laser');
+PVec   = laserA.vArf;
+
+PC     = PVec(2); %fix
+PSC    = PVec(end); %fix
+
+KCA  = opticalSpringK(PC,  -cFactorA,  T1, lCav, f);
+KSCA = opticalSpringK(PSC, -scFactorA, T1, lCav, f);
+KA   = KCA+KSCA;
+tfA  = optomechanicalTF(f0, Q0, m , KA, f);
+
 
 % b) C = 3, SC = 0.5
 cFactorB  = - 3;
@@ -60,15 +75,38 @@ optB      = optTrap(P, fDetuneB);
 
 [fDC, sigDC, sigAC, mMechB, noiseAC] = tickle(optB, pos, f);
 
+laserB = getOptic(optB,'Laser');
+PVec   = laserB.vArf;
+
+PC     = PVec(2); %fix
+PSC    = PVec(end); %fix
+
+KCB  = opticalSpringK(PC,  -cFactorB,  T1, lCav, f);
+KSCB = opticalSpringK(PSC, -scFactorB, T1, lCav, f);
+KB   = KCB+KSCB;
+tfB  = optomechanicalTF(f0, Q0, m , KB, f);
+
+
 % c) C = 3, SC = 0
 cFactorC = - 3;
 detC     = cFactorC * hwhmM;
 pos(nIX) = detC;
-scFactorC = 0
+scFactorC = 0;
 fDetuneC = (cFactorC-scFactorC) * hwhm
 optC     = optTrap(P, fDetuneC);
 
 [fDC, sigDC, sigAC, mMechC, noiseAC] = tickle(optC, pos, f);
+
+laserC = getOptic(optC,'Laser');
+PVec   = laserC.vArf;
+
+PC     = PVec(2); %fix
+PSC    = PVec(end); %fix
+
+KCC  = opticalSpringK(PC,  -cFactorC,  T1, lCav, f);
+KSCC = opticalSpringK(PSC, -scFactorC, T1, lCav, f);
+KC   = KCC+KSCC;
+tfC  = optomechanicalTF(f0, Q0, m , KC, f);
 
 % d) C = 3, SC = -0.3
 cFactorD = - 3;
@@ -80,6 +118,16 @@ optD     = optTrap(P, fDetuneD);
 
 [fDC, sigDC, sigAC, mMechD, noiseAC] = tickle(optD, pos, f);
 
+laserD = getOptic(optD,'Laser');
+PVec   = laserD.vArf;
+
+PC     = PVec(2); %fix
+PSC    = PVec(end); %fix
+
+KCD  = opticalSpringK(PC,  -cFactorD,  T1, lCav, f);
+KSCD = opticalSpringK(PSC, -scFactorD, T1, lCav, f);
+KD   = KCD+KSCD;
+tfD  = optomechanicalTF(f0, Q0, m , KD, f);
 
 
 
@@ -110,7 +158,32 @@ mPerND       = pendulumResp .* rpMechD;
 figure(1)
 clf
 zplotlog(f, [mPerNA, mPerNB, mPerNC, mPerND])
+hold all
+zplotlog(f, [tfA, tfB, tfC, tfD],'--')
 %title(sprintf('ETM response, detuning = %1.2f lw', det2Factor), 'fontsize', 18);
 legend('a)','b)','c)','d)')%hLeg = array2legend(powerVec, 'P = ', ' W', '%3.3e');
 %set(hLeg,'FontSize',12)
 axis([500 1e4 1e-7 1e-3])
+subplot(2,1,2)
+xlim([500 1e4])
+
+
+mPerN = [mPerNA, mPerNB, mPerNC, mPerND];
+tf = [tfA, tfB, tfC, tfD];
+figure(3)
+clf
+subplot(2,1,1)
+loglog(f, abs(mPerN))
+hold all
+loglog(f, abs(tf),'--')
+hold off
+legend('a)','b)','c)','d)')
+axis([500 1e4 1e-6 1e-3])
+
+subplot(2,1,2)
+semilogx(f, 180/pi*angle(mPerN))
+hold all
+semilogx(f, 180/pi*angle(tf),'--')
+xlim([500 1e4])
+
+
