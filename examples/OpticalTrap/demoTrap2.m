@@ -5,7 +5,7 @@ clear all
 
 f        = logspace(2, 4, 600)';
 nPower   = 7;
-powerVec = logspace( -6, 0, nPower); %W
+powerVec = logspace( -6, 1, nPower); %W
 
 for ii = 1:nPower;
     P   = powerVec(ii);
@@ -40,7 +40,7 @@ for ii = 1:nPower;
 
     % and a lot off resonance
     pos        = zeros(opt.Ndrive, 1);
-    det2Factor = - 0.5;
+    det2Factor = -0.5;%-0.5
     det2       = det2Factor * hwhmM;
     pos(nIX)   = det2;
     [fDC, sigDC, sigAC, mMech, noiseAC] = tickle(opt, pos, f);

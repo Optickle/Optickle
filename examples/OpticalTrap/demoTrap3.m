@@ -34,30 +34,37 @@ fsr   = Optickle.c / (2 * lCav);
 hwhm  = 0.5 * fsr * T1 / (2 * pi) %Hz
 hwhmM = (lambda / 2) * hwhm / fsr %m
 
+%Spring stuff
+
+f0 = 172;
+Q0 = 3200;
+m  = 1e-3;
+
+mod   = getOptic(opt, 'Mod1')
+gammaMod = imag(mod.aMod);
+powerCorrection = besselj(0,gammaMod)^2
 % and a lot off resonance
 pos        = zeros(opt.Ndrive, 1);
 
 % There is a sign inversion between Corbitt and me
 
 % a) C = 0.5, SC = 0
-cFactorA = - 0.5;
+cFactorA =  -0.5; %-0.5
 detA     = cFactorA * hwhmM;
 pos(nIX) = detA;
 scFactorA = 0
 fDetuneA = (cFactorA-scFactorA) *hwhm
-optA     = optTrap(P, fDetuneA);
+optA     = optTrap(P);%, fDetuneA);
 
 [fDC, sigDC, sigAC, mMechA, noiseAC] = tickle(optA, pos, f);
 
-f0 = 172;
-Q0 = 3200;
-m  = 1e-3;
-
 laserA = getOptic(optA,'Laser');
-PVec   = laserA.vArf;
+PVec   = laserA.vArf.^2;
 
-PC     = PVec(2); %fix
-PSC    = PVec(end); %fix
+PC     = powerCorrection*PVec(2); %fix
+PSC    = powerCorrection*PVec(end); %fix
+
+%    Need to account for power lost due to modulation
 
 KCA  = opticalSpringK(PC,  -cFactorA,  T1, lCav, f);
 KSCA = opticalSpringK(PSC, -scFactorA, T1, lCav, f);
@@ -76,10 +83,10 @@ optB      = optTrap(P, fDetuneB);
 [fDC, sigDC, sigAC, mMechB, noiseAC] = tickle(optB, pos, f);
 
 laserB = getOptic(optB,'Laser');
-PVec   = laserB.vArf;
+PVec   = laserB.vArf.^2;
 
-PC     = PVec(2); %fix
-PSC    = PVec(end); %fix
+PC     = powerCorrection*PVec(2); %fix
+PSC    = powerCorrection*PVec(end); %fix
 
 KCB  = opticalSpringK(PC,  -cFactorB,  T1, lCav, f);
 KSCB = opticalSpringK(PSC, -scFactorB, T1, lCav, f);
@@ -88,7 +95,7 @@ tfB  = optomechanicalTF(f0, Q0, m , KB, f);
 
 
 % c) C = 3, SC = 0
-cFactorC = - 3;
+cFactorC =  -3;%-3
 detC     = cFactorC * hwhmM;
 pos(nIX) = detC;
 scFactorC = 0;
@@ -98,10 +105,10 @@ optC     = optTrap(P, fDetuneC);
 [fDC, sigDC, sigAC, mMechC, noiseAC] = tickle(optC, pos, f);
 
 laserC = getOptic(optC,'Laser');
-PVec   = laserC.vArf;
+PVec   = laserC.vArf.^2;
 
-PC     = PVec(2); %fix
-PSC    = PVec(end); %fix
+PC     = powerCorrection*PVec(2); %fix
+PSC    = powerCorrection*PVec(end); %fix
 
 KCC  = opticalSpringK(PC,  -cFactorC,  T1, lCav, f);
 KSCC = opticalSpringK(PSC, -scFactorC, T1, lCav, f);
@@ -119,10 +126,10 @@ optD     = optTrap(P, fDetuneD);
 [fDC, sigDC, sigAC, mMechD, noiseAC] = tickle(optD, pos, f);
 
 laserD = getOptic(optD,'Laser');
-PVec   = laserD.vArf;
+PVec   = laserD.vArf.^2;
 
-PC     = PVec(2); %fix
-PSC    = PVec(end); %fix
+PC     = powerCorrection*PVec(2); %fix
+PSC    = powerCorrection*PVec(end); %fix
 
 KCD  = opticalSpringK(PC,  -cFactorD,  T1, lCav, f);
 KSCD = opticalSpringK(PSC, -scFactorD, T1, lCav, f);
