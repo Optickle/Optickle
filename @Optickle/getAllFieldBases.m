@@ -141,7 +141,8 @@ function b = checkConsistency(q1, q2, n, nOut, opt)
   %Use only Y basis (Optickle does TEM 10)
   err = qd(2) / qc(2);
   if err > 5e-3
-    warning('Consistency check failed for field %d from %d (err = %g)!', ...
+    warning('OPTICKLE:FieldInconsistency',...
+        'Consistency check failed for field %d from %d (err = %g)!', ...
       nOut, n, err);
     sourceOut = getSourceName(opt, nOut);
     sinkOut =  getSinkName(opt, nOut);

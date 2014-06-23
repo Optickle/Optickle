@@ -30,7 +30,7 @@ function opt = setPosOffset(opt, varargin)
   if ischar(sn) || length(sn) == 1
     % a single number or name
     sn = getSerialNum(opt, sn);
-    opt.optic{sn} = setPosOffset(opt.optic{sn}, pos);
+    opt.optic{sn}.setPosOffset(pos);
   elseif iscell(sn)
     % a cell array of numbers or names
     N = length(sn);
@@ -43,7 +43,7 @@ function opt = setPosOffset(opt, varargin)
 	Ndrv = length(getPosOffset(opt, sn));
 	error('More drives than positions (%d > %d).', Ndrv, length(pos))
       end
-      opt.optic{snn} = setPosOffset(opt.optic{snn}, pos(mm));
+      opt.optic{snn}.setPosOffset(pos(mm));
     end
     if m ~= length(pos)
       error('More positions than drives (%d > %d).', length(pos), m)
@@ -60,7 +60,7 @@ function opt = setPosOffset(opt, varargin)
 	Ndrv = length(getPosOffset(opt, sn));
 	error('More drives than positions (%d > %d).', Ndrv, length(pos))
       end
-      opt.optic{snn} = setPosOffset(opt.optic{snn}, pos(mm));
+      opt.optic{snn}.setPosOffset(pos(mm));
     end
     if m ~= length(pos)
       error('More positions than drives (%d > %d).', length(pos), m)

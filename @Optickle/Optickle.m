@@ -289,8 +289,8 @@ classdef Optickle < handle
       % sqzOption - select inputs for specifying squeezer.
       %
       % Default parameters are:
-      % [lambda, fRF , pol, sqAng, sqdB, antidB, x, escEff, sqzOption] =
-      % [par.lambda[1], 0, 0, 1, 10, 10, 0.5195, 1, 0]        
+      % [lambda, fRF , pol, sqAng, sqdB, antidB, sqzOption] =
+      % [1064e-9, 0, 0, 1, 10, 10, 0]        
       % See Squeezer for more options
       
       obj = Squeezer(name, varargin{:});
@@ -456,7 +456,7 @@ classdef Optickle < handle
         mPhiFrf = zeros(Nlink,Nrf);
       end
       
-      v = exp(1i * (vLen(:) * vFreq(:).'...      % WE PUT MINUS FOR NOW
+      v = exp(1i * (vLen(:) * vFreq(:).'... 
         + repmat(vPhiLinks, 1, Nrf)...
         + mPhiFrf...
         )... % close phases

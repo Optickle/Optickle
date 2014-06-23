@@ -2,77 +2,66 @@
 %   this function demonstrates the use of tickle with optFP
 %
 
-function [f, sigDC2, sigAC2, mMech2, noiseAC2] = demoDetuneFP
+function demoPolSag
 
   % create the model
-  opt = optFP;
+  opt = optPolSag;
   
   % get some drive indexes
+  nBS = getDriveIndex(opt, 'BS');
+  nPBS = getDriveIndex(opt, 'PBS');
   nEX = getDriveIndex(opt, 'EX');
-  nIX = getDriveIndex(opt, 'IX');
+  nEY = getDriveIndex(opt, 'IX');
 
   % get some probe indexes
-  nREFL_DC = getProbeNum(opt, 'REFL_DC');
-  nREFL_I = getProbeNum(opt, 'REFL_I');
-  nREFL_Q = getProbeNum(opt, 'REFL_Q');
+%   nREFL_DC = getProbeNum(opt, 'REFL_DC');
+%   nREFL_I = getProbeNum(opt, 'REFL_I');
+%   nREFL_Q = getProbeNum(opt, 'REFL_Q');
 
+%   nAS_DC = getProbeNum(opt, 'AS_DC');
+%   nAS_I = getProbeNum(opt, 'AS_I');
+%   nAS_Q = getProbeNum(opt, 'AS_Q');
+  
+  nRA_DC = getProbeNum(opt, 'R_HDA_DC');
+  nRB_DC = getProbeNum(opt, 'R_HDB_DC');
+  
+  nHDA_DC = getProbeNum(opt, 'HDA_DC');
+  nHDB_DC = getProbeNum(opt, 'HDB_DC');
+  
   % compute the DC signals and TFs on resonance
   f = logspace(-1, 3, 200)';
-  %f = 0.7;
-  [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
+  [fDC, sigDC, sigAC, ~, noiseAC] = tickle(opt, [], f);
   
   % Print out the fields and probes, just to demonstrate these functions:
   fprintf('DC fields (fDC matrix):\n');
   showfDC(opt, fDC);
   
   fprintf('\nProbes (sigDC matrix):\n');
-  showsigDC(opt, sigDC0);
-  
-  %fDC
-  % compute the same a little off resonance
-  pos = zeros(opt.Ndrive, 1);
-  pos(nIX) = 0.1e-9;
-  [fDC, sigDC1, sigAC1, mMech1, noiseAC1] = tickle(opt, pos, f);
-  %fDC
-  
-  % and a lot off resonance
-  pos(nIX) = 1e-9;
-  [fDC, sigDC2, sigAC2, mMech2, noiseAC2] = tickle(opt, pos, f);
-  %fDC
+  showsigDC(opt, sigDC);
   
   % make a response plot
-  h0 = getTF(sigAC0, nREFL_I, nEX);
-  h1 = getTF(sigAC1, nREFL_I, nEX);
-  h2 = getTF(sigAC2, nREFL_I, nEX);
+%   h0 = getTF(sigAC, nRA_DC, [nBS, nPBS]);
+%   h1 = getTF(sigAC, nHDA_DC, [nBS, nPBS]);
+  h0 = getTF(sigAC, nRA_DC, [nEX, nEY]);
+  h1 = getTF(sigAC, nHDA_DC, [nEX, nEY]);
+  hREFL = h0(:, 1) - h0(:, 2);
+  hDARM = h1(:, 1) - h1(:, 2);
   
   figure(1)
-  zplotlog(f, [h0, h1, h2])
-  title('PDH Response for Detuned Cavity', 'fontsize', 18);
-  legend('On resonance', '0.1 nm', '1 nm', 'Location','SouthEast');
+%   zplotlog(f, [h0, h1, hREFL, hDARM])
+%   title('PDH Response to EX and EY', 'fontsize', 18);
+%   legend({'EX REFL', 'EY REFL', 'EX AS', 'EY AS', 'DARM R', 'DARM AS'}, 'Location','SouthEast');
+  zplotlog(f, [h0, h1])
+  title('Homodyne Response to EX and EY', 'fontsize', 18);
+  legend({'EX R', 'EY R', 'EX AS', 'EY AS'}, 'Location','NorthEast');
+%   legend({'BS R', 'PBS R', 'BS AS', 'PBS AS'}, 'Location','NorthEast');
   
   % make a noise plot
-  n0 = noiseAC0(nREFL_I, :)';
-  n1 = noiseAC1(nREFL_I, :)';
-  n2 = noiseAC2(nREFL_I, :)';
-  
-  %[h0(1), h1(1), h2(1)]  % HACK
-  %[n0(1), n1(1), n2(1)]  % HACK
-  %abs([n0(1) ./ h0(1), n1(1) ./ h1(1), n2(1) ./ h2(1)])
-  
-  figure(2)
-  loglog(f, abs([n0 ./ h0, n1 ./ h1, n2 ./ h2]))
-  title('Quantum Noise Limit for Detuned Cavity', 'fontsize', 18);
-  legend('On resonance', '0.1 nm', '1 nm');
-  grid on
-  
-  % make a response plot
-%   nTRANS_DC = getProbeNum(opt, 'TRANS_DC');
-%   h0 = getTF(sigAC0, nTRANS_DC, nEX);
-%   h1 = getTF(sigAC1, nTRANS_DC, nEX);
-%   h2 = getTF(sigAC2, nTRANS_DC, nEX);
+%   n0 = noiseAC(nREFL_I, :)';
 %   
-%   figure(3)
-%   zplotlog(f, [h0, h1, h2])
-%   title('TR Response for Detuned Cavity', 'fontsize', 18);
-%   legend('On resonance', '0.1 nm', '1 nm', 'Location','SouthEast');
+%   figure(2)
+%   loglog(f, abs(n0 ./ hDARM))
+%   title('Quantum Noise for Sagnac', 'fontsize', 18);
+%   grid on
   
+end

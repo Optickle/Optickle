@@ -113,6 +113,18 @@ classdef BeamSplitter < Optic
       
       [vThr, vLhr, vRar, vLmd] = obj.mir.getVecProperties(lambda, pol);
     end
+    function obj = setMechTF(obj, mechTF, nDOF)
+        % sets the mechTF property for the BS and internal mirror object
+        
+        if nargin < 3
+            nDOF = Optickle.tfPos;
+        end
+        
+        % set mechTF of sub-mirror
+        obj.mir = setMechTF(obj.mir,mechTF,nDOF);
+        % finally call the superclass method
+        obj = setMechTF@Optic(obj,mechTF,nDOF);
+    end
     
     %%%% Hermite Gauss Basis %%%%
 

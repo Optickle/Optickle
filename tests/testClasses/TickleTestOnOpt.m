@@ -1,4 +1,4 @@
-classdef TickleTestOnOpt < OptickleTest
+classdef TickleTestOnOpt < OptickleReferenceTest
     properties 
         optFuncHandle
     end

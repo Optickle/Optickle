@@ -6,19 +6,23 @@ clear classes
 %%
 % run the test using the optFullIFO function that returns the opt object to
 % test
-addpath('testFunctions')
+addpath('testModels')
+addpath('testClasses')
 test = TickleTestOnOpt(@optFullIFO);
 results = test.run();
-
-global optickleTestResultsFile
-load(optickleTestResultsFile);
 
 %% display results
 disp(results)
 
+numFailed = any(cell2mat({results.Failed}));
+
 %% extract the result data
+if numFailed > 0
 % load the calculated data from disk, this makes variables with the names
 % refStruct and calcStruct with the results of both calculations.
+
+global optickleTestResultsFile
+load(optickleTestResultsFile);
 
 % plot the TF from ETMX to OMCDC
 
@@ -55,3 +59,4 @@ figure(335)
 loglog(f,refPOPNoise,f,calcPOPNoise,f,abs(refPOPNoise-calcPOPNoise))
 title('POPI1 Noise')
 legend('Reference (Optickle 1)','Calculated (Optickle 2)','Residual')
+end

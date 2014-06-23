@@ -71,6 +71,10 @@ end
 fprintf('\n%s\n', [ repmat('-', 1, label_len + 1) '+' ...
     repmat('-', 1, 10*length(vFrf))]);
 
+% define a minumum power value for printing
+smallPower = 1e-10 * max(abs(fDC(:))).^2;
+minPower = 1e-10 * smallPower;
+  
 % print out the data for each link
 for ii=1:opt.Nlink,
     label = labels{ii};
@@ -89,9 +93,9 @@ for ii=1:opt.Nlink,
         else
             precision = 0;  % 137  (no decimals)
         end
-        if value == 0
+        if amp < minPower
            fprintf('---  W   ');
-        elseif abs(amp) < 1e-12
+        elseif amp < smallPower
            fprintf('e%d W   ', round(log10(amp)));
         else
            fprintf('%3.*f %sW   ', precision, value, prefix);

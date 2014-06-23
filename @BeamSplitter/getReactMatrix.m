@@ -40,7 +40,7 @@ function [mRadAC, mFrc, vRspAF] = ...
     mGenB = mOutBrf.' * mGen;
   end
   
-  % mapping matrices
+  % mapping matrices, for upper and lower ASBs
   [mInArf, mInBrf] = BeamSplitter.getMirrorIO(2 * par.Nrf);
   
   % get radiation and force matrices for both sides

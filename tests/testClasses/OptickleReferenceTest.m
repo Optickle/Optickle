@@ -1,4 +1,4 @@
-classdef OptickleTest < matlab.unittest.TestCase
+classdef OptickleReferenceTest < matlab.unittest.TestCase
     
     properties
         testFunctionHandle;
@@ -16,6 +16,12 @@ classdef OptickleTest < matlab.unittest.TestCase
         end
     end
     methods (TestClassSetup)
+        function displayConfig(testCase)
+            disp('---===Optickle Test===---')
+            disp(['Reference type is ' testCase.config.referenceType])
+            disp(['Reference path is ' testCase.config.referencePath])
+            disp(['Optickle path is ' testCase.config.calculationPath])
+        end
         function loadReferenceStruct(testCase)
             switch testCase.config.referenceType
                 case 'Path'
@@ -65,12 +71,7 @@ classdef OptickleTest < matlab.unittest.TestCase
     end
     methods
         % constructor
-        function testCase = OptickleTest()
-            disp('---===Optickle Test===---')
-            disp(['Reference type is ' testCase.config.referenceType])
-            disp(['Reference path is ' testCase.config.referencePath])
-            disp(['Optickle path is ' testCase.config.calculationPath])
-            
+        function testCase = OptickleReferenceTest()
             % it's OK if you are doing reference type and your calc path is
             % the same as what is in the current path... otherwise there
             % shouldn't be anything in the current path
@@ -100,6 +101,13 @@ classdef OptickleTest < matlab.unittest.TestCase
             
             output = testCase.testFunctionHandle(); %#ok<NASGU>
             
+            % get the git hash id
+            [retCode,retString] = system('git rev-parse HEAD');
+            gitHash = 'unknown!';
+            if ~retCode
+                gitHash = retString;
+            end
+            
             % write metadata
             textFileID = fopen([fileNameBase '.txt'],'w');
             fprintf(textFileID,'Optickle test reference data\n');
@@ -107,6 +115,7 @@ classdef OptickleTest < matlab.unittest.TestCase
             fprintf(textFileID,['Test function: ' func2str(testCase.testFunctionHandle) '\n']);
             fprintf(textFileID,['Path to Optickle: ' testCase.optickleLocation '\n']);
             fprintf(textFileID,['Run on: ' datestr(now) '\n']);
+            fprintf(textFileID,['Git hash ID: ' gitHash '\n']);
             fclose(textFileID);
             
             save([fileNameBase '.mat'],'-struct','output')

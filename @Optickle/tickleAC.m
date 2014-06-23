@@ -65,7 +65,7 @@ function varargout = tickleAC(opt, f, nDrive, ...
     % propagation phase matrices
     mPhim = Optickle.getPhaseMatrix(vLen, vFrf - fAudio, -vPhiGouy, mPhiFrf);
     mPhip = Optickle.getPhaseMatrix(vLen, vFrf + fAudio, -vPhiGouy, mPhiFrf);
-    mPhi = blkdiag(mPhim,conj(mPhip));
+    mPhi = blkdiag(mPhim, conj(mPhip));
     
     % mechanical response matrix
     mResp = diag(lResp(nAF,:));
@@ -82,7 +82,6 @@ function varargout = tickleAC(opt, f, nDrive, ...
     
     if isNoise
       %%%% With Quantum Noise
-      %mQinj = [mPhi * mQuant;  mQOz];  % put this back! HACK
       mQinj = blkdiag(mPhi, mResp) * mQuant;
       mNoise = (eyeNdof - mDof) \ mQinj;
       noisePrb = mOut * mNoise(jAsb, :);

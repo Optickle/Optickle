@@ -98,9 +98,9 @@ classdef GouyPhase < Optic
       mOpt = eye(par.Nrf, par.Nrf);
       if par.tfType ~= Optickle.tfPos
         if numel(obj.phi) == 1
-          mOpt = mOpt * exp(1i * obj.phi);
+          mOpt = mOpt * exp(-1i * obj.phi);
         else
-          mOpt = mOpt * exp(1i * obj.phi(par.nBasis));
+          mOpt = mOpt * exp(-1i * obj.phi(par.nBasis));
         end
       end
       

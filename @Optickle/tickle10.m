@@ -1,6 +1,6 @@
-% Compute AC transfer functions for a TEM01 mode (pitch).
+% Compute AC transfer functions for a TEM10 mode (yaw).
 %
-% [sigAC, mMech] = tickle01(opt, pos, f)
+% [sigAC, mMech] = tickle10(opt, pos, f)
 % opt - Optickle model
 % pos - optic positions (Ndrive x 1, or empty)
 % f - audio frequency vector (Naf x 1)
@@ -21,13 +21,13 @@
 % Example:
 % f = logspace(0, 3, 300);
 % opt = optFP;
-% [sigAC, mMech] = tickle01(opt, [], f);
+% [sigAC, mMech] = tickle10(opt, [], f);
 
 % 1/20/2011 N. Smith added nDrive as optional argument, allows calculation
 % to be performed faster if only a subset of the drive points will be used.
 
 
-function varargout = tickle01(opt, pos, f, nDrive)
+function varargout = tickle10(opt, pos, f, nDrive)
 
   % === Argument Handling
   if nargin < 3
@@ -42,14 +42,14 @@ function varargout = tickle01(opt, pos, f, nDrive)
   % call tickle
   if isNoise
     [~,~,sigAC, mMech, noiseAC, noiseMech] = ...
-      tickle(opt, pos, f, Optickle.tfPit, nDrive);
+      tickle(opt, pos, f, Optickle.tfYaw, nDrive);
     varargout{1} = sigAC;
     varargout{2} = mMech;
     varargout{3} = noiseAC;
     varargout{4} = noiseMech;
   else
     [~,~,sigAC, mMech] = ...
-      tickle(opt, pos, f, Optickle.tfPit, nDrive);
+      tickle(opt, pos, f, Optickle.tfYaw, nDrive);
     varargout{1} = sigAC;
     varargout{2} = mMech;
   end
