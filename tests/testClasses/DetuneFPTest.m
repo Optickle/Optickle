@@ -4,6 +4,7 @@ classdef DetuneFPTest < OptickleReferenceTest
         function testCase = DetuneFPTest() 
             addpath('./testModels/')
             testCase.testFunctionHandle = @testDetuneFP;
+            testCase.setDefaultLabel();
         end
     end
     % Exact numerical equality is automatically tested, define additional
