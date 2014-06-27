@@ -49,9 +49,14 @@ opt = addSource(opt, 'Laser', sqrt(powerDistribution));
  %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
  lCav = 0.9;
  T1IR = 0.0008; % T1@1064nm
- T1G  = 0.0008; % T1@532nm
+ T1G  = .7*0.0008; % T1@532nm
+ 
  T1Vec = [T1IR T1G];
- opt  = addMirror(opt, 'IX', 0, 0, T1Vec);
+ 
+ %Transmissivity values should go [T lambda; T lambda]
+ T1 = [T1Vec' lambda'];
+
+ opt  = addMirror(opt, 'IX', 0, 0,T1);
  % Can we define a single transmission for ETM?
  opt  = addMirror(opt, 'EX', 0, 0.7 / lCav, 0);
 

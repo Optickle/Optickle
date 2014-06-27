@@ -38,7 +38,7 @@ T1G   = T1Vec(2);
 fsr   = Optickle.c / (2 * lCav);
 
 %Compute linewidth
-hwhmVec  = 0.5 * fsr * T1Vec / (2 * pi) %Hz
+hwhmVec  = 0.5 * fsr * T1Vec(1:2) / (2 * pi) %Hz
 hwhmMVec = (lambdaVec' / 2) .* hwhmVec / fsr %m
 
 %Spring stuff
@@ -47,7 +47,7 @@ f0 = 172;
 Q0 = 3200;
 m  = 1e-3;
 
-mod             = getOptic(opt, 'Mod1')
+mod             = getOptic(opt, 'Mod1');
 gammaMod        = imag(mod.aMod);
 powerCorrection = besselj(0, gammaMod)^2;
 
@@ -57,7 +57,7 @@ pos        = zeros(opt.Ndrive, 1);
 % There is a sign inversion between Corbitt and me
 
 % a) C = 0.5, SC = 0
-irFactorA = - 0.5;      % - 0.5
+irFactorA = -0.5;      % - 0.5
 detA      = irFactorA * hwhmMVec(1);
 pos(nIX)  = detA;
 gFactorA  = 0.5;
@@ -68,23 +68,27 @@ fDetuneA  = (detA/hwhmMVec(2)-gFactorA) * hwhmVec(2); %sign
                                                      %and
                                                      %differences
                                                      %in linewidth
-optA      = optTrapDual(P, fDetuneA);
+optA  = optTrapDual(P, fDetuneA);
 
 [fDC, sigDC, sigAC, mMechA, noiseAC] = tickle(optA, pos, f);
+showfDC(optA, fDC);
 
 laserA = getOptic(optA,'Laser');
 PVec   = laserA.vArf.^2;
 
-PIR = powerCorrection * PVec(1); %fix
-PG  = powerCorrection * PVec(2); %fix
+PIR = powerCorrection * PVec(1) %fix
+PG  = powerCorrection * PVec(2) %fix
+
+% Power on resonance
+approxPCircIR = PIR*4/T1IR
+approxPCircG = PG*4/T1G
+
 
 %    Need to account for power lost due to modulation
-
 KIRA = opticalSpringK(PIR, - irFactorA, T1IR, lCav, f);
 KGA  = opticalSpringK(PG,  - gFactorA,  T1G,  lCav, f, lambdaG);
 KA   = KIRA + KGA;
 tfA  = optomechanicalTF(f0, Q0, m, KA, f);
-
 
 % $$$ % b) C = 3, SC = 0.5
 % $$$ cFactorB  = - 3;
