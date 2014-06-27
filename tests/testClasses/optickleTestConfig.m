@@ -3,8 +3,8 @@ function config = optickleTestConfig()
     %config.referenceType = 'Path';
     %config.referencePath = '~/tmp/Optickle';
     config.referenceType = 'Files';
-    config.referencePath = './referenceFiles/Optickle1';
-    config.calculationPath = '~/tmp/Optickle';
+    config.referencePath = './referenceFiles/Optickle2';
+    config.calculationPath = '~/repos/Optickle';
     config.residualSize = 5e-5;
     config.errorThreshold = 1e-6;
 end
