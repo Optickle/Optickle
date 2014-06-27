@@ -1,0 +1,7 @@
+Optickle test reference data
+----------------------------
+Test function: TickleTestOnOpt(@optFullIFO)
+Path to Optickle: /home/nicolas/repos/Optickle
+Run on: 26-Jun-2014 20:50:37
+Git hash ID: 1e1fcc29445e6a3bb97b1df7e3de33a4fa23d540
+
