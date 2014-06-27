@@ -1,0 +1,7 @@
+Optickle test reference data
+----------------------------
+Test function: testDetuneFP
+Path to Optickle: /home/nicolas/tmp/Optickle
+Run on: 26-Jun-2014 20:08:10
+Git hash ID: e7acd6f60ac1912b5f36b4d0949d1dc03685c490
+
