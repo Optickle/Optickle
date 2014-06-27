@@ -38,8 +38,8 @@ T1G   = T1Vec(2);
 fsr   = Optickle.c / (2 * lCav);
 
 %Compute linewidth
-hwhmVec  = 0.5 * fsr * T1Vec(1:2) / (2 * pi) %Hz
-hwhmMVec = (lambdaVec' / 2) .* hwhmVec / fsr %m
+hwhmVec  = 0.5 * fsr * T1Vec(1:2) / (2 * pi); %Hz
+hwhmMVec = (lambdaVec' / 2) .* hwhmVec / fsr; %m
 
 %Spring stuff
 
@@ -57,10 +57,10 @@ pos        = zeros(opt.Ndrive, 1);
 % There is a sign inversion between Corbitt and me
 
 % a) C = 0.5, SC = 0
-irFactorA = -0.5;      % - 0.5
+irFactorA = -0.5;
 detA      = irFactorA * hwhmMVec(1);
 pos(nIX)  = detA;
-gFactorA  = 0.5;
+gFactorA  = 0.1;
 % Linewidths in m are different for different wavelengths 
 % Detuning det A metres gives irFactorA half-linewidths for ir but 
 % detA/hwhmM(2) half-linewidhts for the other lambda
@@ -71,23 +71,26 @@ fDetuneA  = (detA/hwhmMVec(2)-gFactorA) * hwhmVec(2); %sign
 optA  = optTrapDual(P, fDetuneA);
 
 [fDC, sigDC, sigAC, mMechA, noiseAC] = tickle(optA, pos, f);
-showfDC(optA, fDC);
+%showfDC(optA, fDC);
 
 laserA = getOptic(optA,'Laser');
 PVec   = laserA.vArf.^2;
 
-PIR = powerCorrection * PVec(1) %fix
-PG  = powerCorrection * PVec(2) %fix
+PIR = powerCorrection * PVec(1); %fix
+PG  = powerCorrection * PVec(2); %fix
 
 % Power on resonance
-approxPCircIR = PIR*4/T1IR
-approxPCircG = PG*4/T1G
+%approxPCircIR = PIR*4/T1IR
+%approxPCircG = PG*4/T1G
 
 
 %    Need to account for power lost due to modulation
 KIRA = opticalSpringK(PIR, - irFactorA, T1IR, lCav, f);
 KGA  = opticalSpringK(PG,  - gFactorA,  T1G,  lCav, f, lambdaG);
 KA   = KIRA + KGA;
+KIRA(1)
+KGA(1)
+KA(1)
 tfA  = optomechanicalTF(f0, Q0, m, KA, f);
 
 % $$$ % b) C = 3, SC = 0.5

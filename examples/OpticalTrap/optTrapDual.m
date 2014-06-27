@@ -23,7 +23,7 @@ opt = Optickle(vFrf, lambda);
  
 % add a source
 PIR    = 1;            % IR power
-ratioP = 1/2;          % Ratio of powers
+ratioP = 1;          % Ratio of powers
 PG     = ratioP * PIR; % Green power
  
 powerDistribution = [PIR PG];
@@ -49,7 +49,7 @@ opt = addSource(opt, 'Laser', sqrt(powerDistribution));
  %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
  lCav = 0.9;
  T1IR = 0.0008; % T1@1064nm
- T1G  = .7*0.0008; % T1@532nm
+ T1G  = 0.85*0.0008; % T1@532nm
  
  T1Vec = [T1IR T1G];
  
