@@ -1,5 +1,5 @@
 
-function opt = optTrapDual(Plaser, fDetune)
+function opt = optTrapDual(Plaser, fDetune, T1IR, T1G)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % create the model
@@ -10,6 +10,11 @@ function opt = optTrapDual(Plaser, fDetune)
 %Deal with args  
 if nargin < 2
     fDetune = 0;
+end
+
+if nargin < 4
+    T1IR = 0.0008; % T1@1064nm
+    T1G  = 0.85*0.0008; % T1@532nm
 end
     
 
@@ -48,8 +53,6 @@ opt = addSource(opt, 'Laser', sqrt(powerDistribution));
  % add mirrors
  %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
  lCav = 0.9;
- T1IR = 0.0008; % T1@1064nm
- T1G  = 0.85*0.0008; % T1@532nm
  
  T1Vec = [T1IR T1G];
  
