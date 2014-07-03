@@ -1,34 +1,77 @@
 function demoTrapDualGUI
-% GUI example where one can change T1 for green and IR and choose
-% detuning with a slider
+%
+% GUI example of a dual carrier optical trap
 %
 
 
-%put fixed params in a struct
+%Get fixed params and pass in a struct
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Freq vector for simulation
+params.f = logspace(2, 4, 600)';
+
+%Input power of each beam
+params.P = 1;
+
+%Give index of IR and G
+params.indIR    = 1;
+params.indG     = 2;
+
+%Run the  standard model to get params
+opt = optTrapDual;
+
+%Get default T1 values
+itm         = getOptic(opt, 'IX');
+T1          = itm.Thr;
+params.T1IRDefault = T1(params.indIR);
+params.T1GDefault  = T1(params.indG);
+
+% Get drive indices
+params.nEX    = getDriveIndex(opt, 'EX');
+params.nIX    = getDriveIndex(opt, 'IX');
+params.nDrive = opt.Ndrive;
+
+% Get cavity length and fsr
+nCavLink    = getLinkNum(opt, 'IX', 'EX');
+vDist       = getLinkLengths(opt);
+params.lCav = vDist(nCavLink);
+params.fsr  = Optickle.c / (2 * params.lCav);
+
+% Get lambda values
+par              = getOptParam(opt);
+params.lambdaVec = par.lambda;
+params.lambdaIR  = params.lambdaVec(params.indIR);
+params.lambdaG   = params.lambdaVec(params.indG);
+
+%Get mechanical response of ETM
+etm                 = getOptic(opt, 'EX');
+params.pendulumResp = squeeze(freqresp(etm.mechTF, 2 * pi * params.f)); 
+
+
+
+%Add components and callbacks for the GUI
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Create a figure for the plots
-hs.fig = figure(1); %Change this
+hs.fig = figure;
 
-% Add GUI elements
-%%%%%%%%%%%%%%%%%%
 % Add sliders for green and IR detuning
 slrange = 5;   % slider range in hwhm
-slmin   = - slrange;
-slmax   = slrange;
+slmin   = -slrange;
+slmax   =  slrange;
 
-leftIR           = 0.1;
-leftG            = 0.55;
-width            = 0.2;
-midY             = 0.05;
-height           = 0.05;
-editBottom       = 0;
-textWidth        = 0.05;
-
-leftIRT          =leftIR+width+textWidth; 
-leftGT           =leftG+width+textWidth;
+% Values used to position sliders, edit boxes etc.
+leftIR     = 0.1;
+leftG      = 0.55;
+width      = 0.2;
+midY       = 0.05;
+height     = 0.05;
+editBottom = 0;
+textWidth  = 0.05;
+leftIRT    = leftIR + width + textWidth; 
+leftGT     = leftG  + width + textWidth;
 
 % IR slider
-%%%%%%%%%%%
 hs.IR.s = uicontrol('Parent',hs.fig, 'Style','slider','Min',slmin,'Max',slmax,...
                 'Value',0, 'Units','normalized',...
                 'Position',[leftIR midY width height]);
@@ -51,7 +94,6 @@ hs.IR.val = uicontrol('Parent',hs.fig,'Style','edit','Units','normalized',...
 
 
 % G slider
-%%%%%%%%%%%
 hs.G.s = uicontrol('Parent',hs.fig, 'Style','slider','Min',slmin,'Max',slmax,...
                 'Value',0, 'Units','normalized',...
                 'Position',[leftG midY width height]);
@@ -73,10 +115,9 @@ hs.G.val = uicontrol('Parent',hs.fig,'Style','edit','Units','normalized',...
                 'String',num2str(get(hs.G.s,'Value')));
 
 % IR trans box
-T1IRDefault = 0.0008;
 hs.IR.T1Box = uicontrol('Parent',hs.fig,'Style','edit','Units','normalized',...
                 'Position',[leftIRT editBottom 2*textWidth height],...
-                'String',num2str(T1IRDefault));
+                'String',num2str(params.T1IRDefault));
 
 hs.IR.T1Label = uicontrol('Parent',hs.fig,'Style','text', 'Units', ...
                       'normalized', 'Position',[leftIRT midY 2*textWidth ...
@@ -85,188 +126,159 @@ hs.IR.T1Label = uicontrol('Parent',hs.fig,'Style','text', 'Units', ...
 
 
 % G trans box
-T1GDefault = 0.0008;
 hs.G.T1Box = uicontrol('Parent',hs.fig,'Style','edit','Units','normalized',...
                 'Position',[leftGT editBottom 2*textWidth height],...
-                'String',num2str(T1GDefault));
+                'String',num2str(params.T1GDefault));
 
 hs.G.T1Label = uicontrol('Parent',hs.fig,'Style','text', 'Units', ...
                       'normalized', 'Position',[leftGT midY 2*textWidth ...
                     height], 'String','G T1', 'BackgroundColor', ...
                       get(hs.fig,'Color'));
 
-
+params.hs = hs;
 
 
 % Callback functions
-set(hs.IR.s,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
-                                                  hs)); 
+set(params.hs.IR.s,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
+                                                  params)); 
 
-set(hs.IR.val,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
-                                                  hs)); 
+set(params.hs.IR.val,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
+                                                  params)); 
 
-set(hs.IR.T1Box,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
-                                                  hs)); 
-
-
-set(hs.G.s,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
-                                                  hs)); 
-
-set(hs.G.val,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
-                                                  hs)); 
+set(params.hs.IR.T1Box,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
+                                                  params)); 
 
 
-set(hs.G.T1Box,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
-                                                  hs)); 
+set(params.hs.G.s,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
+                                                  params)); 
+
+set(params.hs.G.val,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
+                                                  params)); 
 
 
-hCaller = 'noCallingHandleOnFirstGo'; %TODO
-plotSystem(hCaller,hs);
+set(params.hs.G.T1Box,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
+                                                  params)); 
+
+
+
+plotSystem(params);
 
 end
 
-function plotSystem(hCaller, handles)
+function plotSystem(varargin)
 % Plot m/N for system with different input mirror tranmissivities
 % and detunings in units of hwhm
 
+if nargin ==1
+    params = varargin{1};
+    hCaller = 'noCallingHandleOnFirstGo';
+elseif nargin==2
+    hCaller = varargin{1};
+    params = varargin{2};
+else
+    error('Wrong number of args provided to plotSystem')
+end
+ 
+ 
     
-    
-% Do stuff that doesn't change
-f   = logspace(2, 4, 600)';
-P   = 1;
-opt = optTrapDual(P);
 
 
 switch hCaller  % Who called?
     
-  case handles.IR.val % The IR edit box
-    L = get(handles.IR.s,{'min','max','value'});  % Get the slider's info.
+  case params.hs.IR.val % The IR edit box
+    L = get(params.hs.IR.s,{'min','max','value'});  % Get the slider's info.
     E = str2double(get(hCaller,'string'));  % Numerical edit string.
     if E >= L{1} && E <= L{2}
-        set(handles.IR.s,'value',E)  % E falls within range of slider.
+        set(params.hs.IR.s,'value',E)  % E falls within range of slider.
     else
         set(hCaller,'string',L{3}) % User tried to set slider out of range. 
     end
     
-  case handles.IR.s % The IR slider
-    set(handles.IR.val,'string',get(hCaller,'value')) % Set edit to current slider.
+  case params.hs.IR.s % The IR slider
+    set(params.hs.IR.val,'string',get(hCaller,'value')) % Set edit to current slider.
 
-  case handles.G.val % The G edit box
-    L = get(handles.G.s,{'min','max','value'});  % Get the slider's info.
+  case params.hs.G.val % The G edit box
+    L = get(params.hs.G.s,{'min','max','value'});  % Get the slider's info.
     E = str2double(get(hCaller,'string'));  % Numerical edit string.
     if E >= L{1} && E <= L{2}
-        set(handles.G.s,'value',E)  % E falls within range of slider.
+        set(params.hs.G.s,'value',E)  % E falls within range of slider.
     else
         set(hCaller,'string',L{3}) % User tried to set slider out of range. 
     end
     
-  case handles.G.s % The G slider
-    set(handles.G.val,'string',get(hCaller,'value')) % Set edit to current slider.
+  case params.hs.G.s % The G slider
+    set(params.hs.G.val,'string',get(hCaller,'value')) % Set edit to current slider.
 
   otherwise
     % Do nothing, or whatever.
 end
 
 
-% Set chanveable parameters
-irFactorA = str2double(get(handles.IR.val,   'string'));
-gFactorA  = str2double(get(handles.G.val,    'string'));
-T1IR      = str2double(get(handles.IR.T1Box, 'string'));
-T1G       = str2double(get(handles.G.T1Box,  'string'));
+% Set changeable parameters
+irFactor = str2double(get(params.hs.IR.val,   'string'));
+gFactor  = str2double(get(params.hs.G.val,    'string'));
+T1IR      = str2double(get(params.hs.IR.T1Box, 'string'));
+T1G       = str2double(get(params.hs.G.T1Box,  'string'));
 T1Vec = [T1IR T1G];
+
+if any(not(T1Vec))%Test for zeros
+    errordlg('If T1=0 Optickle will take a long time to calculate nothing. Better to choose more reasonable values.','Transmissivity Error');
+    return
+end
+
     
-    %Update labels etc
-    
-    %set(handles.IR.val,'String',num2str(get(handles.IR.s,'Value')))
-    
 
-% get ir and g indices
-
-% get some drive indexes
-nEX = getDriveIndex(opt, 'EX');
-nIX = getDriveIndex(opt, 'IX');
-
-% get some probe indexes
-nREFL_DC = getProbeNum(opt, 'REFL_DC');
-nREFL_I  = getProbeNum(opt, 'REFL_I');
-nREFL_Q  = getProbeNum(opt, 'REFL_Q');
-
-% Grab cavity length
-nCavLink = getLinkNum(opt, 'IX', 'EX');
-vDist    = getLinkLengths(opt);
-lCav     = vDist(nCavLink);
-
-%Get lambda - need to be careful
-par       = getOptParam(opt);
-lambdaVec = par.lambda;
-lambdaIR  = lambdaVec(1);
-lambdaG   = lambdaVec(2);
-
-fsr   = Optickle.c / (2 * lCav);
 
 %Compute linewidth
-hwhmVec  = 0.5 * fsr * T1Vec(1:2) / (2 * pi); %Hz
-hwhmMVec = (lambdaVec' / 2) .* hwhmVec / fsr; %m
+hwhmVec  = 0.5 * params.fsr * T1Vec(1:2) / (2 * pi); %Hz
+hwhmMVec = (params.lambdaVec' / 2) .* hwhmVec / params.fsr; %m
 
-%Spring stuff
-
-f0 = 172;
-Q0 = 3200;
-m  = 1e-3;
-
-mod             = getOptic(opt, 'Mod1');
-gammaMod        = imag(mod.aMod);
-powerCorrection = besselj(0, gammaMod)^2;
 
 % Initialise the pos vector
-pos        = zeros(opt.Ndrive, 1);
+pos        = zeros(params.nDrive, 1);
 
 % There is a sign inversion between Corbitt and me
 
 % a) C = 0.5, SC = 0
-detA      = irFactorA * hwhmMVec(1);
-pos(nIX)  = detA;
+det      = irFactor * hwhmMVec(params.indIR);
+pos(params.nIX)  = det;
 % Linewidths in m are different for different wavelengths 
-% Detuning det A metres gives irFactorA half-linewidths for ir but 
-% detA/hwhmM(2) half-linewidhts for the other lambda
-fDetuneA  = (detA/hwhmMVec(2)-gFactorA) * hwhmVec(2); %sign
+% Detuning det metres gives irFactorA half-linewidths for ir but 
+% det/hwhmM(2) half-linewidhts for the other lambda
+fDetune  = (det/hwhmMVec(params.indG)-gFactor) * hwhmVec(params.indG); %sign
                                                      %and
                                                      %differences
                                                      %in linewidth
-optA  = optTrapDual(P, fDetuneA, T1IR, T1G);
+[opt, f0, Q0, m]  = optTrapDual(params.P, fDetune, T1IR, T1G);
 
-[fDC, sigDC, sigAC, mMechA, noiseAC] = tickle(optA, pos, f);
-%showfDC(optA, fDC);
+[fDC, sigDC, sigAC, mMech, noiseAC] = tickle(opt, pos, params.f);
 
-laserA = getOptic(optA,'Laser');
-PVec   = laserA.vArf.^2;
 
-PIR = powerCorrection * PVec(1); %fix
-PG  = powerCorrection * PVec(2); %fix
+laser = getOptic(opt,'Laser');
+PVec   = laser.vArf.^2;
+
+PIR = PVec(params.indIR);
+PG  = PVec(params.indG); 
 
 
 %    Need to account for power lost due to modulation
-KIRA = opticalSpringK(PIR, - irFactorA, T1IR, lCav, f);
-KGA  = opticalSpringK(PG,  - gFactorA,  T1G,  lCav, f, lambdaG);
-KA   = KIRA + KGA;
-tfA  = optomechanicalTF(f0, Q0, m, KA, f);
+KIR = opticalSpringK(PIR, - irFactor, T1IR, params.lCav, params.f);
+KG  = opticalSpringK(PG,  - gFactor,  T1G,  params.lCav, params.f, params.lambdaG);
+K   = KIR + KG;
+tf  = optomechanicalTF(f0, Q0, m, K, params.f);
 
 
 
 
 % Extract appropriate info from mMech
 % (metres with rp/ metres without rp)
-rpMechA = getTF(mMechA,nEX, nEX);
+rpMech = getTF(mMech,params.nEX, params.nEX);
 
-%Apply normal mechanical resp
-% (metres without rp/ Newton)
-etm          = getOptic(opt, 'EX');
-pendulumResp = squeeze(freqresp(etm.mechTF, 2 * pi * f)); 
+%Response of ETM
+mPerN       = params.pendulumResp .* rpMech;
 
-mPerNA       = pendulumResp .* rpMechA;
-
-mPerN = [mPerNA];
-tf    = [tfA];
+mPerN = mPerN;
+tf    = tf;
 
 l = 0.1; %left
 b = 0.3;  %bottom
@@ -275,14 +287,14 @@ h = 0.275;  %height
 g = 0.05;  %gap
 
 
-figure(handles.fig)
+figure(params.hs.fig)
 % clear existing axes
 %axes('Parent', handles.fig, 'Position', [l b+h+g w h])
 subplot(2,1,1)
 %cla
-loglog(f, abs(mPerN))
+loglog(params.f, abs(mPerN))
 hold all
-loglog(f, abs(tf),'--')
+loglog(params.f, abs(tf),'--')
 hold off
 legend('Op2ickle','Theory')
 set(gca,'Position',[l b+h+g w h],'Units','normalized','XTickLabel',[])
@@ -293,9 +305,9 @@ subplot(2,1,2)
 set(gca,'Position',[l b w h],'Units','normalized')
 %axes('Parent', handles.fig, 'Position', [l b w h])
 %cla
-semilogx(f, 180/pi*angle(mPerN))
+semilogx(params.f, 180/pi*angle(mPerN))
 hold all
-semilogx(f, 180/pi*angle(tf),'--')
+semilogx(params.f, 180/pi*angle(tf),'--')
 xlabel('Frequency [Hz]')
 ylabel('Phase [deg.]')
 set(gca,'YTick',-360:90:360)%h = findobj(gcf,'type','axes')
