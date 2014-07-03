@@ -160,21 +160,25 @@ set(params.hs.G.T1Box,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
                                                   params)); 
 
 
-
+% Plot the default system
+%%%%%%%%%%%%%%%%%%%%%%%%%
 plotSystem(params);
 
 end
+
+
 
 function plotSystem(varargin)
 % Plot m/N for system with different input mirror tranmissivities
 % and detunings in units of hwhm
 
+% Deal with inputs
 if nargin ==1
-    params = varargin{1};
     hCaller = 'noCallingHandleOnFirstGo';
+    params  = varargin{1};
 elseif nargin==2
     hCaller = varargin{1};
-    params = varargin{2};
+    params  = varargin{2};
 else
     error('Wrong number of args provided to plotSystem')
 end
@@ -183,11 +187,11 @@ end
     
 
 
-switch hCaller  % Who called?
+switch hCaller  % Which gui element called slider or edit box
     
   case params.hs.IR.val % The IR edit box
-    L = get(params.hs.IR.s,{'min','max','value'});  % Get the slider's info.
-    E = str2double(get(hCaller,'string'));  % Numerical edit string.
+    L = get(params.hs.IR.s, {'min', 'max', 'value'}); % Get the slider's info.
+    E = str2double(get(hCaller, 'string'));           % Numerical edit string.
     if E >= L{1} && E <= L{2}
         set(params.hs.IR.s,'value',E)  % E falls within range of slider.
     else
@@ -198,8 +202,8 @@ switch hCaller  % Who called?
     set(params.hs.IR.val,'string',get(hCaller,'value')) % Set edit to current slider.
 
   case params.hs.G.val % The G edit box
-    L = get(params.hs.G.s,{'min','max','value'});  % Get the slider's info.
-    E = str2double(get(hCaller,'string'));  % Numerical edit string.
+    L = get(params.hs.G.s, {'min', 'max', 'value'}); % Get the slider's info.
+    E = str2double(get(hCaller, 'string'));          % Numerical edit string.
     if E >= L{1} && E <= L{2}
         set(params.hs.G.s,'value',E)  % E falls within range of slider.
     else
@@ -215,19 +219,16 @@ end
 
 
 % Set changeable parameters
-irFactor = str2double(get(params.hs.IR.val,   'string'));
-gFactor  = str2double(get(params.hs.G.val,    'string'));
-T1IR      = str2double(get(params.hs.IR.T1Box, 'string'));
-T1G       = str2double(get(params.hs.G.T1Box,  'string'));
-T1Vec = [T1IR T1G];
+irFactor = str2double(get(params.hs.IR.val, 'string'));
+gFactor  = str2double(get(params.hs.G.val, 'string'));
+T1IR     = str2double(get(params.hs.IR.T1Box, 'string'));
+T1G      = str2double(get(params.hs.G.T1Box, 'string'));
+T1Vec    = [T1IR T1G];
 
-if any(not(T1Vec))%Test for zeros
-    errordlg('If T1=0 Optickle will take a long time to calculate nothing. Better to choose more reasonable values.','Transmissivity Error');
-    return
-end
-
-    
-
+% $$$ if any(not(T1Vec))%Test for zeros
+% $$$     errordlg('If T1=0 Optickle will take a long time to calculate nothing. Better to choose more reasonable values.','Transmissivity Error');
+% $$$     return
+% $$$ end
 
 %Compute linewidth
 hwhmVec  = 0.5 * params.fsr * T1Vec(1:2) / (2 * pi); %Hz
@@ -235,33 +236,31 @@ hwhmMVec = (params.lambdaVec' / 2) .* hwhmVec / params.fsr; %m
 
 
 % Initialise the pos vector
-pos        = zeros(params.nDrive, 1);
+pos      = zeros(params.nDrive, 1);
 
 % There is a sign inversion between Corbitt and me
 
-% a) C = 0.5, SC = 0
+% Set detunging of cavity
 det      = irFactor * hwhmMVec(params.indIR);
 pos(params.nIX)  = det;
-% Linewidths in m are different for different wavelengths 
-% Detuning det metres gives irFactorA half-linewidths for ir but 
-% det/hwhmM(2) half-linewidhts for the other lambda
-fDetune  = (det/hwhmMVec(params.indG)-gFactor) * hwhmVec(params.indG); %sign
-                                                     %and
-                                                     %differences
-                                                     %in linewidth
+
+% Set detuning of green beam
+fDetune  = (det/hwhmMVec(params.indG)-gFactor) * ...
+    hwhmVec(params.indG);
+
+% Get updated model
 [opt, f0, Q0, m]  = optTrapDual(params.P, fDetune, T1IR, T1G);
 
+% Get mMech
 [fDC, sigDC, sigAC, mMech, noiseAC] = tickle(opt, pos, params.f);
 
 
-laser = getOptic(opt,'Laser');
-PVec   = laser.vArf.^2;
+%Theoretical optical spring
+laser = getOptic(opt, 'Laser');
+PVec  = laser.vArf.^2;
+PIR   = PVec(params.indIR);
+PG    = PVec(params.indG); 
 
-PIR = PVec(params.indIR);
-PG  = PVec(params.indG); 
-
-
-%    Need to account for power lost due to modulation
 KIR = opticalSpringK(PIR, - irFactor, T1IR, params.lCav, params.f);
 KG  = opticalSpringK(PG,  - gFactor,  T1G,  params.lCav, params.f, params.lambdaG);
 K   = KIR + KG;
@@ -271,27 +270,22 @@ tf  = optomechanicalTF(f0, Q0, m, K, params.f);
 
 
 % Extract appropriate info from mMech
-% (metres with rp/ metres without rp)
 rpMech = getTF(mMech,params.nEX, params.nEX);
 
 %Response of ETM
 mPerN       = params.pendulumResp .* rpMech;
 
-mPerN = mPerN;
-tf    = tf;
-
-l = 0.1; %left
-b = 0.3;  %bottom
-w = 0.8;  %width
-h = 0.275;  %height
+% Parameters for laying out plot
+l = 0.1;   %left
+b = 0.3;   %bottom
+w = 0.8;   %width
+h = 0.275; %height
 g = 0.05;  %gap
 
 
 figure(params.hs.fig)
-% clear existing axes
-%axes('Parent', handles.fig, 'Position', [l b+h+g w h])
+
 subplot(2,1,1)
-%cla
 loglog(params.f, abs(mPerN))
 hold all
 loglog(params.f, abs(tf),'--')
@@ -303,14 +297,12 @@ ylabel('Mag. [m/N]')
 
 subplot(2,1,2)
 set(gca,'Position',[l b w h],'Units','normalized')
-%axes('Parent', handles.fig, 'Position', [l b w h])
-%cla
 semilogx(params.f, 180/pi*angle(mPerN))
 hold all
 semilogx(params.f, 180/pi*angle(tf),'--')
 xlabel('Frequency [Hz]')
 ylabel('Phase [deg.]')
-set(gca,'YTick',-360:90:360)%h = findobj(gcf,'type','axes')
+set(gca,'YTick',-360:90:360)
 
 
 end
