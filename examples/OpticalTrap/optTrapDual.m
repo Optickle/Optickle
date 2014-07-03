@@ -45,10 +45,11 @@ opt = addSource(opt, 'Laser', sqrt(powerDistribution));
  %Transmissivity values should go [T lambda; T lambda]
  T1 = [T1Vec' lambda'];
 
+ lCav = 0.9;
  opt  = addMirror(opt, 'IX', 0, 0,T1);
  opt  = addMirror(opt, 'EX', 0, 0.7 / lCav, 0);
 
- lCav = 0.9;
+
  opt = addLink(opt, 'Laser', 'out', 'IX', 'bk', 0);
  opt = addLink(opt, 'IX',    'fr',  'EX', 'fr', lCav);
  opt = addLink(opt, 'EX',    'fr',  'IX', 'fr', lCav);

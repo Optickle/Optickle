@@ -225,10 +225,10 @@ T1IR     = str2double(get(params.hs.IR.T1Box, 'string'));
 T1G      = str2double(get(params.hs.G.T1Box, 'string'));
 T1Vec    = [T1IR T1G];
 
-% $$$ if any(not(T1Vec))%Test for zeros
-% $$$     errordlg('If T1=0 Optickle will take a long time to calculate nothing. Better to choose more reasonable values.','Transmissivity Error');
-% $$$     return
-% $$$ end
+if any(not(T1Vec))%Test for zeros
+    errordlg('If T1=0 the field in the cavity is not well-defined (T2=0). Better to choose more reasonable values.','Transmissivity Error');
+    return
+end
 
 %Compute linewidth
 hwhmVec  = 0.5 * params.fsr * T1Vec(1:2) / (2 * pi); %Hz
