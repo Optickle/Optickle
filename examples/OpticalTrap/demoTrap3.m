@@ -182,7 +182,7 @@ clf
 subplot(2,1,1)
 loglog(f, abs(mPerN))
 hold all
-%loglog(f, abs(tf),'--')
+loglog(f, abs(tf),'--')
 hold off
 legend('a)','b)','c)','d)')
 axis([500 1e4 1e-6 1e-3])
@@ -190,7 +190,7 @@ axis([500 1e4 1e-6 1e-3])
 subplot(2,1,2)
 semilogx(f, 180/pi*angle(mPerN))
 hold all
-%semilogx(f, 180/pi*angle(tf),'--')
+semilogx(f, 180/pi*angle(tf),'--')
 xlim([500 1e4])
 
 
