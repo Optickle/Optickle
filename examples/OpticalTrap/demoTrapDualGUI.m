@@ -314,9 +314,6 @@ set(gca,'YTick',-360:90:360)
 
 %Plot optical springs
 %%%%%%%%%%%%%%%%%%%%%
-K(1)
-real(K(1))
-imag(K(1))
 figure(params.hs.fig2)
 clf
 hKIR = plot(real(KIR), imag(KIR),'r');
@@ -330,13 +327,20 @@ hK = plot(real(K), imag(K),'m');
 plot(real(K(1)), imag(K(1)),'o','MarkerSize',10,'MarkerEdgeColor','m')
 plot(real(K(end)), imag(K(end)),'o','MarkerSize',10,'MarkerFaceColor','m','MarkerEdgeColor','m')
 title({sprintf('Optical spring constants from %5.2f (open cirlces)',params.f(1)),sprintf('to %5.2f Hz (filled circles)',params.f(end))})
-title(sprintf('Optical spring constants from %5.2f (open cirlces)\nto %5.2f Hz (filled circles)',params.f(1),params.f(end)))
-legend([hKIR hKG hK],'IR','G', 'Total')
+title(sprintf(['Optical spring constants from %5.2f (open cirlces)\nto ' ...
+'%5.2f Hz (filled circles)'],params.f(1),params.f(end)))
 extent = max(abs([get(gca,'XLim') get(gca,'YLim')]));
+areaColour = 'b';
+hArea = area([0 extent],[extent extent],'EdgeColor',areaColour, ...
+             'FaceColor',areaColour);
+transparencyLevel = 0.75;
+set(get(hArea,'Children'),'FaceAlpha',transparencyLevel);
+uistack(hArea,'bottom')
+hLeg = legend([hKIR hKG hK hArea],'IR','G', 'Total','Stable region','Location','SouthWest');
 axis([-extent extent -extent extent])
 axis square
 xlabel('Real(K)')
 ylabel('Imag(K)')
-fprintf('Label stable region')
+
 end
 
