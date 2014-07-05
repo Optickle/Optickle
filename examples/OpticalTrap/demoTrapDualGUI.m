@@ -47,14 +47,15 @@ params.lambdaG   = params.lambdaVec(params.indG);
 etm                 = getOptic(opt, 'EX');
 params.pendulumResp = squeeze(freqresp(etm.mechTF, 2 * pi * params.f)); 
 
-
+% $$$ % Frequency at which to evalute optical spring constants
+% $$$ params.fSpringEval = 
 
 %Add components and callbacks for the GUI
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-% Create a figure for the plots
-hs.fig = figure;
-
+% Create figures for the plots
+hs.fig  = figure;
+hs.fig2 = figure;
 % Add sliders for green and IR detuning
 slrange = 5;   % slider range in hwhm
 slmin   = -slrange;
@@ -240,12 +241,15 @@ pos      = zeros(params.nDrive, 1);
 
 % There is a sign inversion between Corbitt and me
 
-% Set detunging of cavity
-det      = irFactor * hwhmMVec(params.indIR);
-pos(params.nIX)  = det;
+% Set detuning of cavity
+lengthFactor    = - 1; %Need a minus sign bacuse a positive frequency
+                       %detuning (blue detuned) requires that the cavity
+                       %get longer which is a negative detuning in Optickle
+det             = lengthFactor * irFactor * hwhmMVec(params.indIR);
+pos(params.nIX) = det;
 
 % Set detuning of green beam
-fDetune  = (det/hwhmMVec(params.indG)-gFactor) * ...
+fDetune  = (det/hwhmMVec(params.indG)+gFactor) * ...
     hwhmVec(params.indG);
 
 % Get updated model
@@ -261,8 +265,8 @@ PVec  = laser.vArf.^2;
 PIR   = PVec(params.indIR);
 PG    = PVec(params.indG); 
 
-KIR = opticalSpringK(PIR, - irFactor, T1IR, params.lCav, params.f);
-KG  = opticalSpringK(PG,  - gFactor,  T1G,  params.lCav, params.f, params.lambdaG);
+KIR = opticalSpringK(PIR,  irFactor, T1IR, params.lCav, params.f);
+KG  = opticalSpringK(PG,   gFactor,  T1G,  params.lCav, params.f, params.lambdaG);
 K   = KIR + KG;
 tf  = optomechanicalTF(f0, Q0, m, K, params.f);
 
@@ -274,6 +278,10 @@ rpMech = getTF(mMech,params.nEX, params.nEX);
 
 %Response of ETM
 mPerN       = params.pendulumResp .* rpMech;
+
+
+%Plot transfer function
+%%%%%%%%%%%%%%%%%%%%%%%
 
 % Parameters for laying out plot
 l = 0.1;   %left
@@ -304,6 +312,31 @@ xlabel('Frequency [Hz]')
 ylabel('Phase [deg.]')
 set(gca,'YTick',-360:90:360)
 
-
+%Plot optical springs
+%%%%%%%%%%%%%%%%%%%%%
+K(1)
+real(K(1))
+imag(K(1))
+figure(params.hs.fig2)
+clf
+hKIR = plot(real(KIR), imag(KIR),'r');
+hold all
+plot(real(KIR(1)), imag(KIR(1)),'o','MarkerSize',10,'MarkerEdgeColor','r')
+plot(real(KIR(end)),imag(KIR(end)),'o','MarkerSize',10,'MarkerFaceColor','r','MarkerEdgeColor','r')
+hKG = plot(real(KG), imag(KG),'g');
+plot(real(KG(1)), imag(KG(1)),'o','MarkerSize',10,'MarkerEdgeColor','g')
+plot(real(KG(end)), imag(KG(end)),'o','MarkerSize',10,'MarkerFaceColor','g','MarkerEdgeColor','g')
+hK = plot(real(K), imag(K),'m');
+plot(real(K(1)), imag(K(1)),'o','MarkerSize',10,'MarkerEdgeColor','m')
+plot(real(K(end)), imag(K(end)),'o','MarkerSize',10,'MarkerFaceColor','m','MarkerEdgeColor','m')
+title({sprintf('Optical spring constants from %5.2f (open cirlces)',params.f(1)),sprintf('to %5.2f Hz (filled circles)',params.f(end))})
+title(sprintf('Optical spring constants from %5.2f (open cirlces)\nto %5.2f Hz (filled circles)',params.f(1),params.f(end)))
+legend([hKIR hKG hK],'IR','G', 'Total')
+extent = max(abs([get(gca,'XLim') get(gca,'YLim')]));
+axis([-extent extent -extent extent])
+axis square
+xlabel('Real(K)')
+ylabel('Imag(K)')
+fprintf('Label stable region')
 end
 
