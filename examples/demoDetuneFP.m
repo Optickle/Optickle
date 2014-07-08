@@ -20,6 +20,7 @@ function [f, sigDC2, sigAC2, mMech2, noiseAC2] = demoDetuneFP
   f = logspace(-1, 3, 200)';
   %f = 0.7;
   [fDC, sigDC0, sigAC0, mMech0, noiseAC0] = tickle(opt, [], f);
+
   
   % Print out the fields and probes, just to demonstrate these functions:
   fprintf('DC fields (fDC matrix):\n');

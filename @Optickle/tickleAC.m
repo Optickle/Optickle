@@ -75,7 +75,7 @@ function varargout = tickleAC(opt, f, nDrive, ...
              mResp * mRadFrc ];
     
     tfAC = (eyeNdof - mDof) \ mExc;
-    
+
     % extract optic to probe transfer functions
     sigAC(:, :, nAF) = 2 * mOut * tfAC(jAsb, :);
     mMech(:, :, nAF) = tfAC(jDrv, :);

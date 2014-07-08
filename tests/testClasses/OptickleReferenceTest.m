@@ -4,6 +4,7 @@ classdef OptickleReferenceTest < matlab.unittest.TestCase
         testFunctionHandle;
         referenceStruct;
         calculatedStruct;
+        testLabel;
     end
     properties
         config = optickleTestConfig();
@@ -44,7 +45,7 @@ classdef OptickleReferenceTest < matlab.unittest.TestCase
                 case 'Files'
                     % load struct from file
                     refPath = testCase.config.referencePath;
-                    refStruct = load([refPath '/' func2str(testCase.testFunctionHandle) '.mat']);
+                    refStruct = load([refPath '/' testCase.testLabel '.mat']);
                 otherwise
                     error(['Sorry, I don''t understand referenceType: ',testCase.config.referenceType])
             end
@@ -90,30 +91,50 @@ classdef OptickleReferenceTest < matlab.unittest.TestCase
                 end
             end
         end
+        function setDefaultLabel(testCase)
+            testCase.testLabel = func2str(testCase.testFunctionHandle);
+        end
         function saveTestFunctionOutputToReference(testCase)
             
             if ~strcmp(testCase.config.referenceType,'Files')
                 error('cannot save unless config.referenceType is Files')
             end
             
+            opPath = testCase.config.calculationPath;
+            
+            origPath = path;
+            addpath(opPath);
+            addpath([opPath '/lib']);
+            
             testPath = testCase.config.referencePath;
-            fileNameBase = [testPath '/' func2str(testCase.testFunctionHandle)];
+            fileNameBase = [testPath '/' testCase.testLabel];
             
             output = testCase.testFunctionHandle(); %#ok<NASGU>
             
+            path(origPath);
+            
             % get the git hash id
-            [retCode,retString] = system('git rev-parse HEAD');
+            fullOpPath = GetFullPath(opPath);
+            
+            gitCommand = ['git --git-dir=' fullOpPath '/.git --work-tree=' fullOpPath ' rev-parse HEAD'];
+            
+            [retCode,retString] = system(gitCommand);
             gitHash = 'unknown!';
             if ~retCode
                 gitHash = retString;
             end
+%             
+%             testLabel = func2str(testCase.testFunctionHandle);
+%             if strcmp(testLabel,'@()computeResults(testCase)')
+%                 testLabel = [ class(testCase) '(' testCase.optFuncHandle ')'];
+%             end
             
             % write metadata
             textFileID = fopen([fileNameBase '.txt'],'w');
             fprintf(textFileID,'Optickle test reference data\n');
             fprintf(textFileID,'----------------------------\n');
-            fprintf(textFileID,['Test function: ' func2str(testCase.testFunctionHandle) '\n']);
-            fprintf(textFileID,['Path to Optickle: ' testCase.optickleLocation '\n']);
+            fprintf(textFileID,['Test function: ' testCase.testLabel '\n']);
+            fprintf(textFileID,['Path to Optickle: ' fullOpPath '\n']);
             fprintf(textFileID,['Run on: ' datestr(now) '\n']);
             fprintf(textFileID,['Git hash ID: ' gitHash '\n']);
             fclose(textFileID);

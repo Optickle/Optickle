@@ -9,6 +9,7 @@ classdef Tickle01TestOnOpt < OptickleReferenceTest
             testCase.optFuncHandle = optFuncHandle;
             
             testCase.testFunctionHandle = @()computeResults(testCase);
+            testCase.testLabel = [ class(testCase) '(@' func2str(testCase.optFuncHandle) ')'];
         end
         function resultStruct = computeResults(testCase)
             f = logspace(-1, 3, 200)';
