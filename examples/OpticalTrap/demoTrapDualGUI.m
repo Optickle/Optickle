@@ -10,8 +10,11 @@ function demoTrapDualGUI
 % Freq vector for simulation
 params.f = logspace(2, 4, 600)';
 
-%Input power of each beam
-params.P = 1;
+%Input power of IR beam
+params.PIR = 1;
+
+%Ratio of IR to G power PG = ratioP*PIR
+params.ratioP = 1;
 
 %Give index of IR and G
 params.indIR    = 1;
@@ -56,21 +59,34 @@ params.pendulumResp = squeeze(freqresp(etm.mechTF, 2 * pi * params.f));
 % Create figures for the plots
 hs.fig  = figure;
 hs.fig2 = figure;
+
+
 % Add sliders for green and IR detuning
 slrange = 5;   % slider range in hwhm
 slmin   = -slrange;
 slmax   =  slrange;
 
+% Add slider for ratio of powers
+slPrange     = 10;
+slPmin       = 1 / slPrange;
+slPmax       = slPrange;
+slPRange     = slPmax - slPmin;
+slPMinorStep = 0.1;
+slPMajorStep = 1;
+sliderStepP  = [slPMinorStep / slPRange slPMajorStep / slPRange];
+
 % Values used to position sliders, edit boxes etc.
-leftIR     = 0.1;
-leftG      = 0.55;
-width      = 0.2;
+textWidth  = 0.0505;
+width      = 0.165;
+leftIR     = textWidth;%0.1
+leftIRT    = leftIR + width + textWidth; 
+leftG      = leftIRT+3*textWidth;%0.55;
+leftGT     = leftG  + width + textWidth;
+leftP      = leftGT+3*textWidth;
 midY       = 0.05;
 height     = 0.05;
 editBottom = 0;
-textWidth  = 0.05;
-leftIRT    = leftIR + width + textWidth; 
-leftGT     = leftG  + width + textWidth;
+
 
 % IR slider
 hs.IR.s = uicontrol('Parent',hs.fig, 'Style','slider','Min',slmin,'Max',slmax,...
@@ -109,7 +125,7 @@ hs.G.max = uicontrol('Parent',hs.fig,'Style','text','Units', 'normalized', ...
 
 hs.G.lab = uicontrol('Parent',hs.fig,'Style','text','Units','normalized',...
                 'Position',[leftG midY+height width height],...
-                'String','Green detuning [HWHM]','BackgroundColor',get(hs.fig,'Color'));
+                'String','G detuning [HWHM]','BackgroundColor',get(hs.fig,'Color'));
 
 hs.G.val = uicontrol('Parent',hs.fig,'Style','edit','Units','normalized',...
                 'Position',[leftG editBottom width height],...
@@ -136,6 +152,28 @@ hs.G.T1Label = uicontrol('Parent',hs.fig,'Style','text', 'Units', ...
                     height], 'String','G T1', 'BackgroundColor', ...
                       get(hs.fig,'Color'));
 
+
+% ratioP slider
+hs.G.sP = uicontrol('Parent',hs.fig, 'Style','slider','Min',slPmin,'Max',slPmax,...
+                'Value',1, 'SliderStep',sliderStepP,'Units','normalized',...
+                'Position',[leftP midY width height]);
+
+hs.G.minP = uicontrol('Parent',hs.fig,'Style','text', 'Units','normalized', ...
+                'Position',[leftP-textWidth midY textWidth height], 'String',num2str(slPmin), ...
+                'BackgroundColor',get(hs.fig,'Color'));
+
+hs.G.maxP = uicontrol('Parent',hs.fig,'Style','text','Units', 'normalized', ...
+                'Position',[leftP+width midY textWidth height], 'String',num2str(slPmax), ...
+                'BackgroundColor',get(hs.fig,'Color'));
+
+hs.G.labP = uicontrol('Parent',hs.fig,'Style','text','Units','normalized',...
+                'Position',[leftP midY+height width height],...
+                'String','PG/PIR','BackgroundColor',get(hs.fig,'Color'));
+
+hs.G.valP = uicontrol('Parent',hs.fig,'Style','edit','Units','normalized',...
+                'Position',[leftP editBottom width height],...
+                'String',num2str(get(hs.G.sP,'Value')));
+ 
 params.hs = hs;
 
 
@@ -160,6 +198,11 @@ set(params.hs.G.val,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
 set(params.hs.G.T1Box,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
                                                   params)); 
 
+set(params.hs.G.sP,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
+                                                  params)); 
+
+set(params.hs.G.valP,'Callback', @(hObject,eventdata) plotSystem(hObject, ...
+                                                  params)); 
 
 % Plot the default system
 %%%%%%%%%%%%%%%%%%%%%%%%%
@@ -214,6 +257,19 @@ switch hCaller  % Which gui element called slider or edit box
   case params.hs.G.s % The G slider
     set(params.hs.G.val,'string',get(hCaller,'value')) % Set edit to current slider.
 
+    
+  case params.hs.G.valP % The power ratio edit box
+    L = get(params.hs.G.sP, {'min', 'max', 'value'}); % Get the slider's info.
+    E = str2double(get(hCaller, 'string'));          % Numerical edit string.
+    if E >= L{1} && E <= L{2}
+        set(params.hs.G.sP,'value',E)  % E falls within range of slider.
+    else
+        set(hCaller,'string',L{3}) % User tried to set slider out of range. 
+    end
+    
+  case params.hs.G.sP % The power ratio slider
+    set(params.hs.G.valP,'string',round(100*get(hCaller,'value'))/100) % Set edit to current slider.
+
   otherwise
     % Do nothing, or whatever.
 end
@@ -225,6 +281,7 @@ gFactor  = str2double(get(params.hs.G.val, 'string'));
 T1IR     = str2double(get(params.hs.IR.T1Box, 'string'));
 T1G      = str2double(get(params.hs.G.T1Box, 'string'));
 T1Vec    = [T1IR T1G];
+ratioP   = str2double(get(params.hs.G.valP, 'string'));
 
 if any(not(T1Vec))%Test for zeros
     errordlg('If T1=0 the field in the cavity is not well-defined (T2=0). Better to choose more reasonable values.','Transmissivity Error');
@@ -253,7 +310,7 @@ fDetune  = (det/hwhmMVec(params.indG)+gFactor) * ...
     hwhmVec(params.indG);
 
 % Get updated model
-[opt, f0, Q0, m]  = optTrapDual(params.P, fDetune, T1IR, T1G);
+[opt, f0, Q0, m]  = optTrapDual(params.PIR, ratioP, fDetune, T1IR, T1G);
 
 % Get mMech
 [fDC, sigDC, sigAC, mMech, noiseAC] = tickle(opt, pos, params.f);
@@ -270,14 +327,48 @@ KG  = opticalSpringK(PG,   gFactor,  T1G,  params.lCav, params.f, params.lambdaG
 K   = KIR + KG;
 tf  = optomechanicalTF(f0, Q0, m, K, params.f);
 
-
-
+%Test for spring stability
+if isempty(find([real(K) imag(K)]<=0))
+    fprintf('\nStable spring!\n')
+end
 
 % Extract appropriate info from mMech
 rpMech = getTF(mMech,params.nEX, params.nEX);
 
 %Response of ETM
 mPerN       = params.pendulumResp .* rpMech;
+
+
+
+%Plot optical springs
+%%%%%%%%%%%%%%%%%%%%%
+figure(params.hs.fig2)
+clf
+hKIR = plot(real(KIR), imag(KIR),'r');
+hold all
+plot(real(KIR(1)), imag(KIR(1)),'o','MarkerSize',10,'MarkerEdgeColor','r')
+plot(real(KIR(end)),imag(KIR(end)),'o','MarkerSize',10,'MarkerFaceColor','r','MarkerEdgeColor','r')
+hKG = plot(real(KG), imag(KG),'g');
+plot(real(KG(1)), imag(KG(1)),'o','MarkerSize',10,'MarkerEdgeColor','g')
+plot(real(KG(end)), imag(KG(end)),'o','MarkerSize',10,'MarkerFaceColor','g','MarkerEdgeColor','g')
+hK = plot(real(K), imag(K),'m');
+plot(real(K(1)), imag(K(1)),'o','MarkerSize',10,'MarkerEdgeColor','m')
+plot(real(K(end)), imag(K(end)),'o','MarkerSize',10,'MarkerFaceColor','m','MarkerEdgeColor','m')
+title({sprintf('Optical spring constants from %5.2f (open cirlces)',params.f(1)),sprintf('to %5.2f Hz (filled circles)',params.f(end))})
+title(sprintf(['Optical spring constants from %5.2f (open cirlces)\nto ' ...
+'%5.2f Hz (filled circles)'],params.f(1),params.f(end)))
+extent = max(abs([get(gca,'XLim') get(gca,'YLim')]));
+areaColour = 'b';
+hArea = area([0 extent],[extent extent],'EdgeColor',areaColour, ...
+             'FaceColor',areaColour);
+transparencyLevel = 0.75;
+set(get(hArea,'Children'),'FaceAlpha',transparencyLevel);
+uistack(hArea,'bottom')
+hLeg = legend([hKIR hKG hK hArea],'IR','G', 'Total','Stable region','Location','SouthWest');
+axis([-extent extent -extent extent])
+axis square
+xlabel('Real(K)')
+ylabel('Imag(K)')
 
 
 %Plot transfer function
@@ -312,35 +403,6 @@ xlabel('Frequency [Hz]')
 ylabel('Phase [deg.]')
 set(gca,'YTick',-360:90:360)
 
-%Plot optical springs
-%%%%%%%%%%%%%%%%%%%%%
-figure(params.hs.fig2)
-clf
-hKIR = plot(real(KIR), imag(KIR),'r');
-hold all
-plot(real(KIR(1)), imag(KIR(1)),'o','MarkerSize',10,'MarkerEdgeColor','r')
-plot(real(KIR(end)),imag(KIR(end)),'o','MarkerSize',10,'MarkerFaceColor','r','MarkerEdgeColor','r')
-hKG = plot(real(KG), imag(KG),'g');
-plot(real(KG(1)), imag(KG(1)),'o','MarkerSize',10,'MarkerEdgeColor','g')
-plot(real(KG(end)), imag(KG(end)),'o','MarkerSize',10,'MarkerFaceColor','g','MarkerEdgeColor','g')
-hK = plot(real(K), imag(K),'m');
-plot(real(K(1)), imag(K(1)),'o','MarkerSize',10,'MarkerEdgeColor','m')
-plot(real(K(end)), imag(K(end)),'o','MarkerSize',10,'MarkerFaceColor','m','MarkerEdgeColor','m')
-title({sprintf('Optical spring constants from %5.2f (open cirlces)',params.f(1)),sprintf('to %5.2f Hz (filled circles)',params.f(end))})
-title(sprintf(['Optical spring constants from %5.2f (open cirlces)\nto ' ...
-'%5.2f Hz (filled circles)'],params.f(1),params.f(end)))
-extent = max(abs([get(gca,'XLim') get(gca,'YLim')]));
-areaColour = 'b';
-hArea = area([0 extent],[extent extent],'EdgeColor',areaColour, ...
-             'FaceColor',areaColour);
-transparencyLevel = 0.75;
-set(get(hArea,'Children'),'FaceAlpha',transparencyLevel);
-uistack(hArea,'bottom')
-hLeg = legend([hKIR hKG hK hArea],'IR','G', 'Total','Stable region','Location','SouthWest');
-axis([-extent extent -extent extent])
-axis square
-xlabel('Real(K)')
-ylabel('Imag(K)')
 
 end
 

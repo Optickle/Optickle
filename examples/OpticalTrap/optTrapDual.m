@@ -1,5 +1,5 @@
 
-function [opt, f0, Q0, m] = optTrapDual(Plaser, fDetune, T1IR, T1G)
+function [opt, f0, Q0, m] = optTrapDual(PIR, ratioP, fDetune, T1IR, T1G)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 
 % create the model
@@ -7,16 +7,20 @@ function [opt, f0, Q0, m] = optTrapDual(Plaser, fDetune, T1IR, T1G)
     
 %Deal with args  
 if nargin < 1
-    Plaser = 1;
+    PIR = 1;
 end
 
 if nargin < 2
+    ratioP = 1;
+end
+
+if nargin < 3
     fDetune = 0;
 end
 
-if nargin < 4
-    T1IR = 0.0008;        % T1@1064nm
-    T1G  = 0.85 * 0.0008; % T1@532nm
+if nargin < 5
+    T1IR = 0.0008; % T1@1064nm
+    T1G  = 0.0008; % T1@532nm
 end
     
 
@@ -24,13 +28,12 @@ end
 fMod   = 20e6;              % Not actually used in a meaningful way
 vFrf   = [0; fDetune];
 lambda = 1064e-9 * [1 0.5]; % Second one is green
+%lambda = 1064e-9 * [1 1]; % Second one is NOT green
 
 % create model
 opt = Optickle(vFrf, lambda);
  
 % add a source
-PIR    = 1;            % IR power
-ratioP = 1;            % Ratio of powers
 PG     = ratioP * PIR; % Green power
 powerDistribution = [PIR PG];
 opt = addSource(opt, 'Laser', sqrt(powerDistribution));
