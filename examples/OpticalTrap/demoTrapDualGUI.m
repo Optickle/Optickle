@@ -50,8 +50,6 @@ params.lambdaG   = params.lambdaVec(params.indG);
 etm                 = getOptic(opt, 'EX');
 params.pendulumResp = squeeze(freqresp(etm.mechTF, 2 * pi * params.f)); 
 
-% $$$ % Frequency at which to evalute optical spring constants
-% $$$ params.fSpringEval = 
 
 %Add components and callbacks for the GUI
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -78,11 +76,11 @@ sliderStepP  = [slPMinorStep / slPRange slPMajorStep / slPRange];
 % Values used to position sliders, edit boxes etc.
 textWidth  = 0.0505;
 width      = 0.165;
-leftIR     = textWidth;%0.1
+leftIR     = textWidth;
 leftIRT    = leftIR + width + textWidth; 
-leftG      = leftIRT+3*textWidth;%0.55;
-leftGT     = leftG  + width + textWidth;
-leftP      = leftGT+3*textWidth;
+leftG      = leftIRT + 3 * textWidth;
+leftGT     = leftG + width + textWidth;
+leftP      = leftGT + 3 * textWidth;
 midY       = 0.05;
 height     = 0.05;
 editBottom = 0;
@@ -213,8 +211,8 @@ end
 
 
 function plotSystem(varargin)
-% Plot m/N for system with different input mirror tranmissivities
-% and detunings in units of hwhm
+% Plot m/N and K for system with different input mirror tranmissivities
+% and detunings
 
 % Deal with inputs
 if nargin ==1
@@ -276,12 +274,12 @@ end
 
 
 % Set changeable parameters
-irFactor = str2double(get(params.hs.IR.val, 'string'));
-gFactor  = str2double(get(params.hs.G.val, 'string'));
+irFactor = str2double(get(params.hs.IR.val,   'string'));
+gFactor  = str2double(get(params.hs.G.val,    'string'));
 T1IR     = str2double(get(params.hs.IR.T1Box, 'string'));
-T1G      = str2double(get(params.hs.G.T1Box, 'string'));
+T1G      = str2double(get(params.hs.G.T1Box,  'string'));
 T1Vec    = [T1IR T1G];
-ratioP   = str2double(get(params.hs.G.valP, 'string'));
+ratioP   = str2double(get(params.hs.G.valP,   'string'));
 
 if any(not(T1Vec))%Test for zeros
     errordlg('If T1=0 the field in the cavity is not well-defined (T2=0). Better to choose more reasonable values.','Transmissivity Error');
@@ -294,12 +292,11 @@ hwhmMVec = (params.lambdaVec' / 2) .* hwhmVec / params.fsr; %m
 
 
 % Initialise the pos vector
-pos      = zeros(params.nDrive, 1);
+pos = zeros(params.nDrive, 1);
 
-% There is a sign inversion between Corbitt and me
 
 % Set detuning of cavity
-lengthFactor    = - 1; %Need a minus sign bacuse a positive frequency
+lengthFactor    = - 1; %Need a minus sign because a positive frequency
                        %detuning (blue detuned) requires that the cavity
                        %get longer which is a negative detuning in Optickle
 det             = lengthFactor * irFactor * hwhmMVec(params.indIR);
@@ -339,7 +336,6 @@ rpMech = getTF(mMech,params.nEX, params.nEX);
 mPerN       = params.pendulumResp .* rpMech;
 
 
-
 %Plot optical springs
 %%%%%%%%%%%%%%%%%%%%%
 figure(params.hs.fig2)
@@ -348,15 +344,18 @@ hKIR = plot(real(KIR), imag(KIR),'r');
 hold all
 plot(real(KIR(1)), imag(KIR(1)),'o','MarkerSize',10,'MarkerEdgeColor','r')
 plot(real(KIR(end)),imag(KIR(end)),'o','MarkerSize',10,'MarkerFaceColor','r','MarkerEdgeColor','r')
+
 hKG = plot(real(KG), imag(KG),'g');
 plot(real(KG(1)), imag(KG(1)),'o','MarkerSize',10,'MarkerEdgeColor','g')
 plot(real(KG(end)), imag(KG(end)),'o','MarkerSize',10,'MarkerFaceColor','g','MarkerEdgeColor','g')
+
 hK = plot(real(K), imag(K),'m');
 plot(real(K(1)), imag(K(1)),'o','MarkerSize',10,'MarkerEdgeColor','m')
 plot(real(K(end)), imag(K(end)),'o','MarkerSize',10,'MarkerFaceColor','m','MarkerEdgeColor','m')
-title({sprintf('Optical spring constants from %5.2f (open cirlces)',params.f(1)),sprintf('to %5.2f Hz (filled circles)',params.f(end))})
+
 title(sprintf(['Optical spring constants from %5.2f (open cirlces)\nto ' ...
 '%5.2f Hz (filled circles)'],params.f(1),params.f(end)))
+
 extent = max(abs([get(gca,'XLim') get(gca,'YLim')]));
 areaColour = 'b';
 hArea = area([0 extent],[extent extent],'EdgeColor',areaColour, ...
@@ -364,9 +363,12 @@ hArea = area([0 extent],[extent extent],'EdgeColor',areaColour, ...
 transparencyLevel = 0.75;
 set(get(hArea,'Children'),'FaceAlpha',transparencyLevel);
 uistack(hArea,'bottom')
+
 hLeg = legend([hKIR hKG hK hArea],'IR','G', 'Total','Stable region','Location','SouthWest');
+
 axis([-extent extent -extent extent])
 axis square
+
 xlabel('Real(K)')
 ylabel('Imag(K)')
 
@@ -389,7 +391,7 @@ loglog(params.f, abs(mPerN))
 hold all
 loglog(params.f, abs(tf),'--')
 hold off
-legend('Op2ickle','Theory')
+legend('Optickle','Theory')
 set(gca,'Position',[l b+h+g w h],'Units','normalized','XTickLabel',[])
 title('ETM response')
 ylabel('Mag. [m/N]')

@@ -8,16 +8,16 @@ function K = opticalSpringK(Pin, delta, T1, L, f, lambda)
 %
 % Pin - cavity input power
 % delta - cavity detuning in linewidths  (+ve for blue detuned
-% springy side. Had to fudge to get this,  see file).
-% L - cavity length
+% springy side).
+% L - cavity length [m]
 % f - frequency [Hz]
-% lambda - laser wavelength
+% lambda - laser wavelength [m]
 
 if nargin < 6
     lambda = 1064e-9;
 end
 
-delta = -delta; %Fudgeroonie. Differs from Corbitt thesis - want +ve
+delta = -delta; %Differs from Corbitt thesis - want +ve
                 %spring constant for positive detuning
 
 c     = 299792458;           %Speed of light
@@ -27,6 +27,3 @@ w0    = 2 * pi * c / lambda; %Angular frequency of light c = f lambda
 
 K0    = - (64 * Pin * w0) * delta / (T1^2 * c^2 * (1 + delta^2));
 K     = K0 ./ (delta^2 + (1 + i * 2 * pi * f / gamma).^2);
-
-
-%Full version
