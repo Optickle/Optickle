@@ -896,7 +896,18 @@ This has the advantage that the result can be returned to the user in 2 parts,
  and the other representing the opto-mechanical modification of the drives, $\mMech$.
 
 \subsection{A note about units}
-An oft-asked question is, ``What are the units of sigAC?'' Here we provide the answer.
+An oft-asked question is, ``What are the units of sigAC?'' Assuming
+the input laser power is in Watts, the laser wavelength is in metres
+and that a mirror is being driven, sigAC has dimensions of W/$\mu$,
+where $\mu$ denotes \emph{metres that there would have been had there
+  been no radiation pressure}.
+
+The reasoning behind this choice is that one is normally interested in
+the optical response to the force applied by some mirror actuator
+(units of W/N). The conversion factor from applied force to mirror
+motion is generally only known in the absence of radiation pressure,
+i.e. one has a transfer function with units $\mu$/N. Hence, to find the
+desired response, one requires a quantity with dimensions of W/$\mu$.
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \section{Quantum Noise}
