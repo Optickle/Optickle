@@ -319,10 +319,15 @@ PVec  = laser.vArf.^2;
 PIR   = PVec(params.indIR);
 PG    = PVec(params.indG); 
 
-KIR = opticalSpringK(PIR,  irFactor, T1IR, params.lCav, params.f);
-KG  = opticalSpringK(PG,   gFactor,  T1G,  params.lCav, params.f, params.lambdaG);
+KIR = opticalSpringK(PIR, irFactor, T1IR, params.lCav, params.f);
+KG  = opticalSpringK(PG, gFactor, T1G, params.lCav, params.f, params.lambdaG);
 K   = KIR + KG;
 tf  = optomechanicalTF(f0, Q0, m, K, params.f);
+
+%Calculate spring frequency
+Km        = m * (2 * pi * f0)^2; %mech spring constant
+indSpring = find((abs(Km + K) ./ (m * (2 * pi * params.f).^2))<1, 1);
+fSpring   = params.f(indSpring);
 
 %Test for spring stability
 if isempty(find([real(K) imag(K)]<=0))
@@ -344,17 +349,23 @@ hKIR = plot(real(KIR), imag(KIR),'r');
 hold all
 plot(real(KIR(1)), imag(KIR(1)),'o','MarkerSize',10,'MarkerEdgeColor','r')
 plot(real(KIR(end)),imag(KIR(end)),'o','MarkerSize',10,'MarkerFaceColor','r','MarkerEdgeColor','r')
+plot(real(KIR(indSpring)),imag(KIR(indSpring)),'+','MarkerSize',10,'MarkerFaceColor','r','MarkerEdgeColor','r')
+
 
 hKG = plot(real(KG), imag(KG),'g');
 plot(real(KG(1)), imag(KG(1)),'o','MarkerSize',10,'MarkerEdgeColor','g')
-plot(real(KG(end)), imag(KG(end)),'o','MarkerSize',10,'MarkerFaceColor','g','MarkerEdgeColor','g')
+plot(real(KG(end)), imag(KG(end)),'o','MarkerSize',10, ...
+     'MarkerFaceColor','g','MarkerEdgeColor','g')
+plot(real(KG(indSpring)), imag(KG(indSpring)),'+','MarkerSize',10,'MarkerFaceColor','g','MarkerEdgeColor','g')
 
 hK = plot(real(K), imag(K),'m');
 plot(real(K(1)), imag(K(1)),'o','MarkerSize',10,'MarkerEdgeColor','m')
-plot(real(K(end)), imag(K(end)),'o','MarkerSize',10,'MarkerFaceColor','m','MarkerEdgeColor','m')
+plot(real(K(end)), imag(K(end)),'o','MarkerSize',10, ...
+     'MarkerFaceColor','m','MarkerEdgeColor','m')
+plot(real(K(indSpring)), imag(K(indSpring)),'+','MarkerSize',10,'MarkerFaceColor','m','MarkerEdgeColor','m')
 
-title(sprintf(['Optical spring constants from %5.2f (open cirlces)\nto ' ...
-'%5.2f Hz (filled circles)'],params.f(1),params.f(end)))
+title(sprintf(['Spring constants from %5.2f (open circles) to\n' ...
+'%5.2f Hz (filled circles). Crosses denote resonant freq.'],params.f(1),params.f(end)))
 
 extent = max(abs([get(gca,'XLim') get(gca,'YLim')]));
 areaColour = 'b';

@@ -25,5 +25,7 @@ gamma = T1 * c / (4 * L);    %Cavity HWHM rad s^ - 1
 w0    = 2 * pi * c / lambda; %Angular frequency of light c = f lambda
 
 
-K0    = - (64 * Pin * w0) * delta / (T1^2 * c^2 * (1 + delta^2));
-K     = K0 ./ (delta^2 + (1 + i * 2 * pi * f / gamma).^2);
+K0         = - (64 * Pin * w0) * delta / (T1^2 * c^2 * (1 + delta^2));
+K          = K0 ./ (delta^2 + (1 + i * 2 * pi * f / gamma).^2);
+
+
