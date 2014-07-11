@@ -4,8 +4,8 @@ function [tf, tfOscillator] = optomechanicalTF(f0, Q0, m , K, f)
 %
 
 %Mechanical spring constant and damping factor
-Km = m*(2*pi*f0)^2; %old spring constant
-bm = m*(2*pi*f0)/Q0; %old damping factor
+Km = m * (2 * pi * f0)^2;    %old spring constant
+bm = m * (2 * pi * f0) / Q0; %old damping factor
 
 
 w = 2*pi*f;
