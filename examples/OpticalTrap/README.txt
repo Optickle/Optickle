@@ -27,6 +27,6 @@ T1IR=T1G=0.0008. Stable spring same T1.
 T1G=0.0013. Stable spring same P.
 
 5. IR detuning = -0.5, G detuning = 0.5, PG/PIR = 2.5, T1IR=0.001,
-T1G=0.002. Stable spring same P.
+T1G=0.002. Stable spring same det.
 
 -John
