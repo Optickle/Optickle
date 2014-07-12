@@ -1,6 +1,6 @@
 % Create an Optickle Fabry-Perot
 
-function opt = optPolSag
+function opt = optSagnac
 
   % some parameters
   lambda = 1064e-9;  % just one wavelength
@@ -11,9 +11,6 @@ function opt = optPolSag
   Tin = 0.01;      % input mirror transmission
   Tend = 10e-6;    % end mirror transmission
   lCav = 4000;     % long cavity length
-  
-  posPBS = lambda / 16;
-  
   
   % RF component vector
   vMod = (-1:1)';
@@ -122,36 +119,10 @@ function opt = optPolSag
   % Probes
   %%%%%%%%%%%%%%%%%%%%%%
     
-%   % add REFL optics
-%   opt.addSink('REFL');
-%   opt.addLink('BS', 'frB', 'REFL', 'in', 0);
-%   
-%   % add REFL probes (this call adds probes REFL_DC, I and Q)
-%   phi = 0;
-%   opt.addReadout('REFL', [fMod, phi]);
-
-%   % add AS optics
-%   opt.addSink('AS');
-%   opt.addLink('BS', 'bkB', 'AS', 'in', 0);
-%   
-%   % add AS probes (this call adds probes AS_DC, I and Q)
-%   phi = 0;
-%   opt.addReadout('AS', [fMod, phi]);
-% 
-%   % add unphysical intra-cavity probes
-%   opt.addProbeIn('EX_DC', 'EX', 'fr', 0, 0);
-%   opt.addProbeIn('EY_DC', 'EY', 'fr', 0, 0);  
-
   % use homodyne readout at REFL port
   opt.addHomodyne('R_HD', Optickle.c / lambda, Optickle.polS, 90, 1, 'BS', 'frB');
 
   % use homodyne readout at AS port
   opt.addHomodyne('HD', Optickle.c / lambda, Optickle.polS, 90, 1, 'BS', 'bkB');
 
-  %%%%%%%%%%%%%%%%%%%%%%
-  % HG Basis
-  %%%%%%%%%%%%%%%%%%%%%%
-    
-  % tell Optickle to use this cavity basis
-  %opt.setCavityBasis('IX', 'EX');  
 end
