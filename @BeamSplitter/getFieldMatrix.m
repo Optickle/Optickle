@@ -2,6 +2,10 @@
 %   returns a mOpt, the field transfer matrix for this optic
 %
 % [mOpt, mDirIn, mDirOut, dldx] = getFieldMatrix(obj, pos, par)
+%
+% Example:
+% par = opt.getOptParam;
+% [mOpt, mDirIn, mDirOut, dldx] = opt.optic{nBS}.getFieldMatrix(0, par);
 
 function [mOpt, mOptMir, mDirIn, mDirOut, dldx] = ...
   getFieldMatrix(obj, pos, par, varargin)
