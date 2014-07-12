@@ -11,22 +11,22 @@ function demoSagnac
   nBS = getDriveIndex(opt, 'BS');
   nCM = getDriveIndex(opt, 'CM');
   nEX = getDriveIndex(opt, 'EX');
-  nEY = getDriveIndex(opt, 'IX');
+  nEY = getDriveIndex(opt, 'EY');
 
   % get some probe indexes
-%   nREFL_DC = getProbeNum(opt, 'REFL_DC');
-%   nREFL_I = getProbeNum(opt, 'REFL_I');
-%   nREFL_Q = getProbeNum(opt, 'REFL_Q');
+  nREFL_DC = getProbeNum(opt, 'REFL_DC');
+  nREFL_I = getProbeNum(opt, 'REFL_I');
+  nREFL_Q = getProbeNum(opt, 'REFL_Q');
 
-%   nAS_DC = getProbeNum(opt, 'AS_DC');
-%   nAS_I = getProbeNum(opt, 'AS_I');
-%   nAS_Q = getProbeNum(opt, 'AS_Q');
-  
-  nRA_DC = getProbeNum(opt, 'R_HDA_DC');
-  nRB_DC = getProbeNum(opt, 'R_HDB_DC');
-  
   nHDA_DC = getProbeNum(opt, 'HDA_DC');
   nHDB_DC = getProbeNum(opt, 'HDB_DC');
+  
+  % set output matrix for homodyne readout
+  opt.mProbeOut = eye(opt.Nprobe);      % start with identity matrix
+  opt.mProbeOut(nHDA_DC, nHDB_DC) = 1;  % add B to A
+  opt.mProbeOut(nHDB_DC, nHDA_DC) = -1; % subtract A from B
+  
+  nHD = nHDB_DC;  % output nHDB_DC is now the difference
   
   % compute the DC signals and TFs on resonance
   f = logspace(-1, 3, 200)';
@@ -40,28 +40,26 @@ function demoSagnac
   showsigDC(opt, sigDC);
   
   % make a response plot
-%   h0 = getTF(sigAC, nRA_DC, [nBS, nPBS]);
-%   h1 = getTF(sigAC, nHDA_DC, [nBS, nPBS]);
-  h0 = getTF(sigAC, nRA_DC, [nEX, nEY]);
-  h1 = getTF(sigAC, nHDA_DC, [nEX, nEY]);
-  hREFL = h0(:, 1) - h0(:, 2);
+  h0 = getTF(sigAC, nREFL_I, [nEX, nEY]);
+  h1 = getTF(sigAC, nHD, [nEX, nEY]);
+  hREFL = h0(:, 1) + h0(:, 2);
   hDARM = h1(:, 1) - h1(:, 2);
   
   figure(1)
-%   zplotlog(f, [h0, h1, hREFL, hDARM])
-%   title('PDH Response to EX and EY', 'fontsize', 18);
-%   legend({'EX REFL', 'EY REFL', 'EX AS', 'EY AS', 'DARM R', 'DARM AS'}, 'Location','SouthEast');
-  zplotlog(f, [h0, h1])
-  title('Homodyne Response to EX and EY', 'fontsize', 18);
-  legend({'EX R', 'EY R', 'EX AS', 'EY AS'}, 'Location','NorthEast');
-%   legend({'BS R', 'PBS R', 'BS AS', 'PBS AS'}, 'Location','NorthEast');
+  zplotlog(f, [hREFL, hDARM])
+  title('Response to CARM and DARM', 'fontsize', 18);
+  legend({'CARM REFL', 'DARM AS'}, 'Location','NorthEast');
+  
+%  zplotlog(f, [h0, h1])
+%  title('Response to EX and EY', 'fontsize', 18);
+%  legend({'EX R', 'EY R', 'EX AS', 'EY AS'}, 'Location','NorthEast');
   
   % make a noise plot
-%   n0 = noiseAC(nREFL_I, :)';
-%   
-%   figure(2)
-%   loglog(f, abs(n0 ./ hDARM))
-%   title('Quantum Noise for Sagnac', 'fontsize', 18);
-%   grid on
+  n0 = noiseAC(nHD, :)';
+  
+  figure(2)
+  loglog(f, abs(n0 ./ hDARM))
+  title('Quantum Noise for Sagnac', 'fontsize', 18);
+  grid on
   
 end

@@ -5,22 +5,18 @@ function opt = optPolSag
   % some parameters
   lambda = 1064e-9;  % just one wavelength
   Pin = 100;
-  gamma = 0;     % RF modulation depth
+  gamma = 0.1;       % RF modulation depth
   
-  PBSleakS = 0;    % leakage of S-pol power into transmission
-  PBSleakP = 0;      % leakage of P-pol power into reflection
+  PBSleakS = 0.01;    % leakage of S-pol power into transmission
+  PBSleakP = 0.01;    % leakage of P-pol power into reflection
   
   Tbs  = 0.5;      % non-polarizing BS transmission
   Tin = 0.01;      % input mirror transmission
   Tend = 10e-6;    % end mirror transmission
   lCav = 4000;     % long cavity length
-  
-  posPBS = lambda / 16;
-  
-  
+    
   % RF component vector
   vMod = (-1:1)';
-  vMod = 0;
   fMod = 20e6;
   vFrf = fMod * [vMod; vMod];  % add vMod for both polarizations
   
@@ -53,9 +49,9 @@ function opt = optPolSag
   %   opt.addBeamSplitter(name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
   opt.addBeamSplitter('BS', 45, 0, Tbs);  % regular beamsplitter
   
-  % PBS
-  Thr = [PBSleakS, 1064e-9, 1
-         1 - PBSleakP, 1064e-9, 0];
+  % PBS (different transmission for S and P)
+  Thr = [    PBSleakS, lambda, Optickle.polS
+         1 - PBSleakP, lambda, Optickle.polP];
   opt.addBeamSplitter('PBS', 45, 0, Thr);
 
   % waveplates
@@ -72,9 +68,6 @@ function opt = optPolSag
   opt.addMirror('IY', 0, 0, Tin);
   opt.addMirror('EY', 0, 0.7 / lCav, Tend);
 
-  opt.setPosOffset('BS', posPBS);
-  %opt.setPosOffset('EX', -posPBS);
-  
   %%%%%%%%%%%%%%%%%%%%%%
   % Add Links
   %%%%%%%%%%%%%%%%%%%%%%
@@ -143,28 +136,13 @@ function opt = optPolSag
   % Probes
   %%%%%%%%%%%%%%%%%%%%%%
     
-%   % add REFL optics
-%   opt.addSink('REFL');
-%   opt.addLink('BS', 'frB', 'REFL', 'in', 0);
-%   
-%   % add REFL probes (this call adds probes REFL_DC, I and Q)
-%   phi = 0;
-%   opt.addReadout('REFL', [fMod, phi]);
-
-%   % add AS optics
-%   opt.addSink('AS');
-%   opt.addLink('BS', 'bkB', 'AS', 'in', 0);
-%   
-%   % add AS probes (this call adds probes AS_DC, I and Q)
-%   phi = 0;
-%   opt.addReadout('AS', [fMod, phi]);
-% 
-%   % add unphysical intra-cavity probes
-%   opt.addProbeIn('EX_DC', 'EX', 'fr', 0, 0);
-%   opt.addProbeIn('EY_DC', 'EY', 'fr', 0, 0);  
-
-  % use homodyne readout at REFL port
-  opt.addHomodyne('R_HD', Optickle.c / lambda, Optickle.polP, 90, 1, 'BS', 'frB');
+  % add REFL optics
+  opt.addSink('REFL');
+  opt.addLink('BS', 'frB', 'REFL', 'in', 0);
+  
+  % add REFL probes (this call adds probes REFL_DC, I and Q)
+  phi = 0;
+  opt.addReadout('REFL', [fMod, phi]);
 
   % use homodyne readout at AS port
   opt.addHomodyne('HD', Optickle.c / lambda, Optickle.polP, 90, 1, 'BS', 'bkB');

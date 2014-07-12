@@ -280,7 +280,7 @@ classdef Optickle < handle
       % lambda - wavelength to be squeezed
       % fRF - RF sideband of chosen lambda to be used
       % pol - polarization of chosen RF sideband to be squeezed
-      % sqAng - squeezing angle
+      % sqAng - squeezing angle (in radians)
       % sqdB - amount of squeezing in dB at OPO output
       % antidB - amount of antisqueezing in dB at OPO output
       % escEff - escape efficiency.

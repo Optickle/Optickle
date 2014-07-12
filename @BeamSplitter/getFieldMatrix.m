@@ -5,7 +5,8 @@
 %
 % Example:
 % par = opt.getOptParam;
-% [mOpt, mDirIn, mDirOut, dldx] = opt.optic{nBS}.getFieldMatrix(0, par);
+% [mOpt, mOptMir, mDirIn, mDirOut, dldx] = ...
+%      opt.optic{nBS}.getFieldMatrix(0, par);
 
 function [mOpt, mOptMir, mDirIn, mDirOut, dldx] = ...
   getFieldMatrix(obj, pos, par, varargin)

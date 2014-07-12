@@ -5,7 +5,7 @@ function opt = optSagnac
   % some parameters
   lambda = 1064e-9;  % just one wavelength
   Pin = 100;
-  gamma = 0;     % RF modulation depth
+  gamma = 0.1;     % RF modulation depth
   
   Tbs  = 0.5;      % non-polarizing BS transmission
   Tin = 0.01;      % input mirror transmission
@@ -14,12 +14,16 @@ function opt = optSagnac
   
   % RF component vector
   vMod = (-1:1)';
-  vMod = 0;
   fMod = 20e6;
   vFrf = fMod * vMod;
   
+  % squeezer parameters
+  szqAng = -pi/2;
+  sqzDB = 6;
+  antiDB = 10;
+  
   %%%%%%%%%%%%%%%%%%%%%%
-  % Add Optics
+  % Optics
   %%%%%%%%%%%%%%%%%%%%%%
     
   % create model
@@ -59,7 +63,7 @@ function opt = optSagnac
   %opt.setPosOffset('EX', -posPBS);
   
   %%%%%%%%%%%%%%%%%%%%%%
-  % Add Links
+  % Link the Optics
   %%%%%%%%%%%%%%%%%%%%%%
     
   % link laser to modulators
@@ -116,11 +120,25 @@ function opt = optSagnac
   
   
   %%%%%%%%%%%%%%%%%%%%%%
+  % Squeezer
+  %%%%%%%%%%%%%%%%%%%%%%
+  
+  % opt.addSqueezer(name, lambda, fRF, pol,...
+  %                         sqAng, sqdB, antidB, sqzOption = 0)
+  opt.addSqueezer('Sqz', lambda, 0, Optickle.polS, szqAng, sqzDB, antiDB, 0);
+  opt.addLink('Sqz', 'out', 'BS', 'bkA', 0);
+  
+  %%%%%%%%%%%%%%%%%%%%%%
   % Probes
   %%%%%%%%%%%%%%%%%%%%%%
     
-  % use homodyne readout at REFL port
-  opt.addHomodyne('R_HD', Optickle.c / lambda, Optickle.polS, 90, 1, 'BS', 'frB');
+  % add REFL optics
+  opt.addSink('REFL');
+  opt.addLink('BS', 'frB', 'REFL', 'in', 0);
+  
+  % add REFL probes (this call adds probes REFL_DC, I and Q)
+  phi = 0;
+  opt.addReadout('REFL', [fMod, phi]);
 
   % use homodyne readout at AS port
   opt.addHomodyne('HD', Optickle.c / lambda, Optickle.polS, 90, 1, 'BS', 'bkB');
