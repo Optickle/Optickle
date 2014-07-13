@@ -1,5 +1,5 @@
-% demoDetuneFP
-%   this function demonstrates the use of tickle with optFP
+% demoSagnac
+%   this function demonstrates the use of tickle with a Sagnac Interferometer
 %
 
 function demoSagnac

@@ -1,4 +1,4 @@
-% Create an Optickle Fabry-Perot
+% Create a Sagnac Interferometer
 
 function opt = optSagnac
 

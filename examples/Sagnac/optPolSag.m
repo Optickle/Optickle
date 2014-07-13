@@ -1,4 +1,4 @@
-% Create an Optickle Fabry-Perot
+% Create a Polarization Sagnac Interferometer
 
 function opt = optPolSag
 
