@@ -329,14 +329,6 @@ Km        = m * (2 * pi * f0)^2; %mech spring constant
 indSpring = find((abs(Km + K) ./ (m * (2 * pi * params.f).^2))<1, 1);
 fSpring   = params.f(indSpring);
 
-<<<<<<< HEAD
-%Test for spring stability
-if isempty(find([real(K) imag(K)]<=0))
-    fprintf('\nStable spring!\n')
-end
-=======
->>>>>>> origin/Optickle2-jm
-
 % Extract appropriate info from mMech
 rpMech = getTF(mMech,params.nEX, params.nEX);
 

@@ -54,7 +54,7 @@ function opt = optPolSag
          1 - PBSleakP, lambda, Optickle.polP];
   opt.addBeamSplitter('PBS', 45, 0, Thr);
 
-  % waveplates
+  % waveplates (NB: we need one for each direction, since WP is one-in and one-out)
   opt.addWaveplate('WPX_A', 0.25, 45);  % seen from the front; 45 dg
   opt.addWaveplate('WPX_B', 0.25, -45); % seen from the back, so -45dg
   

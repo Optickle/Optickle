@@ -59,9 +59,6 @@ function opt = optSagnac
   opt.addBeamSplitter('IY', 0, 0, Tin);
   opt.addBeamSplitter('EY', 0, 0.7 / lCav, Tend);
 
-  %opt.setPosOffset('BS', posPBS);
-  %opt.setPosOffset('EX', -posPBS);
-  
   %%%%%%%%%%%%%%%%%%%%%%
   % Link the Optics
   %%%%%%%%%%%%%%%%%%%%%%
