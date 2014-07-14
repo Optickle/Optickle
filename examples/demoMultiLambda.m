@@ -1,6 +1,17 @@
+% demoMultiLambda
+%   this function demonstrates the use of multiple wavelengths
+%
+% Note: This is an "all in one file" demo, which is not usually
+% the best structure, but it shows all of the steps together.
 
+function demoMultiLambda
+
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Build Optickle Model
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  
   % RF component vector
-  Pin = 100;
+  Pin = 1;
   vMod = (-1:1)';
   fMod = 20e6;
   vFrf = fMod * vMod;
@@ -11,113 +22,81 @@
   vFrf = [vFrf; 0];
   lambda = [lambda; 532e-9];
   
-  
-  phaseOffsetGreen = [0 1064e-9
-                      pi/10  532e-9];
+  nRed = 2;  % index of 1064nm carrier field in fDC
+  nGrn = 4;  % index of 532nm carrier field in fDC
   
   % create model
   opt = Optickle(vFrf,lambda);
   
-  % add a source
-  opt = addSource(opt, 'Laser', sqrt(Pin) * (vFrf==0));
-
-  % add an AM modulator (for intensity control, and intensity noise)
-  %   opt = addModulator(opt, name, cMod)
-  opt = addModulator(opt, 'AM', 1);
-  opt = addLink(opt, 'Laser', 'out', 'AM', 'in', 0);
-
-  % add an PM modulator (for frequency control and noise)
-  opt = addModulator(opt, 'PM', 1i);
-  opt = addLink(opt, 'AM', 'out', 'PM', 'in', 0);
+  % add a source, with power in red and green carriers
+  opt.addSource('Laser', sqrt(Pin) * (vFrf==0));
 
   % add an RF modulator
-  %   opt = addRFmodulator(opt, name, fMod, aMod)
+  %   opt.addRFmodulator(name, fMod, aMod)
   gamma = 1.2;
-  opt = addRFmodulator(opt, 'Mod1', fMod, 1i * gamma);
-  opt = addLink(opt, 'PM', 'out', 'Mod1', 'in', 1);
+  opt.addRFmodulator('Mod1', fMod, 1i * gamma);
+  opt.addLink('Laser', 'out', 'Mod1', 'in', 0);
 
   % add mirrors
-  %   opt = addMirror(opt, name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
+  %   opt.addMirror(name, aio, Chr, Thr, Lhr, Rar, Lmd, Nmd)
   lCav = 4000;
-  opt = addMirror(opt, 'IX', 0, 0, [0.3 1064e-9; 0.1 532e-9]);
-  opt = addMirror(opt, 'EX', 0, 0.7 / lCav, 0.001);
+  opt.addMirror('IX', 0, 0, [0.3 1064e-9; 0.1 532e-9]);
+  opt.addMirror('EX', 0, 0.7 / lCav, 0.001);
 
-  opt = addLink(opt, 'Mod1', 'out', 'IX', 'bk', 2);
-  
+  opt.addLink('Mod1', 'out', 'IX', 'bk', 0);
   
   % here we add the green phase offset
-  opt = addLink(opt, 'IX', 'fr', 'EX', 'fr', lCav, phaseOffsetGreen);
-  opt = addLink(opt, 'EX', 'fr', 'IX', 'fr', lCav, phaseOffsetGreen);
+  phaseOffsetGreen = [0 1064e-9
+                      pi/10  532e-9];
   
-  % set some mechanical transfer functions
-  w = 2 * pi * 0.7;      % pendulum resonance frequency
-  mI = 40;               % mass of input mirror
-  mE = 40;               % mass of end mirror
-
-  w_pit = 2 * pi * 0.5;   % pitch mode resonance frequency
-
-  rTM = 0.17;             % test-mass radius
-  tTM = 0.2;              % test-mass thickness
-  iTM = (3 * rTM^2 + tTM^2) / 12;  % TM moment / mass
-
-  iI = mE * iTM;          % moment of input mirror
-  iE = mE * iTM;          % moment of end mirror
-
-  dampRes = [0.01 + 1i, 0.01 - 1i];
-  
-  opt = setMechTF(opt, 'IX', zpk([], -w * dampRes, 1 / mI));
-  opt = setMechTF(opt, 'EX', zpk([], -w * dampRes, 1 / mE));
-
-  opt = setMechTF(opt, 'IX', zpk([], -w_pit * dampRes, 1 / iI), 2);
-  opt = setMechTF(opt, 'EX', zpk([], -w_pit * dampRes, 1 / iE), 2);
-  
-  % tell Optickle to use this cavity basis
-  opt = setCavityBasis(opt, 'IX', 'EX');
+  opt.addLink('IX', 'fr', 'EX', 'fr', lCav, phaseOffsetGreen);
+  opt.addLink('EX', 'fr', 'IX', 'fr', lCav, phaseOffsetGreen);
   
   % add REFL optics
-  opt = addSink(opt, 'REFL');
-  opt = addLink(opt, 'IX', 'bk', 'REFL', 'in', 2);
+  opt.addSink('REFL');
+  opt.addLink('IX', 'bk', 'REFL', 'in', 0);
   
   % add REFL probes (this call adds probes REFL_DC, I and Q)
-  phi = 180 - 83.721;
-  opt = addReadout(opt, 'REFL', [fMod, phi]);
-  
-  % add TRANS optics (adds telescope, splitter and sinks)
-  % opt = addReadoutTelescope(opt, name, f, df, ts, ds, da, db)
-  opt = addReadoutTelescope(opt, 'TRANS', 2, [2.2 0.19], ...
-    0.5, 0.1, 0.1, 4.1);
-  opt = addLink(opt, 'EX', 'bk', 'TRANS_TELE', 'in', 0.3);
-  
-  % add TRANS probes
-  opt = addProbeIn(opt, 'TRANSa_DC', 'TRANSa', 'in', 0, 0);	% DC
-  opt = addProbeIn(opt, 'TRANSb_DC', 'TRANSb', 'in', 0, 0);	% DC
-
-  % add a source at the end, just for fun
-  %opt = addSource(opt, 'FlashLight', (1e-3)^2 * (vMod == 1));
-  %opt = addGouyPhase(opt, 'FakeTele', pi / 4);
-  %opt = addLink(opt, 'FlashLight', 'out', 'FakeTele', 'in', 0.1);
-  %opt = addLink(opt, 'FakeTele', 'out', 'EX', 'bk', 0.1);
-  %opt = setGouyPhase(opt, 'FakeTele', pi / 8);
-  
+  phi = 0;
+  opt.addReadout('REFL', [fMod, phi]);
+    
   % add unphysical intra-cavity probes
-  opt = addProbeIn(opt, 'IX_DC', 'IX', 'fr', 0, 0);
-  opt = addProbeIn(opt, 'EX_DC', 'EX', 'fr', 0, 0);
+  opt.addProbeIn('IX_DC', 'IX', 'fr', 0, 0);
+  opt.addProbeIn('EX_DC', 'EX', 'fr', 0, 0);
+  
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Show DC Fields and Signals
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   [fDC,sigDC] = tickle(opt);
   showfDC(opt,fDC)
   showsigDC(opt,sigDC)
   
   
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % Plot Intra-cavity Powers vs. EX position
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  lenSweep = linspace(0,1,5000);
+  nEX = opt.getDriveNum('EX');       % EX position drive
+  nDC = opt.getProbeNum('EX_DC');    % DC probe on EX
+  nFld = opt.getFieldIn('EX', 'fr'); % field incident on EX
+  
+  % make a linear sweep of EX
+  lenSweep = linspace(-0.1, 0.6, 1000);
   posSweep = zeros(opt.Ndrive,length(lenSweep));
-  posSweep(getDriveNum(opt,'EX'),:)=lenSweep*1064e-9;
+  posSweep(nEX,:)=lenSweep*1e-6;
   [fDcSweep,sigDcSweep] = sweep(opt,posSweep);
   
-  figure
-  plot(lenSweep,sigDcSweep(getProbeNum(opt,'TRANSa_DC'),:),'k',...
-       lenSweep,abs(squeeze(fDcSweep(9,2,:))).^2,'r',...
-       lenSweep,abs(squeeze(fDcSweep(9,4,:))).^2,'g'...
-       );
+  % plot DC signal, and carrier powers
+  figure(1)  
+  plot(lenSweep,sigDcSweep(nDC,:),'k',...
+       lenSweep,abs(squeeze(fDcSweep(nFld,nRed,:))).^2,'r',...
+       lenSweep,abs(squeeze(fDcSweep(nFld,nGrn,:))).^2,'g');
+   xlim(lenSweep([1, end]))
    grid on
    set(get(gca,'Children'),'Linewidth',5)
+   xlabel('Position [um]')
+   ylabel('Power [W]')
+   legend('DC Signal', '1064nm Carrier', '532nm Carrier')
+   
+end

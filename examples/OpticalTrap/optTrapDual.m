@@ -36,7 +36,7 @@ opt = Optickle(vFrf, lambda);
 % add a source
 PG     = ratioP * PIR; % Green power
 powerDistribution = [PIR PG];
-opt = addSource(opt, 'Laser', sqrt(powerDistribution));
+opt.addSource('Laser', sqrt(powerDistribution));
 
 
 %Tramsissivity vector
@@ -47,12 +47,12 @@ T1 = [T1Vec' lambda'];
 
 % Add mirrors
 lCav = 0.9;
-opt  = addMirror(opt, 'IX', 0, 0, T1);
-opt  = addMirror(opt, 'EX', 0, 0.7 / lCav, 0);
+opt.addMirror('IX', 0, 0, T1);
+opt.addMirror('EX', 0, 0.7 / lCav, 0);
 
-opt  = addLink(opt, 'Laser', 'out', 'IX', 'bk', 0);
-opt  = addLink(opt, 'IX', 'fr', 'EX', 'fr', lCav);
-opt  = addLink(opt, 'EX', 'fr', 'IX', 'fr', lCav);
+opt.addLink('Laser', 'out', 'IX', 'bk', 0);
+opt.addLink('IX', 'fr', 'EX', 'fr', lCav);
+opt.addLink('EX', 'fr', 'IX', 'fr', lCav);
 
 % Set  mechanical transfer functions
 f0 = 172;         % pendulum resonant frequency
@@ -67,18 +67,18 @@ poles = [p1, p2];
 
 % Build zpk model
 pendulumModel = zpk([], poles, 1 / m);
-opt = setMechTF(opt, 'EX', pendulumModel);
+opt.setMechTF('EX', pendulumModel);
 
 % Tell Optickle to use this cavity basis
-opt = setCavityBasis(opt, 'IX', 'EX');
+opt.setCavityBasis('IX', 'EX');
 
 % Add REFL optics
-opt = addSink(opt, 'REFL');
-opt = addLink(opt, 'IX', 'bk', 'REFL', 'in', 2);
+opt.addSink('REFL');
+opt.addLink('IX', 'bk', 'REFL', 'in', 2);
 
 % Add REFL probes (this call adds probes REFL_DC, I and Q)
 phi = 0;
-opt = addReadout(opt, 'REFL', [fMod, phi]);
+opt.addReadout('REFL', [fMod, phi]);
 
 
 end

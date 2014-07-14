@@ -1,6 +1,9 @@
 % Create an Optickle test case with
-%   just some modulators (AM for position, PM for tilt)
+%   some modulators (AM or shift for TEM01/10, and PM/tilt)
 %   a Gouy phase telescope and some detectors
+%
+% This can be useful for conducting simple tests of modulators
+% and readout telescopes.
 
 function opt = optTest
 
