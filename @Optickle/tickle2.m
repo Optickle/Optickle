@@ -1,44 +1,50 @@
 % Compute DC fields, and DC signals, and AC transfer functions
 %
-% [fDC, sigDC, sigAC, mMech, noiseAC, noiseMech] = tickle(opt, pos, f, nDrive)
+% [fDC, sigDC, mInOut, mMech, noiseAC, noiseMech] = tickle(opt, pos, f, nDrive)
 % opt       - Optickle model
 % pos       - optic positions (Ndrive x 1, or empty)
 % f         - audio frequency vector (Naf x 1)
-% nDrive    - drive indices to consider (Nx1, default is all)
 %
 % fDC       - DC fields at this position (Nlink x Nrf)
 %             where Nlink is the number of links, and Nrf
 %             is the number of RF frequency components.
 % sigDC     - DC signals for each probe (Nprobe x 1)
 %             where Nprobe is the number of probes.
-% sigAC     - transfer matrix (Nprobe x Ndrive x Naf),
-%             where Ndrive is the total number of optic drive
+% mInOut    - optical transfer matrix (Nout x Nin x Naf),
+%             where Nin is the total number of optic drive
 %             inputs (e.g., 1 for a mirror, 2 for a RFmodulator).
 %             Thus, sigAC is arranged such that sigAC(n, m, :)
-%             is the TF from the drive m to probe n.
-% mMech     - modified drive transfer functions (Ndrv x Ndrv x Naf)
-% noiseAC   - quantum noise at each probe (Nprb x Naf)
-% noiseMech - quantum noise at each drive (Ndrv x Naf)
+%             is the TF from input m to output n.
+%             NOTE: if mProbeOut is empty, the outputs are all probes
+%               similarly, if mInDrv is empty, the inputs are all drives
+% mMech     - opto-mechanical modification of the inputs (Nin x Nin x Naf)
+%             if there are no opto-mechanics, this will be the identity.
+%             NOTE: mMech does NOT include the mechanical response to
+%             force (i.e., MechTF).
+%
+% noiseOut   - quantum noise at each output/probe (Nout x Naf)
+% noiseMech - quantum noise at each input/drive (Nin x Naf)
 %
 % UNITS:
 % Assuming the input laser power is in Watts, and laser wavelength is in
 % meters, the outputs are generically 
 % fDC   - [sqrt(W)]
 % sigDC - [W]
-% sigAC - [W/m]
-% assuming the drive is a mirror. If the drive is a modulator, then sigAC
-% is [W/AM] or [W/rad] for an amplitude or phase modulation, respectively.
+% mInOut - [W/m]  assuming the drive is a mirror. 
+%  If the drive is a modulator, then mInOut is [W/AM] or [W/rad] for
+%  an amplitude or phase modulation, respectively.  Generally, the
+%  units are W/(drive unit).
+% mMech - [m/m]  again, generally this is (drive unit)/(drive unit)
 %
 % EXAMPLE:
 % f = logspace(0, 3, 300);
 % opt = optFP;
 % [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
 %
-% 
-% $Id: tickle.m,v 1.14 2011/07/26 23:09:57 tfricke Exp $
+% (see also @Optickle/Optickle)
 
 
-function varargout = tickle(opt, pos, f, tfType, nDrive)
+function varargout = tickle2(opt, pos, f, tfType)
 
   % === Argument Handling
   if nargin < 2
@@ -49,9 +55,6 @@ function varargout = tickle(opt, pos, f, tfType, nDrive)
   end
   if nargin < 4
     tfType = Optickle.tfPos;
-  end
-  if nargin < 5
-    nDrive = [];
   end
     
   % === Field Info
@@ -172,8 +175,8 @@ function varargout = tickle(opt, pos, f, tfType, nDrive)
     shotPrb = zeros(Nprb, 1);
     mQuant = zeros(Narf, 0);
     
-    [sigAC, mMech] = tickleAC(opt, f, nDrive, vLen, ...
-      vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+    [mInOut, mMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
+      mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   else
     % set the quantum scale
     pQuant  = Optickle.h * opt.nu;
@@ -185,21 +188,21 @@ function varargout = tickle(opt, pos, f, tfType, nDrive)
       mIn_k = prbList(k).mIn;
       mPrb_k = prbList(k).mPrb;
       
-      % This section attempts to account for the shot noise due to
-      % fields which are not recorded by a detector. E.g. a 10
-      % MHz detector will not see signal due to 37 MHz sidebands
-      % but it should see their shot noise
+      % This section accounts for the shot noise due to
+      % fields which are not recorded by a detector. For instance,
+      % a 10 MHz detector will not see signal due to 37 MHz
+      % sidebands, but it should see their shot noise.
       shotPrb(k) = (1 - sum(abs(mPrb_k), 1)) * ...
         (pQuant .* abs(mIn_k * vDC).^2);
     end
     
     % call tickleAC to do the rest
-    [sigAC, mMech, noiseAC, noiseMech] = tickleAC(opt, f, nDrive, vLen, ...
+    [mInOut, mMech, noiseAC, noiseMech] = tickleAC(opt, f, vLen, ...
       vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   end
 
   % Build the rest of the outputs
-  varargout{3} = sigAC;
+  varargout{3} = mInOut;
   varargout{4} = mMech;
   if isNoise
     varargout{5} = noiseAC;

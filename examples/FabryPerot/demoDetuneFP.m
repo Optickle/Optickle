@@ -38,6 +38,7 @@ function demoDetuneFP
   pos(nIX) = 1e-9;
   [fDC, sigDC2, sigAC2, mMech2, noiseAC2] = opt.tickle(pos, f);
   
+  
   % make a response plot
   h0 = getTF(sigAC0, nREFL_I, nEX);
   h1 = getTF(sigAC1, nREFL_I, nEX);
