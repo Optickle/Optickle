@@ -55,7 +55,7 @@ function [opt, pos] = setOperatingPoint(opt, varargin)
   % main minimization loop
   pos = zeros(opt.Ndrive, Nlock + 1);
   mOffset = repmat(vOffset, 1, Nlock + 1);
-  mDelta = mDrive * 1e-6 * opt.lambda;
+  mDelta = mDrive * 1e-6 * opt.lambda(1);
   for n = 1:10
     % compute sigDC at initial position plus small offsets
     pos(:, 2:end) = repmat(pos(:, 1), 1, Nlock) + mDelta;
