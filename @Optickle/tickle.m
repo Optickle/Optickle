@@ -57,7 +57,7 @@ function varargout = tickle(opt, varargin)
     if ~isNoise
       [fDC, sigDC, mInOut, mMech] = tickle2(opt, varargin{:});
     else
-      [fDC, sigDC, mInOut, mMech, noiseOut, noiseMech] = ...
+      [fDC, sigDC, mInOut, mMech, noiseOpt, noiseMech] = ...
         tickle2(opt, varargin{:});
     end
     sigAC = getProdTF(mInOut, mMech);
@@ -73,7 +73,7 @@ function varargout = tickle(opt, varargin)
   end
   
   if isNoise
-    varargout{5} = noiseOut;
+    varargout{5} = noiseOpt;
     varargout{6} = noiseMech;
   end
 end

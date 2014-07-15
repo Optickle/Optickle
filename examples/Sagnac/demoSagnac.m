@@ -4,33 +4,50 @@
 
 function demoSagnac
 
-  % create the model
+  % create the model (no squeezing)
   opt = optSagnac;
   
   % get some drive indexes
-  nBS = getDriveIndex(opt, 'BS');
-  nCM = getDriveIndex(opt, 'CM');
-  nEX = getDriveIndex(opt, 'EX');
-  nEY = getDriveIndex(opt, 'EY');
+  nBS = opt.getDriveIndex('BS');
+  nCM = opt.getDriveIndex('CM');
+  nEX = opt.getDriveIndex('EX');
+  nEY = opt.getDriveIndex('EY');
 
   % get some probe indexes
-  nREFL_DC = getProbeNum(opt, 'REFL_DC');
-  nREFL_I = getProbeNum(opt, 'REFL_I');
-  nREFL_Q = getProbeNum(opt, 'REFL_Q');
+  nREFL_DC = opt.getProbeNum('REFL_DC');
+  nREFL_I = opt.getProbeNum('REFL_I');
+  nREFL_Q = opt.getProbeNum('REFL_Q');
 
-  nHDA_DC = getProbeNum(opt, 'HDA_DC');
-  nHDB_DC = getProbeNum(opt, 'HDB_DC');
+  nHDA_DC = opt.getProbeNum('HDA_DC');
+  nHDB_DC = opt.getProbeNum('HDB_DC');
   
-  % set output matrix for homodyne readout
-  opt.mProbeOut = eye(opt.Nprobe);      % start with identity matrix
-  opt.mProbeOut(nHDA_DC, nHDB_DC) = 1;  % add B to A
-  opt.mProbeOut(nHDB_DC, nHDA_DC) = -1; % subtract A from B
+  % output nHDB_DC is now the difference is the homodyne difference
+  %  signal, and nHDA_DC is the sum (using Optickle.mProbeOut).
+  nHD = nHDB_DC;
   
-  nHD = nHDB_DC;  % output nHDB_DC is now the difference
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+  % compute the DC signals, noise and transfer functions
+  %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
-  % compute the DC signals and TFs on resonance
+  % for the standard Sagnac
   f = logspace(-1, 3, 200)';
-  [fDC, sigDC, sigAC, ~, noiseAC] = tickle(opt, [], f);
+  [fDC, sigDC, sigAC, ~, noiseOpt] = opt.tickle([], f);
+  
+  % compute the same with squeezing (squeeze angle = 0)
+  opt = optSagnac(0, 6, 10);
+  [~, ~, ~, ~, noiseSqz00] = opt.tickle([], f);
+  
+  % compute the same with squeezing (squeeze angle = 45)
+  opt = optSagnac(pi / 4, 6, 10);
+  [~, ~, ~, ~, noiseSqz45] = opt.tickle([], f);
+  
+  % compute the same with squeezing (squeeze angle = 90)
+  opt = optSagnac(pi / 2, 6, 10);
+  [~, ~, ~, ~, noiseSqz90] = opt.tickle([], f);
+  
+  % compute the same with squeezing (squeeze angle = 135)
+  opt = optSagnac(3 * pi / 4, 6, 10);
+  [~, ~, ~, ~, noiseSqz135] = opt.tickle([], f);
   
   % Print out the fields and probes, just to demonstrate these functions:
   fprintf('DC fields (fDC matrix):\n');
@@ -55,11 +72,16 @@ function demoSagnac
 %  legend({'EX R', 'EY R', 'EX AS', 'EY AS'}, 'Location','NorthEast');
   
   % make a noise plot
-  n0 = noiseAC(nHD, :)';
+  nNoSqz = noiseOpt(nHD, :)';
+  nSqz00 = noiseSqz00(nHD, :)';
+  nSqz45 = noiseSqz45(nHD, :)';
+  nSqz90 = noiseSqz90(nHD, :)';
+  nSqz135 = noiseSqz135(nHD, :)';
   
   figure(2)
-  loglog(f, abs(n0 ./ hDARM))
+  loglog(f, abs([nNoSqz ./ hDARM, nSqz00 ./ hDARM, ...
+    nSqz45 ./ hDARM, nSqz90 ./ hDARM, nSqz135 ./ hDARM]))
   title('Quantum Noise for Sagnac', 'fontsize', 18);
   grid on
-  
+  legend('No Squeezing', '6dB 0 dg', '6dB 45 dg', '6dB 90 dg', '6dB 135 dg')
 end

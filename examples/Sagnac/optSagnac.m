@@ -1,6 +1,8 @@
 % Create a Sagnac Interferometer
+%
+% opt = optSagnac(sqzAng, sqzDB, antiDB)
 
-function opt = optSagnac
+function opt = optSagnac(sqzAng, sqzDB, antiDB)
 
   % some parameters
   lambda = 1064e-9;  % just one wavelength
@@ -18,9 +20,15 @@ function opt = optSagnac
   vFrf = fMod * vMod;
   
   % squeezer parameters
-  szqAng = -pi/2;
-  sqzDB = 6;
-  antiDB = 10;
+  if nargin < 1
+    sqzAng = -pi/2;
+  end
+  if nargin < 2
+    sqzDB = 0;
+  end
+  if nargin < 3
+    antiDB = sqzDB;
+  end
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Optics
@@ -122,8 +130,10 @@ function opt = optSagnac
   
   % opt.addSqueezer(name, lambda, fRF, pol,...
   %                         sqAng, sqdB, antidB, sqzOption = 0)
-  opt.addSqueezer('Sqz', lambda, 0, Optickle.polS, szqAng, sqzDB, antiDB, 0);
-  opt.addLink('Sqz', 'out', 'BS', 'bkA', 0);
+  if sqzDB > 0
+    opt.addSqueezer('Sqz', lambda, 0, Optickle.polS, sqzAng, sqzDB, antiDB, 0);
+    opt.addLink('Sqz', 'out', 'BS', 'bkA', 0);
+  end
   
   %%%%%%%%%%%%%%%%%%%%%%
   % Probes
@@ -140,4 +150,11 @@ function opt = optSagnac
   % use homodyne readout at AS port
   opt.addHomodyne('HD', Optickle.c / lambda, Optickle.polS, 90, 1, 'BS', 'bkB');
 
+  % set output matrix for homodyne readout
+  nHDA_DC = opt.getProbeNum('HDA_DC');
+  nHDB_DC = opt.getProbeNum('HDB_DC');
+  
+  opt.mProbeOut = eye(opt.Nprobe);      % start with identity matrix
+  opt.mProbeOut(nHDA_DC, nHDB_DC) = 1;  % add B to A
+  opt.mProbeOut(nHDB_DC, nHDA_DC) = -1; % subtract A from B
 end

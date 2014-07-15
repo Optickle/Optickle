@@ -1,6 +1,6 @@
 % backend function for tickle2
 %
-% [mOpt, mMech, noiseAC, noiseMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
+% [mOpt, mMech, noiseOpt, noiseMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
 %   mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb)
 
 
@@ -50,9 +50,9 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
   %sigAC     = zeros(Nout, Nin, Naf);
   eyeNarf   = speye(Narf);
   eyeNin    = speye(Nin);
-  mOpt    = zeros(Nout, Nin, Naf);
+  mOpt      = zeros(Nout, Nin, Naf);
   mMech     = zeros(Nin, Nin, Naf);
-  noiseAC   = zeros(Nout, Naf);
+  noiseOpt  = zeros(Nout, Naf);
   noiseMech = zeros(Nin, Naf);
   
   % since this can take a while, let's time it
@@ -112,7 +112,7 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
       noiseDrv = mDrvIn * mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise
-      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+      noiseOpt(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
       noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
     end
     
@@ -172,7 +172,7 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
   varargout{1} = mOpt;
   varargout{2} = mMech;
   if isNoise
-    varargout{3} = noiseAC;
+    varargout{3} = noiseOpt;
     varargout{4} = noiseMech;
   end
 end
