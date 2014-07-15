@@ -1,6 +1,6 @@
 % Compute DC fields, and DC signals, and AC transfer functions
 %
-% [fDC, sigDC, mInOut, mMech, noiseAC, noiseMech] = tickle(opt, pos, f, nDrive)
+% [fDC, sigDC, mOpt, mMech, noiseAC, noiseMech] = tickle(opt, pos, f, nDrive)
 % opt       - Optickle model
 % pos       - optic positions (Ndrive x 1, or empty)
 % f         - audio frequency vector (Naf x 1)
@@ -10,7 +10,7 @@
 %             is the number of RF frequency components.
 % sigDC     - DC signals for each probe (Nprobe x 1)
 %             where Nprobe is the number of probes.
-% mInOut    - optical transfer matrix (Nout x Nin x Naf),
+% mOpt      - optical transfer matrix (Nout x Nin x Naf),
 %             where Nin is the total number of optic drive
 %             inputs (e.g., 1 for a mirror, 2 for a RFmodulator).
 %             Thus, sigAC is arranged such that sigAC(n, m, :)
@@ -30,8 +30,8 @@
 % meters, the outputs are generically 
 % fDC   - [sqrt(W)]
 % sigDC - [W]
-% mInOut - [W/m]  assuming the drive is a mirror. 
-%  If the drive is a modulator, then mInOut is [W/AM] or [W/rad] for
+% mOpt - [W/m]  assuming the drive is a mirror. 
+%  If the drive is a modulator, then mOpt is [W/AM] or [W/rad] for
 %  an amplitude or phase modulation, respectively.  Generally, the
 %  units are W/(drive unit).
 % mMech - [m/m]  again, generally this is (drive unit)/(drive unit)
@@ -175,7 +175,7 @@ function varargout = tickle2(opt, pos, f, tfType)
     shotPrb = zeros(Nprb, 1);
     mQuant = zeros(Narf, 0);
     
-    [mInOut, mMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
+    [mOpt, mMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
       mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   else
     % set the quantum scale
@@ -197,12 +197,12 @@ function varargout = tickle2(opt, pos, f, tfType)
     end
     
     % call tickleAC to do the rest
-    [mInOut, mMech, noiseAC, noiseMech] = tickleAC(opt, f, vLen, ...
+    [mOpt, mMech, noiseAC, noiseMech] = tickleAC(opt, f, vLen, ...
       vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
   end
 
   % Build the rest of the outputs
-  varargout{3} = mInOut;
+  varargout{3} = mOpt;
   varargout{4} = mMech;
   if isNoise
     varargout{5} = noiseAC;
