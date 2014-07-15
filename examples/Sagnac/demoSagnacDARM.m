@@ -1,17 +1,15 @@
-% demoSagnac
+% demoSagnacDARM
 %   this function demonstrates the use of tickle with a Sagnac Interferometer
 %
+%   this example is the same as demoSagnac, except that it uses the
 
-function demoSagnac
+function demoSagnacDARM
 
   % create the model (no squeezing)
   opt = optSagnac;
   
-  % get some drive indexes
-  nBS = opt.getDriveIndex('BS');
-  nCM = opt.getDriveIndex('CM');
-  nEX = opt.getDriveIndex('EX');
-  nEY = opt.getDriveIndex('EY');
+  % set the input matrix
+  [opt, nDARM, nCARM] = setInDriveForDARM(opt);
 
   % get some probe indexes
   nREFL_DC = opt.getProbeNum('REFL_DC');
@@ -42,34 +40,32 @@ function demoSagnac
   
   % compute the same with squeezing (squeeze angle = 0)
   opt = optSagnac(0, 6, 10);
+  opt = setInDriveForDARM(opt);
   [~, ~, ~, ~, noiseSqz00] = opt.tickle([], f);
   
   % compute the same with squeezing (squeeze angle = 45)
   opt = optSagnac(pi / 4, 6, 10);
+  opt = setInDriveForDARM(opt);
   [~, ~, ~, ~, noiseSqz45] = opt.tickle([], f);
   
   % compute the same with squeezing (squeeze angle = 90)
   opt = optSagnac(pi / 2, 6, 10);
+  opt = setInDriveForDARM(opt);
   [~, ~, ~, ~, noiseSqz90] = opt.tickle([], f);
   
   % compute the same with squeezing (squeeze angle = 135)
   opt = optSagnac(3 * pi / 4, 6, 10);
+  opt = setInDriveForDARM(opt);
   [~, ~, ~, ~, noiseSqz135] = opt.tickle([], f);
   
   % make a response plot
-  h0 = getTF(sigAC, nREFL_I, [nEX, nEY]);
-  h1 = getTF(sigAC, nHD, [nEX, nEY]);
-  hREFL = h0(:, 1) + h0(:, 2);
-  hDARM = h1(:, 1) - h1(:, 2);
+  hREFL = getTF(sigAC, nREFL_I, nCARM);
+  hDARM = getTF(sigAC, nHD, nDARM);
   
   figure(1)
   zplotlog(f, [hREFL, hDARM])
   title('Response to CARM and DARM', 'fontsize', 18);
   legend({'CARM REFL', 'DARM AS'}, 'Location','NorthEast');
-  
-%  zplotlog(f, [h0, h1])
-%  title('Response to EX and EY', 'fontsize', 18);
-%  legend({'EX R', 'EY R', 'EX AS', 'EY AS'}, 'Location','NorthEast');
   
   % make a noise plot
   nNoSqz = noiseOpt(nHD, :)';
@@ -84,4 +80,24 @@ function demoSagnac
   title('Quantum Noise for Sagnac', 'fontsize', 18);
   grid on
   legend('No Squeezing', '6dB 0 dg', '6dB 45 dg', '6dB 90 dg', '6dB 135 dg')
+end
+
+
+% setup the input matrix to drive CARM and DARM instead of EX and EY
+%
+function  [opt, nDARM, nCARM] = setInDriveForDARM(opt)
+  
+  % get EX and EY drive indexes
+  nEX = opt.getDriveIndex('EX');
+  nEY = opt.getDriveIndex('EY');
+  
+  % new drive indices
+  nDARM = 1;
+  nCARM = 2;
+  
+  % set the Optickle input matrix
+  opt.mInDrive = zeros(opt.Ndrive, 2);  % matrix from DARM and CARM to all drives
+  opt.mInDrive([nEX, nEY], nDARM) = [1, -1];     % DARM
+  opt.mInDrive([nEX, nEY], nCARM) = [1, 1];      % CARM
+  
 end
