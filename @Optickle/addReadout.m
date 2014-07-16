@@ -12,7 +12,7 @@
 % names - optional cell array of probe suffixes (instead of 1:N)
 %
 % Example:
-% opt = addReadout(opt, 'REFL', [f1, par.REFL_1; f2 par.REFL_2]);
+% opt.addReadout('REFL', [f1, par.REFL_1; f2 par.REFL_2]);
 
 
 function opt = addReadout(opt, name, fphi, names)

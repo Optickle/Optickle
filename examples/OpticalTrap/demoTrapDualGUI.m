@@ -24,30 +24,30 @@ params.indG     = 2;
 opt = optTrapDual;
 
 %Get default T1 values
-itm         = getOptic(opt, 'IX');
+itm         = opt.getOptic('IX');
 T1          = itm.Thr;
 params.T1IRDefault = T1(params.indIR);
 params.T1GDefault  = T1(params.indG);
 
 % Get drive indices
-params.nEX    = getDriveIndex(opt, 'EX');
-params.nIX    = getDriveIndex(opt, 'IX');
+params.nEX    = opt.getDriveIndex('EX');
+params.nIX    = opt.getDriveIndex('IX');
 params.nDrive = opt.Ndrive;
 
 % Get cavity length and fsr
-nCavLink    = getLinkNum(opt, 'IX', 'EX');
-vDist       = getLinkLengths(opt);
+nCavLink    = opt.getLinkNum('IX', 'EX');
+vDist       = opt.getLinkLengths;
 params.lCav = vDist(nCavLink);
 params.fsr  = Optickle.c / (2 * params.lCav);
 
 % Get lambda values
-par              = getOptParam(opt);
+par              = opt.getOptParam;
 params.lambdaVec = par.lambda;
 params.lambdaIR  = params.lambdaVec(params.indIR);
 params.lambdaG   = params.lambdaVec(params.indG);
 
 %Get mechanical response of ETM
-etm                 = getOptic(opt, 'EX');
+etm                 = opt.getOptic('EX');
 params.pendulumResp = squeeze(freqresp(etm.mechTF, 2 * pi * params.f)); 
 
 
@@ -310,11 +310,11 @@ fDetune  = (det/hwhmMVec(params.indG)+gFactor) * ...
 [opt, f0, Q0, m]  = optTrapDual(params.PIR, ratioP, fDetune, T1IR, T1G);
 
 % Get mMech
-[fDC, sigDC, sigAC, mMech, noiseAC] = tickle(opt, pos, params.f);
+[fDC, sigDC, sigAC, mMech, noiseAC] = opt.tickle(pos, params.f);
 
 
 %Theoretical optical spring
-laser = getOptic(opt, 'Laser');
+laser = opt.getOptic('Laser');
 PVec  = laser.vArf.^2;
 PIR   = PVec(params.indIR);
 PG    = PVec(params.indG); 
@@ -328,7 +328,6 @@ tf  = optomechanicalTF(f0, Q0, m, K, params.f);
 Km        = m * (2 * pi * f0)^2; %mech spring constant
 indSpring = find((abs(Km + K) ./ (m * (2 * pi * params.f).^2))<1, 1);
 fSpring   = params.f(indSpring);
-
 
 % Extract appropriate info from mMech
 rpMech = getTF(mMech,params.nEX, params.nEX);

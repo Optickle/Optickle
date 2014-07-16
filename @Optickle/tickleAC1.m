@@ -1,10 +1,12 @@
-% backend function for tickle2
+% FOR REFERENCE ONLY (see tickleAC, tickle2)
 %
-% [mOpt, mMech, noiseOpt, noiseMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
+% backend function for tickle and tickle01
+%
+% [sigAC, mMech, noiseAC, noiseMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
 %   mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb)
 
 
-function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
+function varargout = tickleAC1(opt, f, vLen, vPhiGouy, ...
   mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb)
 
   % === Field Info
@@ -41,17 +43,15 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
   else
     mInDrv = opt.mInDrive;
   end
-  mDrvIn = pinv(mInDrv);
+  mDrvIn = mInDrv.';
   Nin = size(mInDrv, 2);
 
   % intialize result space
   eyeNdof   = speye(Ndof);
-  %mExc      = eyeNdof(:, jDrv) * mInDrv;
-  %sigAC     = zeros(Nout, Nin, Naf);
-  eyeNarf   = speye(Narf);
-  mOpt      = zeros(Nout, Nin, Naf);
+  mExc      = eyeNdof(:, jDrv) * mInDrv;
+  sigAC     = zeros(Nout, Nin, Naf);
   mMech     = zeros(Nin, Nin, Naf);
-  noiseOpt  = zeros(Nout, Naf);
+  noiseAC   = zeros(Nout, Naf);
   noiseMech = zeros(Nin, Naf);
   
   % since this can take a while, let's time it
@@ -74,45 +74,41 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
     % mechanical response matrix
     mResp = diag(lResp(nAF,:));
     
-    %%%%%%%%%%%%% Reference Code (matches Optickle 1)
-    % % ==== Put it together and solve
-    % mDof = [  mPhi * mOptGen
-    %          mResp * mRadFrc ];
-    %
-    % tfAC = (eyeNdof - mDof) \ mExc;
+    % ==== Put it together and solve
+    mDof = [  mPhi * mOptGen
+             mResp * mRadFrc ];
+    
+    tfAC = (eyeNdof - mDof) \ mExc;
 
-    % % extract optic to probe transfer functions
-    % sigAC(:, :, nAF) = 2 * mOut * tfAC(jAsb, :);
-    % mMech(:, :, nAF) = mDrvIn * tfAC(jDrv, :);
+    % extract optic to probe transfer functions
+    sigAC(:, :, nAF) = 2 * mOut * tfAC(jAsb, :);
+    mMech(:, :, nAF) = mDrvIn * tfAC(jDrv, :);
     
-    %%%%%%%%%%%%% Piecewise Inversion
-    % see Optickle2 documentation, secion 5.3 AC Matrix Inversion
-    %   sigAC == mOpt * mMech
-    
-    mPhiOptGen = mPhi * mOptGen;
-    mFF = mPhiOptGen(:, jAsb);    % field-field
-    mOF = mPhiOptGen(:, jDrv);    % optic-field
-    
-    mRespRadFrc = mResp * mRadFrc;
-    mFO = mRespRadFrc(:, jAsb);   % field-optic
-    mOO = mRespRadFrc(:, jDrv);   % optic-optic
-    
-    tfOptAC = (eyeNarf - mFF) \ (mOF * mInDrv); % inputs to ASB amplitudes
-    mOpt(:, :, nAF) = -2 * mOut * tfOptAC;
-    mMech(:, :, nAF) = (mInDrv - mOO * mInDrv - mFO * tfOptAC) \ mInDrv;
-    
-    %%% Quantum noise
     if isNoise
-      % setup
-      mDof = [mPhiOptGen; mRespRadFrc];
+      %%%% With Quantum Noise
       mQinj = blkdiag(mPhi, mResp) * mQuant;
       mNoise = (eyeNdof - mDof) \ mQinj;
       noisePrb = mOut * mNoise(jAsb, :);
       noiseDrv = mDrvIn * mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise
-      noiseOpt(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+      noiseAC(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
       noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
+      
+      % for debugging
+%       jMsb = 1:Nfld;          % minus sideband
+%       jPsb = Nfld + jMsb;     % plus sideband
+%   fprintf('\n\n======== mNoise \n')
+%   disp((full(mNoise)) * 1e10 / 4.3208)
+%   fprintf('\n-- mPrb 1\n')
+%   disp(full(mPrb(1, jMsb) * mNoise(jMsb, :)) * 1e10 / 4.3208)
+%   disp(full(mPrb(1, jPsb) * mNoise(jPsb, :)) * 1e10 / 4.3208)
+%   fprintf('\n-- mPrb 2\n')
+%   disp(full(mPrb(2, jMsb) * mNoise(jMsb, :)) * 1e10 / 4.3208)
+%   disp(full(mPrb(2, jPsb) * mNoise(jPsb, :)) * 1e10 / 4.3208)
+  
+      % HACK: noise probe
+      %tmpPrb(nAF, :) = abs(noisePrb(nTmpProbe, :)).^2;
     end
     
     % ==== Timing and User Interaction
@@ -168,10 +164,10 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
   drawnow
 
   % Build the outputs
-  varargout{1} = mOpt;
+  varargout{1} = sigAC;
   varargout{2} = mMech;
   if isNoise
-    varargout{3} = noiseOpt;
+    varargout{3} = noiseAC;
     varargout{4} = noiseMech;
   end
 end

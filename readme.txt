@@ -8,10 +8,7 @@ Optickle is for quick, rough, but essentially complete design
 studies.
 
 In Optickle you can, in principle, simulate any interferometer.
-The provided example is a Fabry-Perot cavity, optFP.  There is
-currently only one demo file which you are encouraged to run and read:
-demoDetuneFP.  Alignment sensing and control demos are lacking,
-so for now just read the help on tickle01.
+There are several examples provided in the example directory.
 
 >> cd Optickle
 >> 
@@ -21,11 +18,18 @@ so for now just read the help on tickle01.
 >> 
 >> demoDetuneFP
 
-There is much more to say, but for now look at the demo, and
-use the help command!  If things get bad, you can always send me
-email.  I like questions from people who actually use my code.  At
-least the first few questions.
+There is much more to say, but for now look at the examples, and
+use the help command!
 
--Matt
+If things get bad, please contact the Optickle user group at
+https://groups.google.com/group/optickle-users
+
+The Optickle 2 code repository is
+https://github.com/Optickle/Optickle/tree/Optickle2
+
+And a zip file of the current working version can be found at
+https://github.com/Optickle/Optickle/archive/Optickle2.zip
+
+-Matthew Evans
 
 mevans@ligo.mit.edu
