@@ -49,7 +49,6 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
   %mExc      = eyeNdof(:, jDrv) * mInDrv;
   %sigAC     = zeros(Nout, Nin, Naf);
   eyeNarf   = speye(Narf);
-  eyeNin    = speye(Nin);
   mOpt      = zeros(Nout, Nin, Naf);
   mMech     = zeros(Nin, Nin, Naf);
   noiseOpt  = zeros(Nout, Naf);
@@ -100,7 +99,7 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
     
     tfOptAC = (eyeNarf - mFF) \ (mOF * mInDrv); % inputs to ASB amplitudes
     mOpt(:, :, nAF) = -2 * mOut * tfOptAC;
-    mMech(:, :, nAF) = (eyeNin - mOO * mInDrv - mFO * tfOptAC) \ mInDrv;
+    mMech(:, :, nAF) = (mInDrv - mOO * mInDrv - mFO * tfOptAC) \ mInDrv;
     
     %%% Quantum noise
     if isNoise
