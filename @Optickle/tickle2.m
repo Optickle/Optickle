@@ -36,12 +36,20 @@
 %  units are W/(drive unit).
 % mMech - [m/m]  again, generally this is (drive unit)/(drive unit)
 %
+% NOTE: tickle2 will use parallel workers (see parpool)
+%
 % EXAMPLE:
 % f = logspace(0, 3, 300);
 % opt = optFP;
-% [fDC, sigDC, sigAC, mMech] = tickle(opt, [], f);
+% [fDC, sigDC, mOpt, mMech] = tickle2(opt, [], f);
 %
-% (see also @Optickle/Optickle)
+% EXAMPLE (parallel):
+% gcp; % start parallel worker pool
+% f = logspace(0, 3, 3000);
+% opt = optFP;
+% [fDC, sigDC, mOpt, mMech, noiseOpt] = tickle2(opt, [], f);
+%
+% (see also @Optickle/Optickle, parpool)
 
 
 function varargout = tickle2(opt, pos, f, tfType)
@@ -175,8 +183,15 @@ function varargout = tickle2(opt, pos, f, tfType)
     shotPrb = zeros(Nprb, 1);
     mQuant = zeros(Narf, 0);
     
-    [mOpt, mMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
-      mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+    % call tickleAC to do the rest
+    if exist('gcp', 'file') == 2 && ~isempty(gcp('nocreate'))
+      % try to run in parallel
+      [mOpt, mMech] = tickleACpar(opt, f, vLen, vPhiGouy, ...
+        mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+    else
+      [mOpt, mMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
+        mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+    end
   else
     % set the quantum scale
     pQuant  = Optickle.h * opt.nu;
@@ -197,8 +212,14 @@ function varargout = tickle2(opt, pos, f, tfType)
     end
     
     % call tickleAC to do the rest
-    [mOpt, mMech, noiseAC, noiseMech] = tickleAC(opt, f, vLen, ...
-      vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+    if exist('gcp', 'file') == 2 && ~isempty(gcp('nocreate'))
+      % try to run in parallel
+      [mOpt, mMech, noiseAC, noiseMech] = tickleACpar(opt, f, vLen, ...
+        vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+    else
+      [mOpt, mMech, noiseAC, noiseMech] = tickleAC(opt, f, vLen, ...
+        vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+    end
   end
 
   % Build the rest of the outputs
