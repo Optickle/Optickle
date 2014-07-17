@@ -6,6 +6,7 @@
 % opt       - Optickle model
 % pos       - optic positions (Ndrive x 1, or empty)
 % f         - audio frequency vector (Naf x 1)
+% nDrive    - drive indices to consider (Nx1, default is all)
 %
 % fDC       - DC fields at this position (Nlink x Nrf)
 %             where Nlink is the number of links, and Nrf
@@ -43,22 +44,49 @@
 % (see also tickle2, @Optickle/Optickle)
 
 
-function varargout = tickle(opt, varargin)
+function varargout = tickle(opt, pos, f, nDrive)
 
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  % Argument Handling
   
+  % set default inputs
+  if nargin < 2
+    pos = [];
+  end
+  if nargin < 3
+    f = [];
+  end
+  if nargin < 4
+    nDrive = [];
+  end
+
+  % implement nDrive (for backward compatability)
+  if ~isempty(nDrive)
+    if ~isempty(opt.mInDrive)
+      error('Cannot specify nDrive unless opt.mInDrive is empty')
+    end
+    
+    % make input matrix for this nDrive
+    jDrv = 1:opt.Ndrive;
+    eyeNdrv = eye(opt.Ndrive);
+    opt.mInDrive = eyeNdrv(:, jDrv);
+  end
+    
   % decide which calculation is necessary
   isAC = nargout > 2;
   isNoise = nargout > 4;
 
-  % call tickle2
+  %%%%%%%%%%%%%%%%%%%%%%%%
+  % Call tickle2
+  
   if ~isAC
-    [fDC, sigDC] = tickle2(opt, varargin{:});
+    [fDC, sigDC] = tickle2(opt, pos, f, Optickle.tfPos);
   else
     if ~isNoise
-      [fDC, sigDC, mInOut, mMech] = tickle2(opt, varargin{:});
+      [fDC, sigDC, mInOut, mMech] = tickle2(opt, pos, f, Optickle.tfPos);
     else
       [fDC, sigDC, mInOut, mMech, noiseOpt, noiseMech] = ...
-        tickle2(opt, varargin{:});
+        tickle2(opt, pos, f, Optickle.tfPos);
     end
     sigAC = getProdTF(mInOut, mMech);
   end
