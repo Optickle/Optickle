@@ -69,7 +69,8 @@ function varargout = tickle(opt, pos, f, nDrive)
     % make input matrix for this nDrive
     jDrv = 1:opt.Ndrive;
     eyeNdrv = eye(opt.Ndrive);
-    opt.mInDrive = eyeNdrv(:, jDrv);
+    opt.mInDrive = eyeNdrv(:, jDrv(nDrive));
+    opt.mInDrive
   end
     
   % decide which calculation is necessary
@@ -89,6 +90,11 @@ function varargout = tickle(opt, pos, f, nDrive)
         tickle2(opt, pos, f, Optickle.tfPos);
     end
     sigAC = getProdTF(mInOut, mMech);
+  end
+  
+  % remove added mInDrive
+  if ~isempty(nDrive)
+    opt.mInDrive = [];
   end
   
   % assign the outputs
