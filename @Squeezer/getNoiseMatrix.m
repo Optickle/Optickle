@@ -16,7 +16,7 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   if loss > par.minQuant
     mNP = loss * obj.nu * Optickle.h;
   else
-    mNP = zeros(1, 0);
+    mNP = 0;
     loss = 0;
   end
   

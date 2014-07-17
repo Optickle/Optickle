@@ -130,11 +130,9 @@ function opt = optSagnac(sqzAng, sqzDB, antiDB)
   
   % opt.addSqueezer(name, lambda, fRF, pol,...
   %                         sqAng, sqdB, antidB, sqzOption = 0)
-  if sqzDB > 0
-    opt.addSqueezer('Sqz', lambda, 0, Optickle.polS, sqzAng, sqzDB, antiDB, 0);
-    opt.addLink('Sqz', 'out', 'BS', 'bkA', 0);
-  end
-  
+  opt.addSqueezer('Sqz', lambda, 0, Optickle.polS, sqzAng, sqzDB, antiDB, 0);
+  opt.addLink('Sqz', 'out', 'BS', 'bkA', 0);
+    
   %%%%%%%%%%%%%%%%%%%%%%
   % Probes
   %%%%%%%%%%%%%%%%%%%%%%
