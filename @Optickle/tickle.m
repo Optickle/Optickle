@@ -60,19 +60,6 @@ function varargout = tickle(opt, pos, f, nDrive)
     nDrive = [];
   end
 
-  % implement nDrive (for backward compatability)
-  if ~isempty(nDrive)
-    if ~isempty(opt.mInDrive)
-      error('Cannot specify nDrive unless opt.mInDrive is empty')
-    end
-    
-    % make input matrix for this nDrive
-    jDrv = 1:opt.Ndrive;
-    eyeNdrv = eye(opt.Ndrive);
-    opt.mInDrive = eyeNdrv(:, jDrv(nDrive));
-    opt.mInDrive
-  end
-    
   % decide which calculation is necessary
   isAC = nargout > 2;
   isNoise = nargout > 4;
@@ -81,20 +68,16 @@ function varargout = tickle(opt, pos, f, nDrive)
   % Call tickle2
   
   if ~isAC
-    [fDC, sigDC] = tickle2(opt, pos, f, Optickle.tfPos);
+    [fDC, sigDC] = tickle2(opt, pos, f, Optickle.tfPos, nDrive);
   else
     if ~isNoise
-      [fDC, sigDC, mInOut, mMech] = tickle2(opt, pos, f, Optickle.tfPos);
+      [fDC, sigDC, mInOut, mMech] = ...
+        tickle2(opt, pos, f, Optickle.tfPos, nDrive);
     else
       [fDC, sigDC, mInOut, mMech, noiseOpt, noiseMech] = ...
-        tickle2(opt, pos, f, Optickle.tfPos);
+        tickle2(opt, pos, f, Optickle.tfPos, nDrive);
     end
     sigAC = getProdTF(mInOut, mMech);
-  end
-  
-  % remove added mInDrive
-  if ~isempty(nDrive)
-    opt.mInDrive = [];
   end
   
   % assign the outputs
