@@ -1,9 +1,15 @@
 % Compute DC fields, and DC signals, and AC transfer functions
 %
-% [fDC, sigDC, mOpt, mMech, noiseAC, noiseMech] = tickle(opt, pos, f, nDrive)
+% [fDC, sigDC, mOpt, mMech, noiseAC, noiseMech] = ...
+%   tickle2(opt, pos, f, tfType, nDrive)
 % opt       - Optickle model
 % pos       - optic positions (Ndrive x 1, or empty)
-% f         - audio frequency vector (Naf x 1)
+% f         - audio frequency vector (Naf x 1, default is [])
+% tfType    - specify position, pitch or yaw transfer function
+%             (i.e., TEM00, TEM01 or TEM10).  Use the class
+%             constants Optickle.tfPos, tfPit or tfYaw (default is tfPos).
+% nDrive    - drive indices to consider (Nx1, default is all)
+%             NOTE: this _overwrites_ the opt.mInDrive matrix
 %
 % fDC       - DC fields at this position (Nlink x Nrf)
 %             where Nlink is the number of links, and Nrf
@@ -52,7 +58,7 @@
 % (see also @Optickle/Optickle, parpool)
 
 
-function varargout = tickle2(opt, pos, f, tfType)
+function varargout = tickle2(opt, pos, f, tfType, nDrive)
 
   % === Argument Handling
   if nargin < 2
@@ -64,6 +70,18 @@ function varargout = tickle2(opt, pos, f, tfType)
   if nargin < 4
     tfType = Optickle.tfPos;
   end
+  if nargin < 5
+    nDrive = [];
+  end
+
+  % implement nDrive
+  if ~isempty(nDrive)
+    % make input matrix for this nDrive
+    jDrv = 1:opt.Ndrive;
+    eyeNdrv = eye(opt.Ndrive);
+    opt.mInDrive = eyeNdrv(:, jDrv(nDrive));
+  end
+    
     
   % === Field Info
   vFrf = opt.vFrf;
