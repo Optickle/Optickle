@@ -16,8 +16,9 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   if loss > par.minQuant
     mNP = loss * obj.nu * Optickle.h;
   else
-    mNP = zeros(1, 0);
-    loss = 0;
+    % no loss, so no quantum noise
+    mQuant = zeros(2 * par.Nrf * obj.Nout, 0);
+    return
   end
   
   %Find the RF component which is squeezed
@@ -32,5 +33,5 @@ function mQuant = getNoiseMatrix(obj, pos, par)
   
   % convert to noise amplitudes for correct RF components
   % all other components have zero added noise amplitude
-  mQuant = blkdiag(sqrt(mNP)*RFMat, sqrt(mNP)*RFMat);
+  mQuant = blkdiag(sqrt(mNP) * RFMat, sqrt(mNP) * RFMat);
 end
