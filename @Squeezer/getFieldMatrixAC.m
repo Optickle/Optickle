@@ -25,13 +25,12 @@ function mOptAC = getFieldMatrixAC(obj, pos, par)
   %calculate squeezing factor for OPO w/o loss
   %Optickle uses the "beamsplitter model" for losses
   %The effect of losses is included later in mAC and in getNoiseMatrix.m
-  %Th
   r = 0.5*log(1+4*x/(1-x)^2); 
   
   % 2x2 squeezing matrix for signal/idler pair
   % with loss = 1-escape efficiency
-   mAC = sqrt(obj.escEff)*[cosh(r), -exp(i*2*obj.sqAng)*sinh(r);...
-       -exp(-i*2*obj.sqAng)*sinh(r), cosh(r)];
+   mAC = sqrt(obj.escEff) * [cosh(r), -exp(2i * obj.sqAng) * sinh(r)
+                            -exp(-2i * obj.sqAng) * sinh(r), cosh(r)];
   
   %Apply this transformation to the correct RF components
   mOptAC = eye(2*par.Nrf);
@@ -41,3 +40,5 @@ function mOptAC = getFieldMatrixAC(obj, pos, par)
       mOptAC(k+par.Nrf,k) = mAC(2,1);
       mOptAC(k+par.Nrf,k+par.Nrf) = mAC(2,2);
   end
+  
+end

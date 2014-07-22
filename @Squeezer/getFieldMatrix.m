@@ -5,4 +5,6 @@
 
 function mOpt = getFieldMatrix(obj, pos, par)
   % As of now, The squeezer does not modify the DC fields in Optickle
-  mOpt = speye(par.Nrf, par.Nrf)*1;
+  mOpt = speye(par.Nrf, par.Nrf);
+
+end
