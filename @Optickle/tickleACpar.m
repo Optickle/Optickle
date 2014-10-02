@@ -5,7 +5,7 @@
 
 
 function varargout = tickleACpar(opt, f, vLen, vPhiGouy, ...
-  mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb)
+  mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb, nDrive)
 
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % Divide Work
@@ -55,7 +55,7 @@ function varargout = tickleACpar(opt, f, vLen, vPhiGouy, ...
     % request evaluation
     rslt(n) = parfeval(poolobj, @tickleAC, numRslt, opt, f(idxWorker{n}), ...
       vLen,  vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, ...
-      lResp(idxWorker{n}, :), mQuant, shotPrb);
+      lResp(idxWorker{n}, :), mQuant, shotPrb, nDrive);
   end
   
   % get outputs
@@ -66,7 +66,7 @@ function varargout = tickleACpar(opt, f, vLen, vPhiGouy, ...
         
     % do local work
     [mOpt, mMech] = tickleAC(opt, f(idxMine), vLen, vPhiGouy, ...
-      mPhiFrf, mPrb, mOptGen, mRadFrc, lResp(idxMine, :), mQuant, shotPrb);
+      mPhiFrf, mPrb, mOptGen, mRadFrc, lResp(idxMine, :), mQuant, shotPrb, nDrive);
   
     % expand result space
     if numAF > numMine
@@ -92,7 +92,7 @@ function varargout = tickleACpar(opt, f, vLen, vPhiGouy, ...
     
     % do local work
     [mOpt, mMech, noiseOpt, noiseMech] = tickleAC(opt, f(idxMine), vLen, vPhiGouy, ...
-      mPhiFrf, mPrb, mOptGen, mRadFrc, lResp(idxMine, :), mQuant, shotPrb);
+      mPhiFrf, mPrb, mOptGen, mRadFrc, lResp(idxMine, :), mQuant, shotPrb, nDrive);
   
     % expand result space
     if numAF > numMine

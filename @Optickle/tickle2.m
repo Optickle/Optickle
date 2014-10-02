@@ -9,7 +9,7 @@
 %             (i.e., TEM00, TEM01 or TEM10).  Use the class
 %             constants Optickle.tfPos, tfPit or tfYaw (default is tfPos).
 % nDrive    - drive indices to consider (Nx1, default is all)
-%             NOTE: this _overwrites_ the opt.mInDrive matrix
+%             NOTE: this _overrides_ the opt.mInDrive matrix
 %
 % fDC       - DC fields at this position (Nlink x Nrf)
 %             where Nlink is the number of links, and Nrf
@@ -73,15 +73,6 @@ function varargout = tickle2(opt, pos, f, tfType, nDrive)
   if nargin < 5
     nDrive = [];
   end
-
-  % implement nDrive
-  if ~isempty(nDrive)
-    % make input matrix for this nDrive
-    jDrv = 1:opt.Ndrive;
-    eyeNdrv = eye(opt.Ndrive);
-    opt.mInDrive = eyeNdrv(:, jDrv(nDrive));
-  end
-    
     
   % === Field Info
   vFrf = opt.vFrf;
@@ -205,10 +196,10 @@ function varargout = tickle2(opt, pos, f, tfType, nDrive)
     if exist('gcp', 'file') == 2 && ~isempty(gcp('nocreate'))
       % try to run in parallel
       [mOpt, mMech] = tickleACpar(opt, f, vLen, vPhiGouy, ...
-        mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+        mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb, nDrive);
     else
       [mOpt, mMech] = tickleAC(opt, f, vLen, vPhiGouy, ...
-        mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+        mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb, nDrive);
     end
   else
     % set the quantum scale
@@ -233,10 +224,10 @@ function varargout = tickle2(opt, pos, f, tfType, nDrive)
     if exist('gcp', 'file') == 2 && ~isempty(gcp('nocreate'))
       % try to run in parallel
       [mOpt, mMech, noiseAC, noiseMech] = tickleACpar(opt, f, vLen, ...
-        vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+        vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb, nDrive);
     else
       [mOpt, mMech, noiseAC, noiseMech] = tickleAC(opt, f, vLen, ...
-        vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb);
+        vPhiGouy, mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb, nDrive);
     end
   end
 
