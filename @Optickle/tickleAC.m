@@ -38,9 +38,9 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
   % make input to drive matrix
   if ~isempty(nDrive)
     % make input matrix for this nDrive
-    jDrv = 1:opt.Ndrive;
+    jjDrv = 1:opt.Ndrive;
     eyeNdrv = eye(opt.Ndrive);
-    mInDrv = eyeNdrv(:, jDrv(nDrive));
+    mInDrv = eyeNdrv(:, jjDrv(nDrive));
   elseif isempty(opt.mInDrive)
     mInDrv = eye(Ndrv);
   else
