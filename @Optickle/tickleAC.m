@@ -5,7 +5,7 @@
 
 
 function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
-  mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb)
+  mPhiFrf, mPrb, mOptGen, mRadFrc, lResp, mQuant, shotPrb, nDrive)
 
   % === Field Info
   vFrf = opt.vFrf;
@@ -36,11 +36,17 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
   Nout = size(mOut, 1);
 
   % make input to drive matrix
-  if isempty(opt.mInDrive)
+  if ~isempty(nDrive)
+    % make input matrix for this nDrive
+    jjDrv = 1:opt.Ndrive;
+    eyeNdrv = eye(opt.Ndrive);
+    mInDrv = eyeNdrv(:, jjDrv(nDrive));
+  elseif isempty(opt.mInDrive)
     mInDrv = eye(Ndrv);
   else
     mInDrv = opt.mInDrive;
   end
+
   mDrvIn = pinv(mInDrv);
   Nin = size(mInDrv, 2);
 

@@ -55,6 +55,9 @@ function rsp = getMechResp(obj, f, nDOF)
     rsp = squeeze(rsp(1, 1, :));
   end
   
+  % make sure it's a column
+  rsp = rsp(:);
+  
   if length(rsp) ~= Naf
     error('Bad mechTF DOF %d of %s', nDOF, obj.name);
   end

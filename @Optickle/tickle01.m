@@ -42,14 +42,14 @@ function varargout = tickle01(opt, pos, f, nDrive)
   % call tickle
   if isNoise
     [~,~,sigAC, mMech, noiseAC, noiseMech] = ...
-      tickle(opt, pos, f, Optickle.tfPit, nDrive);
+      tickle(opt, pos, f, nDrive, Optickle.tfPit);
     varargout{1} = sigAC;
     varargout{2} = mMech;
     varargout{3} = noiseAC;
     varargout{4} = noiseMech;
   else
     [~,~,sigAC, mMech] = ...
-      tickle(opt, pos, f, Optickle.tfPit, nDrive);
+      tickle(opt, pos, f, nDrive, Optickle.tfPit);
     varargout{1} = sigAC;
     varargout{2} = mMech;
   end
