@@ -28,8 +28,10 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
   % combine probe and output matrix
   if isempty(opt.mProbeOut)
     mOut = mPrb;
+    shotOut = shotPrb;
   elseif size(opt.mProbeOut, 2) == size(mPrb, 1)
     mOut = opt.mProbeOut * mPrb;
+    shotOut = opt.mProbeOut.^2 * shotPrb;
   else
     error('opt.mProbeOut must have Nprobe columns')
   end
@@ -117,7 +119,7 @@ function varargout = tickleAC(opt, f, vLen, vPhiGouy, ...
       noiseDrv = mDrvIn * mNoise(jDrv, :);
       
       % incoherent sum of amplitude and phase noise
-      noiseOpt(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotPrb);
+      noiseOpt(:, nAF) = sqrt(sum(abs(noisePrb).^2, 2) + shotOut);
       noiseMech(:, nAF) = sqrt(sum(abs(noiseDrv).^2, 2));
     end
     

@@ -23,13 +23,22 @@ classdef Optickle < handle
   % vFrf - RF frequency components
   % h - Plank constant
   % c - speed of light
-  % k - carrier wave-number
+  % k - wave-number of each RF component
+  % nu - c  / lambda + fRF = c * k / (2 * pi)
   % minQuant - minimum loss considered for quantum noise (default = 1e-3)
   % debug - debugging level (default = 1, set to 0 for no tickle info)
   %
-  % Of these, only some can be reference directly.  They are:
-  %   Noptic, Ndrive, Nlink, Nprobe, lambda, k, c, h, and debug
+  % Mapping matrices:
+  % mProbeOut - probe to output matrix (Nout x Nprobe)
+  % mInDrive - input to drive matrix (Ndrive x Nin)
+  %
+  % Of these, only some can be changed directly.  They are:
+  %   mProbeOut, mInDrive, minQuant and debug
+  % several others can be reference directly.  They are:
+  %   Noptic, Ndrive, Nlink, Nprobe, lambda, k, c, h and nu
   % for others, use access functions.
+  %
+  % ==> use doc Optickle for more information <==
   %
   % ======== Optics
   % An optic is a general optical component (mirror, lens, etc.).
