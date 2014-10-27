@@ -1,4 +1,4 @@
-% [opt, snLink] = removeLink(opt, snFrom, nameOut, snTo, nameIn, len, phase)
+% [opt, snLink] = removeLink(opt, snFrom, nameOut, snTo, nameIn)
 %   Remove a link.
 %
 % Arguments:
