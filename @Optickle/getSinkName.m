@@ -10,4 +10,8 @@ function [name, sn, port] = getSinkName(opt, snLink)
 
   sn = opt.link(snLink).snSink;
   port = opt.link(snLink).portSink;
+  if sn==0
+      name = '<REMOVED>';
+      return
+  end
   name = getInputName(opt.optic{sn}, port);

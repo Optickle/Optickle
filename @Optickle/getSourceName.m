@@ -12,4 +12,8 @@ function [name, sn, port] = getSourceName(opt, snLink)
 
   sn = opt.link(snLink).snSource;
   port = opt.link(snLink).portSource;
+  if sn==0
+      name = '<REMOVED>';
+      return
+  end
   name = getOutputName(opt.optic{sn}, port);
