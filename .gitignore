@@ -3,6 +3,5 @@
 *.aux
 *.log
 *.out
-*.pdf
 *.dvi
 *.synctex.*

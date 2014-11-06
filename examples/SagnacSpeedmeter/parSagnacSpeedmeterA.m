@@ -1,3 +1,5 @@
+% par = parSagnacSpeedmeterA()
+
 function par = parSagnacSpeedmeterA()
 
 %% Constants
