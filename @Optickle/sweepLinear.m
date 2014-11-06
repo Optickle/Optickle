@@ -16,8 +16,8 @@
 function [pos, sigDC, fDC] = sweepLinear(opt, posStart, posEnd, Npos)
 
   % check that "posStart" and "posEnd" are the right length
-  if length(posStart) ~= opt.Ndrive
-      error('posStart is the wrong length; should have length(posStart)==opt.Ndrive.');
+  if length(posStart) ~= opt.Nin
+      error('posStart is the wrong length; should have length(posStart) == %d.', opt.Nin);
   end
   
   if size(posStart) ~= size(posEnd),
@@ -27,10 +27,11 @@ function [pos, sigDC, fDC] = sweepLinear(opt, posStart, posEnd, Npos)
   % generate position vectors
   x = (0:Npos-1)' / (Npos - 1);
   dpos = posEnd - posStart;
-  pos = zeros(opt.Ndrive, Npos);			% optic positions
+  pos = zeros(opt.Nin, Npos);			% optic positions
   for n = 1:Npos
     pos(:, n) = dpos * x(n) + posStart;
   end
 
   % sweep
   [fDC, sigDC] = sweep(opt, pos);
+end

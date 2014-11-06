@@ -126,6 +126,11 @@ classdef Optickle < handle
     mInDrive = [];
   end
   
+  properties (Dependent = true, SetAccess = private)
+    % dependent properties (see get functions after constructor)
+    Nin
+  end
+
   properties (Constant)
     % fundamental constants
     h = 6.62606891e-34;   % Plank constant [J*s]
@@ -192,6 +197,17 @@ classdef Optickle < handle
       % wave number [1/m]
       opt.k = 2 * pi * (1 ./ opt.lambda + opt.vFrf / Optickle.c);
       opt.nu = Optickle.c ./ opt.lambda + opt.vFrf;      
+    end
+    
+  
+    
+    %%%% Dependent Properties %%%%
+    function Nin = get.Nin(opt)
+      if isempty(opt.mInDrive)
+        Nin = opt.Ndrive;
+      else
+        Nin = size(opt.mInDrive, 2);
+      end
     end
     
     %%%% Add Optics %%%%

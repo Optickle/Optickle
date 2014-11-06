@@ -27,7 +27,8 @@
 % conOut - Name of conObj output which is connected to homodyne input
 %
 % Example:
-% opt.addHomodyne('HD', opt.nu(1), 1, 0, 100, 'Sqz1', 'out');
+% n0 = find(par.laser.vFrf == 0, 1);  % find the carrier
+% opt.addHomodyne('HD', opt.nu(n0), Optickle.polS, 0, 1, 'Sqz1', 'out');
 %
 % This will create an object with 2 sinks 'HDA' and 'HDB', 2 probes
 % 'HDA_DC' and 'HDB_DC', a source 'HD_LO', a splitter mirror 'HD_SMIR', and

@@ -17,18 +17,24 @@ function [fDC, sigDC] = sweep(opt, pos)
   % ==== Sizes of Things
   Nopt = opt.Noptic;			% number of optics
   Ndrv = opt.Ndrive;			% number of drives (internal DOFs)
+  Nin = opt.Nin;          % number of inputs (mapped drives)
   Nlnk = opt.Nlink;			% number of links
   Nprb = opt.Nprobe;			% number of probes
   Nrf  = length(vFrf);			% number of RF components
   Nfld = Nlnk * Nrf;			% number of RF fields
   Npos = size(pos, 2);			% number of position vectors
-  
+
   % check positions
-  if size(pos, 1) ~= Ndrv
-    error('Number of positions not equal to Ndrive (%d ~= %d).', ...
-      size(pos, 1), Ndrv);
+  if size(pos, 1) ~= Nin
+    error('Number of positions not equal to Nin (%d ~= %d).', ...
+      size(pos, 1), Nin);
   end
 
+  % map input positions to drives
+  if ~isempty(opt.mInDrive)
+    pos = opt.mInDrive * pos;
+  end
+  
   % link converstion
   [vLen, prbList, mapList, mPhiFrf] = convertLinks(opt);
   
@@ -94,3 +100,10 @@ function [fDC, sigDC] = sweep(opt, pos)
     sigDC(:, n) = real(mPrb * vDC);
     fDC(:, :, n) = reshape(vDC, Nlnk, Nrf);
   end
+  
+  % map probes to outputs
+  if ~isempty(opt.mProbeOut)
+    sigDC = opt.mProbeOut * sigDC;
+  end
+end
+
