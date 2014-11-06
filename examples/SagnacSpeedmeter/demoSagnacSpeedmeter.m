@@ -1,20 +1,25 @@
-function demoSagnacTest
+function demoSagnacTestSpeedmeter
 
-  % create the model (no squeezing)
-  opt = optSagnac;
+  % create the model
+  par = parSagnacSpeedmeterA();
+  opt = optSagnacSpeedmeterA(par);
   
   % get EX and EY drive indexes
-  nEX = opt.getDriveIndex('EX');
-  nEY = opt.getDriveIndex('EY');
+  nEX = opt.getDriveNum('M2b');
+  nEY = opt.getDriveNum('M2a');
   
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   % compute the DC signals, noise and transfer functions
   %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
   
   % for the standard Sagnac
-  f = logspace(-1, 3, 200)';
+  f = logspace(1, 10, 200)';
   
   pos = zeros(opt.Ndrive, 1);
+  %pos(nEX) = -3.625311e-7;
+  %pos(nEY) = -3.625311e-7;
+  pos(nEX) = (opt.lambda(1) / 4) / cos(degtorad(par.M2b.AngleOfIncidence));
+  pos(nEY) = (opt.lambda(1) / 4) / cos(degtorad(par.M2a.AngleOfIncidence));
   
   [fDC, sigDC, sigAC, ~, noiseAC] = opt.tickle(pos, f);
   
@@ -33,17 +38,19 @@ function demoSagnacTest
   nHD = nHDB_DC;
   
   % make a response plot
-  hDARM = squeeze(sigAC(nHD, nEX, :) - sigAC(nHD, nEY, :));
+  h2b = getTF(sigAC, nHD, nEX);
+  h2a = getTF(sigAC, nHD, nEY);
+  hDARM = squeeze(h2b - h2a);
   
-  figure;
-  zplotlog(f, hDARM)
+  figure(1);
+  zplotlog(f, [hDARM, h2a, h2b])
   title('Response to DARM', 'fontsize', 18);
-  legend('DARM AS', 'Location', 'NorthEast');
+  legend({'DARM AS', 'M2b', 'M2a'}, 'Location', 'NorthEast');
   
   % make a noise plot
   nQuant = noiseAC(nHD, :)';
   
-  figure;
+  figure(2);
   loglog(f, abs(nQuant ./ hDARM))
   title('Quantum Noise for Sagnac', 'fontsize', 18);
   grid on
