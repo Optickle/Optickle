@@ -37,8 +37,14 @@ function [opt,fDC,sigDC,sigAC,iqPhase] = setDemodPhases(opt,mIQ,mDOF,pos,f0)
     % $Id: setDemodPhases.m,v 1.4 2011/08/02 18:26:16 nsmith Exp $
 
     % Compute the DC signals and TFs on resonance
-    [fDC, sigDC, sigAC] = tickle(opt, pos, f0);
-
+    
+    % speedup for simulink NB
+    if exist('cacheFunction','file')==2
+        [fDC, sigDC, sigAC] = cacheFunction(@tickle,opt, pos, f0);
+    else
+        [fDC, sigDC, sigAC] = tickle(opt, pos, f0);
+    end
+    
     nProbes = size(mIQ,1);
     nOptics = size(mDOF,2);
 

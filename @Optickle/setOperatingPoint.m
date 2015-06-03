@@ -59,7 +59,13 @@ function [opt, pos] = setOperatingPoint(opt, varargin)
   for n = 1:10
     % compute sigDC at initial position plus small offsets
     pos(:, 2:end) = repmat(pos(:, 1), 1, Nlock) + mDelta;
-    [fDC, sigDC] = sweep(opt, pos);
+    
+    % speedup for simulink NB
+    if exist('cacheFunction','file')==2
+        [fDC, sigDC] = cacheFunction(@sweep, opt, pos);
+    else
+        [fDC, sigDC] = sweep(opt, pos);
+    end
     
     % compute error signal and derivatives
     if isErrFunc
