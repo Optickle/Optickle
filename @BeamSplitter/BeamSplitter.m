@@ -125,6 +125,7 @@ classdef BeamSplitter < Optic
       end
       %obj.pos = pos(:); %fix this for BS mir object
       obj.mir = setPosOffset(obj.mir,pos);
+      obj = setPosOffset@Optic(obj,pos);
     end
     function obj = setMechTF(obj, mechTF, nDOF)
         % sets the mechTF property for the BS and internal mirror object
