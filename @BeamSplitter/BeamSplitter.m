@@ -113,6 +113,19 @@ classdef BeamSplitter < Optic
       
       [vThr, vLhr, vRar, vLmd] = obj.mir.getVecProperties(lambda, pol);
     end
+    %%%% Protected Properties %%%%
+    function obj = setPosOffset(obj, pos)
+      % set the position offset for an optic
+      %
+      % obj = setPosOffset(obj, pos)
+      
+      if length(pos) ~= obj.Ndrive
+        error('%s: drive positions not equal to number of drives (%d ~= %d)', ...
+          obj.name, length(pos), obj.Ndrive);
+      end
+      %obj.pos = pos(:); %fix this for BS mir object
+      obj.mir = setPosOffset(obj.mir,pos);
+    end
     function obj = setMechTF(obj, mechTF, nDOF)
         % sets the mechTF property for the BS and internal mirror object
         
